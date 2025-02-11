@@ -1,8 +1,8 @@
-workspace "AsteroidSDL"
+workspace "AsteroidSDL3"
 	configurations{"Debug", "Release"}
 	platforms{"x64"}
 
-project "AsteroidSDL"
+project "AsteroidSDL3"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
@@ -32,7 +32,10 @@ project "AsteroidSDL"
 				"dependencies/imgui/"}
 	libdirs("dependencies/SDL3/lib/x64/")
 	links{"SDL3"}
-
+	
+	postbuildcommands {
+        "{COPY} dependencies/SDL3/lib/x64/SDL3.dll x64/%{cfg.buildcfg}"
+    }
 
 	filter "configurations:Debug"
         defines { "DEBUG" }
@@ -48,6 +51,4 @@ project "AsteroidSDL"
 	filter "toolset:msc"
 		buildoptions { "/W4 /WX" }
 
-	postbuildcommands {
-        "{COPY} dependencies/SDL3/lib/x64/SDL3.dll %{cfg.targetdir}"
-    }
+	
