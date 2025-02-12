@@ -5,7 +5,7 @@
 
 namespace Asteroid
 {
-	explicit Engine::Engine(EngineInitData&& l_initialData)
+	Engine::Engine(EngineInitData&& l_initialData)
 		:m_initialData(std::move(l_initialData))
 		,m_renderer(nullptr)
 		,m_window(nullptr)
@@ -81,6 +81,8 @@ namespace Asteroid
 			}
 
 		}
+
+		return true;
 
 	}
 
