@@ -20,7 +20,7 @@ namespace Asteroid
 		bool Init();
 
 
-		void GameLoop();
+		bool GameLoop();
 
 
 		~Engine();
