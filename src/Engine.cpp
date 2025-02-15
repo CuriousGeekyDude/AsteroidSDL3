@@ -22,10 +22,14 @@ namespace Asteroid
 			SDL_Log("SDL Failed to create metadata for the app: %s ", SDL_GetError());
 		}
 
+		SDL_Log("Metadata creation was successfull.\n");
+
 		if (false == SDL_InitSubSystem(m_initialData.m_sdlInitFlags)) {
-			SDL_Log("SDL failed to initialize: %s", SDL_GetError());
+			SDL_Log("SDL failed to initialize at least one of the requested subsystems: %s", SDL_GetError());
 			return false;
 		}
+
+		SDL_Log("Initialization of all the requested subsystems was successfull.\n");
 
 		if (false == SDL_CreateWindowAndRenderer
 			(m_initialData.m_windowTitle.c_str()
@@ -38,6 +42,8 @@ namespace Asteroid
 			return false;
 
 		}
+
+		SDL_Log("Window and renderer creation was successfull.\n");
 
 		return true;
 	}
