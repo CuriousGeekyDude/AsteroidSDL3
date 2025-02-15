@@ -17,6 +17,8 @@ int main()
 	lv_engineInitialData.m_height = 512;
 	lv_engineInitialData.m_width = 512;
 	lv_engineInitialData.m_sdlInitFlags = SDL_INIT_VIDEO;
+	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
+		.emplace(std::pair<std::string, std::string>("Spaceship", "Assets/spaceship.png"));
 
 
 	
