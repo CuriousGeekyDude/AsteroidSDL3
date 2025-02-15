@@ -25,19 +25,24 @@ project "AsteroidSDL3"
 		  "dependencies/imgui/**.cpp",
 		  "dependencies/imgui/**.h",
 		  "dependencies/glm/**.h",
-		  "dependencies/glm/**.hpp"}
+		  "dependencies/glm/**.hpp",
+		  "dependencies/SDL3_image/**.hpp",
+		  "dependencies/SDL3_image/**.h"}
 		  
 	targetdir "x64/%{cfg.buildcfg}"
 	objdir ("bin-intermediate/%{cfg.buildcfg}")
 	includedirs{"include/",
 				"dependencies/SDL3/include/",
 				"dependencies/imgui/",
-				"dependencies/glm/"}
-	libdirs("dependencies/SDL3/lib/x64/")
-	links{"SDL3"}
+				"dependencies/glm/",
+				"dependencies/SDL3_image/include/"}
+	libdirs{"dependencies/SDL3/lib/x64/",
+			"dependencies/SDL3_image/lib/x64/"}
+	links{"SDL3", "SDL3_image"}
 	
 	postbuildcommands {
-        "{COPY} dependencies/SDL3/lib/x64/SDL3.dll x64/%{cfg.buildcfg}"
+        "{COPY} dependencies/SDL3/lib/x64/SDL3.dll x64/%{cfg.buildcfg}",
+		"{COPY} dependencies/SDL3_image/lib/x64/SDL3_image.dll x64/%{cfg.buildcfg}"
     }
 
 	filter "configurations:Debug"
@@ -49,7 +54,7 @@ project "AsteroidSDL3"
         optimize "On"
 
 	filter "toolset:gcc or toolset:clang"
-    buildoptions { "-Wall", "-Wextra", "-Werror" }
+		buildoptions { "-Wall", "-Wextra", "-Werror" }
 
 	filter "toolset:msc"
 		buildoptions { "/W4 /WX" }
