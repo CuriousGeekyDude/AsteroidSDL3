@@ -32,9 +32,9 @@ namespace Asteroid
 
 	private:
 
-		//void HandleKeyboardInput(const SDL_Event& l_event);
+		void HandleKeyboardInput(const SDL_Event& l_event);
 
-
+		void ProcessPhysics();
 
 	private:
 

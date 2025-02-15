@@ -1,6 +1,7 @@
 
 
 #include "Engine.hpp"
+#include "Physics.hpp"
 #include <SDL3/SDL.h>
 
 namespace Asteroid
@@ -122,6 +123,15 @@ namespace Asteroid
 		m_playerDeltaPosQueue.push(lv_deltaPos);
 	}
 
+
+	void Engine::ProcessPhysics()
+	{
+		using namespace Physics;
+
+		for (auto& l_entity : m_entities) {
+			MovePlayer(l_entity, m_playerDeltaPosQueue);
+		}
+	}
 
 
 	Engine::~Engine()
