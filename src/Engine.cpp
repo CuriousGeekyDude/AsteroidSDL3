@@ -3,6 +3,7 @@
 #include "Engine.hpp"
 #include "Physics.hpp"
 #include <SDL3/SDL.h>
+#include "EntityData.hpp"
 
 namespace Asteroid
 {
@@ -44,6 +45,28 @@ namespace Asteroid
 		}
 
 		SDL_Log("Window and renderer creation was successfull.\n");
+
+
+		SDL_Log("Creating textures on Gpu and their respective entities commencing....\n");
+		for (auto& l_mapPairNameToPath : m_initialData.m_mappedTextureNamesToTheirPaths) {
+			
+			EntityData lv_entityData;
+			lv_entityData.m_hasPhysics = true;
+			
+			if ("Spaceship" == l_mapPairNameToPath.first) {
+				lv_entityData.m_isPlayer = true;
+			}
+			else {
+				lv_entityData.m_isPlayer = false;
+			}
+
+			lv_entityData.m_pos = glm::vec2{ 0.f, 0.f };
+			lv_entityData.m_textureHandle = m_gpuResourceManager.CreateGpuTextureReturnHandle
+			(m_renderer, l_mapPairNameToPath.second, l_mapPairNameToPath.first);
+
+			m_entities.push_back(Entity(lv_entityData));
+		}
+
 
 		return true;
 	}
