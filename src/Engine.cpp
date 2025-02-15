@@ -69,7 +69,7 @@ namespace Asteroid
 				}
 
 				if (SDL_EVENT_KEY_DOWN == lv_event.type) {
-					HandleKeyboardInput(lv_event);
+					ProcessKeyboardInput(lv_event);
 				}
 
 			}
@@ -104,7 +104,7 @@ namespace Asteroid
 
 
 
-	void Engine::HandleKeyboardInput(const SDL_Event& l_event)
+	void Engine::ProcessKeyboardInput(const SDL_Event& l_event)
 	{
 		glm::vec2 lv_deltaPos{};
 		uint64_t lv_speedAmplifier = (uint64_t)1000;
@@ -139,6 +139,33 @@ namespace Asteroid
 		}
 	}
 
+
+	bool Engine::RenderScene()
+	{
+		if (false == SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 1)) {
+			SDL_Log("SDL failed to set the clear color to the requested color: %s\n", SDL_GetError());
+			return false;
+		}
+		if (false == SDL_RenderClear(m_renderer)) {
+			SDL_Log("SDL failed to clear the swapchain with the requested color: %s\n", SDL_GetError());
+			return false;
+		}
+
+		for (auto& l_entity : m_entities) {
+			auto* lv_entityTexture = m_gpuResourceManager.RetrieveGpuTexture(l_entity.m_data.m_textureHandle);
+			if (false == SDL_RenderTexture(m_renderer, lv_entityTexture, nullptr, nullptr)) {
+				SDL_Log("SDL failed to render a texture: %s\n", SDL_GetError());
+				return false;
+			}
+		}
+
+		if (false == SDL_RenderPresent(m_renderer)) {
+			SDL_Log("SDL failed to present the swapchain: %s\n", SDL_GetError());
+			return false;
+		}
+
+		return true;
+	}
 
 	Engine::~Engine()
 	{

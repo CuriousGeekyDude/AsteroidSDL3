@@ -5,9 +5,11 @@
 #include "EngineInitData.hpp"
 #include "Entity.hpp"
 #include "Time.hpp"
+#include "GpuResouceManager.hpp"
 #include <vector>
 #include <queue>
 #include <glm.hpp>
+
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -32,9 +34,11 @@ namespace Asteroid
 
 	private:
 
-		void HandleKeyboardInput(const SDL_Event& l_event);
+		void ProcessKeyboardInput(const SDL_Event& l_event);
 
 		void ProcessPhysics();
+
+		bool RenderScene();
 
 	private:
 
@@ -45,6 +49,8 @@ namespace Asteroid
 		std::vector<Entity> m_entities;
 
 		Time m_timeTracker;
+
+		GpuResourceManager m_gpuResourceManager;
 
 		SDL_Renderer* m_renderer;
 		SDL_Window* m_window;
