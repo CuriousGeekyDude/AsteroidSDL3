@@ -21,7 +21,7 @@ namespace Asteroid
 			SDL_Log("SDL Failed to create metadata for the app: %s ", SDL_GetError());
 		}
 
-		if (false == SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+		if (false == SDL_InitSubSystem(m_initialData.m_sdlInitFlags)) {
 			SDL_Log("SDL failed to initialize: %s", SDL_GetError());
 			return false;
 		}
