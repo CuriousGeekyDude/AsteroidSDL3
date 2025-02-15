@@ -4,6 +4,7 @@
 
 #include "EngineInitData.hpp"
 #include "Entity.hpp"
+#include "Time.hpp"
 #include <vector>
 #include <queue>
 #include <glm.hpp>
@@ -29,8 +30,9 @@ namespace Asteroid
 
 		~Engine();
 
-	protected:
+	private:
 
+		//void HandleKeyboardInput(const SDL_Event& l_event);
 
 
 
@@ -41,6 +43,8 @@ namespace Asteroid
 		std::queue<glm::vec2> m_playerDeltaPosQueue;
 
 		std::vector<Entity> m_entities;
+
+		Time m_timeTracker;
 
 		SDL_Renderer* m_renderer;
 		SDL_Window* m_window;
