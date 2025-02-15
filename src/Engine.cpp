@@ -97,25 +97,8 @@ namespace Asteroid
 
 			}
 
-			if (false == SDL_SetRenderDrawColor(m_renderer
-				, 255, 0, 0, SDL_ALPHA_OPAQUE)) {
-
-				SDL_Log("SDL failed to set the clear color value: %s"
-					, SDL_GetError());
-				return false;
-			}
-
-			if (false == SDL_RenderClear(m_renderer)) {
-
-				SDL_Log("SDL failed to clear the swapchain to the requested color: %s"
-					, SDL_GetError());
-				return false;
-			}
-
-			if (false == SDL_RenderPresent(m_renderer)) {
-
-				SDL_Log("SDL failed to present the swapchain: %s"
-					, SDL_GetError());
+			ProcessPhysics();
+			if (false == RenderScene()) {
 				return false;
 			}
 
@@ -176,7 +159,14 @@ namespace Asteroid
 
 		for (auto& l_entity : m_entities) {
 			auto* lv_entityTexture = m_gpuResourceManager.RetrieveGpuTexture(l_entity.m_data.m_textureHandle);
-			if (false == SDL_RenderTexture(m_renderer, lv_entityTexture, nullptr, nullptr)) {
+
+			SDL_FRect lv_dstRect;
+			lv_dstRect.x = l_entity.m_data.m_pos.x;
+			lv_dstRect.y = l_entity.m_data.m_pos.y;
+			lv_dstRect.w = (float)lv_entityTexture->w;
+			lv_dstRect.h = (float)lv_entityTexture->h;
+
+			if (false == SDL_RenderTexture(m_renderer, lv_entityTexture, nullptr, &lv_dstRect)) {
 				SDL_Log("SDL failed to render a texture: %s\n", SDL_GetError());
 				return false;
 			}
