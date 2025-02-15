@@ -13,6 +13,8 @@ namespace Asteroid
 	{
 		bool m_hasPhysics{ true };
 		bool m_isPlayer{ false };
+		uint32_t m_textureHandle{std::numeric_limits<uint32_t>::max()};
 		glm::vec2 m_pos{std::numeric_limits<float>::max()};
+
 	};
 }
