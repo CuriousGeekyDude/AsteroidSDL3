@@ -86,6 +86,35 @@ namespace Asteroid
 
 	}
 
+
+
+	void Engine::HandleKeyboardInput(const SDL_Event& l_event)
+	{
+		glm::vec2 lv_deltaPos{};
+		uint64_t lv_speedAmplifier = (uint64_t)1000;
+
+		switch (l_event.key.scancode) {
+
+		case SDL_SCANCODE_W:
+			lv_deltaPos.y = (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
+			break;
+		case SDL_SCANCODE_S:
+			lv_deltaPos.y = -1.f * (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
+			break;
+		case SDL_SCANCODE_D:
+			lv_deltaPos.x = (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
+			break;
+		case SDL_SCANCODE_A:
+			lv_deltaPos.x = -1.f * (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
+			break;
+
+		}
+
+		m_playerDeltaPosQueue.push(lv_deltaPos);
+	}
+
+
+
 	Engine::~Engine()
 	{
 		SDL_DestroyRenderer(m_renderer);
