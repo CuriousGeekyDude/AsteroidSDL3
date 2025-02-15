@@ -49,6 +49,10 @@ namespace Asteroid
 
 		while (false == lv_quit) {
 
+			m_timeTracker.m_currentTime = SDL_GetTicks();
+			m_timeTracker.m_lastFrameElapsedTime
+				= m_timeTracker.m_currentTime - m_timeTracker.m_lastFrameElapsedTime;
+
 			SDL_Event lv_event;
 
 			while (true == SDL_PollEvent(&lv_event)) {
@@ -56,6 +60,11 @@ namespace Asteroid
 				if (SDL_EVENT_QUIT == lv_event.type) {
 					lv_quit = true;
 				}
+
+				if (SDL_EVENT_KEY_DOWN == lv_event.type) {
+					HandleKeyboardInput(lv_event);
+				}
+
 			}
 
 			if (false == SDL_SetRenderDrawColor(m_renderer
