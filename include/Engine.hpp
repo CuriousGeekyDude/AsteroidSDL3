@@ -3,6 +3,10 @@
 
 
 #include "EngineInitData.hpp"
+#include "Entity.hpp"
+#include <vector>
+#include <queue>
+#include <glm.hpp>
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -33,6 +37,10 @@ namespace Asteroid
 	private:
 
 		EngineInitData m_initialData;
+
+		std::queue<glm::vec2> m_playerDeltaPosQueue;
+
+		std::vector<Entity> m_entities;
 
 		SDL_Renderer* m_renderer;
 		SDL_Window* m_window;
