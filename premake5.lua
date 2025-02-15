@@ -23,13 +23,16 @@ project "AsteroidSDL3"
 		  "dependencies/imgui/**.hpp",
 		  "dependencies/imgui/**.c",
 		  "dependencies/imgui/**.cpp",
-		  "dependencies/imgui/**.h"}
+		  "dependencies/imgui/**.h",
+		  "dependencies/glm/**.h",
+		  "dependencies/glm/**.hpp"}
 		  
 	targetdir "x64/%{cfg.buildcfg}"
 	objdir ("bin-intermediate/%{cfg.buildcfg}")
 	includedirs{"include/",
 				"dependencies/SDL3/include/",
-				"dependencies/imgui/"}
+				"dependencies/imgui/",
+				"dependencies/glm/"}
 	libdirs("dependencies/SDL3/lib/x64/")
 	links{"SDL3"}
 	
