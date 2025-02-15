@@ -16,6 +16,7 @@ int main()
 	lv_engineInitialData.m_windowFlags = SDL_WINDOW_RESIZABLE;
 	lv_engineInitialData.m_height = 512;
 	lv_engineInitialData.m_width = 512;
+	lv_engineInitialData.m_sdlInitFlags = SDL_INIT_VIDEO;
 
 
 	
