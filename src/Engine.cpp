@@ -151,7 +151,10 @@ namespace Asteroid
 				l_entity.m_data.m_isVisible = true;
 			}
 
-			MovePlayer(l_entity, m_playerDeltaPosQueue);
+			auto lv_deltaPos = m_playerDeltaPosQueue.front();
+			m_playerDeltaPosQueue.pop();
+			MovePlayer(l_entity, lv_deltaPos);
+
 			continue;
 		}
 	}
