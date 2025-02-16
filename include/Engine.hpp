@@ -48,7 +48,7 @@ namespace Asteroid
 
 		std::vector<Entity> m_entities;
 
-		Time m_timeTracker;
+		Time m_trackLastFrameElapsedTime;
 
 		GpuResourceManager m_gpuResourceManager;
 

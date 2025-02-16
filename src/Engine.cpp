@@ -78,7 +78,7 @@ namespace Asteroid
 		bool lv_quit = false;
 		while (false == lv_quit) {
 
-			m_timeTracker.m_currentTime = SDL_GetTicks();
+			m_trackLastFrameElapsedTime.m_currentTime = SDL_GetTicks();
 
 			SDL_Event lv_event;
 
@@ -95,7 +95,7 @@ namespace Asteroid
 				return false;
 			}
 
-			m_timeTracker.m_lastFrameElapsedTime = SDL_GetTicks() - m_timeTracker.m_currentTime;
+			m_trackLastFrameElapsedTime.m_lastFrameElapsedTime = SDL_GetTicks() - m_trackLastFrameElapsedTime.m_currentTime;
 		}
 
 		return true;
@@ -113,16 +113,16 @@ namespace Asteroid
 
 
 		if (true == lv_keyStates[SDL_SCANCODE_W]) {
-			lv_deltaPos.y = -1.f * (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
+			lv_deltaPos.y = -1.f * (float)(lv_speedAmplifier * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_S]) {
-			lv_deltaPos.y = (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
+			lv_deltaPos.y = (float)(lv_speedAmplifier * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_D]) {
-			lv_deltaPos.x = (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
+			lv_deltaPos.x = (float)(lv_speedAmplifier * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_A]) {
-			lv_deltaPos.x = -1.f * (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
+			lv_deltaPos.x = -1.f * (float)(lv_speedAmplifier * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
 		}
 
 		m_playerDeltaPosQueue.push(lv_deltaPos);
