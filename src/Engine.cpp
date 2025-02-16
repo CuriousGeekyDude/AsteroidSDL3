@@ -109,22 +109,22 @@ namespace Asteroid
 	void Engine::ProcessKeyboardInput()
 	{
 		glm::vec2 lv_deltaPos{};
-		float lv_speedAmplifier = 0.155f;
+		float lv_speedDamper = 0.1f;
 
 		const bool* lv_keyStates = SDL_GetKeyboardState(nullptr);
 
 
 		if (true == lv_keyStates[SDL_SCANCODE_W]) {
-			lv_deltaPos.y = -1.f * (float)(lv_speedAmplifier * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
+			lv_deltaPos.y = -1.f * (float)(lv_speedDamper * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_S]) {
-			lv_deltaPos.y = (float)(lv_speedAmplifier * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
+			lv_deltaPos.y = (float)(lv_speedDamper * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_D]) {
-			lv_deltaPos.x = (float)(lv_speedAmplifier * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
+			lv_deltaPos.x = (float)(lv_speedDamper * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_A]) {
-			lv_deltaPos.x = -1.f * (float)(lv_speedAmplifier * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
+			lv_deltaPos.x = -1.f * (float)(lv_speedDamper * m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
 		}
 
 		m_playerDeltaPosQueue.push(lv_deltaPos);
