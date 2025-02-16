@@ -134,7 +134,25 @@ namespace Asteroid
 		using namespace Physics;
 
 		for (auto& l_entity : m_entities) {
+			
+			int lv_windowWidth{ 0 };
+			int lv_windowHeight{0};
+			auto* lv_entityGpuTexture = m_gpuResourceManager.RetrieveGpuTexture(l_entity.m_data.m_textureHandle);
+			if (false == SDL_GetWindowSize(m_window, &lv_windowWidth, &lv_windowHeight)) {
+				SDL_Log("SDL failed to query the size of the window: %s", SDL_GetError());
+			}
+
+
+			if (false == IsInView(l_entity, lv_windowWidth
+				, lv_windowHeight, lv_entityGpuTexture->w, lv_entityGpuTexture->h)) {
+				l_entity.m_data.m_isVisible = false;
+			}
+			else {
+				l_entity.m_data.m_isVisible = true;
+			}
+
 			MovePlayer(l_entity, m_playerDeltaPosQueue);
+			continue;
 		}
 	}
 
@@ -151,6 +169,11 @@ namespace Asteroid
 		}
 
 		for (auto& l_entity : m_entities) {
+
+			if (false == l_entity.m_data.m_isVisible) {
+				continue;
+			}
+
 			auto* lv_entityTexture = m_gpuResourceManager.RetrieveGpuTexture(l_entity.m_data.m_textureHandle);
 
 			SDL_FRect lv_dstRect;
