@@ -36,7 +36,7 @@ namespace Asteroid
 
 		void ProcessKeyboardInput();
 
-		void ProcessPhysics();
+		bool ProcessPhysics();
 
 		bool RenderScene();
 

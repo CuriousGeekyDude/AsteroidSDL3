@@ -90,7 +90,9 @@ namespace Asteroid
 
 
 			ProcessKeyboardInput();
-			ProcessPhysics();
+			if (false == ProcessPhysics()) {
+				return false;
+			}
 			if (false == RenderScene()) {
 				return false;
 			}
@@ -129,7 +131,7 @@ namespace Asteroid
 	}
 
 
-	void Engine::ProcessPhysics()
+	bool Engine::ProcessPhysics()
 	{
 		using namespace Physics;
 
@@ -138,8 +140,16 @@ namespace Asteroid
 			int lv_windowWidth{ 0 };
 			int lv_windowHeight{0};
 			auto* lv_entityGpuTexture = m_gpuResourceManager.RetrieveGpuTexture(l_entity.m_data.m_textureHandle);
+
+			if (nullptr == lv_entityGpuTexture) {
+				SDL_Log("Failed to retrive the gpu texture of claimed handle: %d"
+					, (int)l_entity.m_data.m_textureHandle);
+				return false;
+			}
+
 			if (false == SDL_GetWindowSize(m_window, &lv_windowWidth, &lv_windowHeight)) {
 				SDL_Log("SDL failed to query the size of the window: %s", SDL_GetError());
+				return false;
 			}
 
 
@@ -157,6 +167,8 @@ namespace Asteroid
 
 			continue;
 		}
+
+		return true;
 	}
 
 
