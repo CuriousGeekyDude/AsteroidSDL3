@@ -76,32 +76,26 @@ namespace Asteroid
 	{
 
 		bool lv_quit = false;
-
 		while (false == lv_quit) {
 
 			m_timeTracker.m_currentTime = SDL_GetTicks();
-			m_timeTracker.m_lastFrameElapsedTime
-				= m_timeTracker.m_currentTime - m_timeTracker.m_lastFrameElapsedTime;
 
 			SDL_Event lv_event;
 
-			while (true == SDL_PollEvent(&lv_event)) {
-
+			if (true == SDL_PollEvent(&lv_event)) {
 				if (SDL_EVENT_QUIT == lv_event.type) {
 					lv_quit = true;
 				}
-
-				if (SDL_EVENT_KEY_DOWN == lv_event.type) {
-					ProcessKeyboardInput(lv_event);
-				}
-
 			}
 
+
+			ProcessKeyboardInput();
 			ProcessPhysics();
 			if (false == RenderScene()) {
 				return false;
 			}
 
+			m_timeTracker.m_lastFrameElapsedTime = SDL_GetTicks() - m_timeTracker.m_currentTime;
 		}
 
 		return true;
@@ -110,26 +104,25 @@ namespace Asteroid
 
 
 
-	void Engine::ProcessKeyboardInput(const SDL_Event& l_event)
+	void Engine::ProcessKeyboardInput()
 	{
 		glm::vec2 lv_deltaPos{};
-		float lv_speedAmplifier = 0.001f;
+		float lv_speedAmplifier = 0.155f;
 
-		switch (l_event.key.scancode) {
+		const bool* lv_keyStates = SDL_GetKeyboardState(nullptr);
 
-		case SDL_SCANCODE_W:
+
+		if (true == lv_keyStates[SDL_SCANCODE_W]) {
 			lv_deltaPos.y = -1.f * (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
-			break;
-		case SDL_SCANCODE_S:
-			lv_deltaPos.y =  (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
-			break;
-		case SDL_SCANCODE_D:
+		}
+		if (true == lv_keyStates[SDL_SCANCODE_S]) {
+			lv_deltaPos.y = (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
+		}
+		if (true == lv_keyStates[SDL_SCANCODE_D]) {
 			lv_deltaPos.x = (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
-			break;
-		case SDL_SCANCODE_A:
+		}
+		if (true == lv_keyStates[SDL_SCANCODE_A]) {
 			lv_deltaPos.x = -1.f * (float)(lv_speedAmplifier * m_timeTracker.m_lastFrameElapsedTime);
-			break;
-
 		}
 
 		m_playerDeltaPosQueue.push(lv_deltaPos);
