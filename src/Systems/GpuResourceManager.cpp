@@ -1,6 +1,6 @@
 
 
-#include "GpuResouceManager.hpp"
+#include "Systems/GpuResouceManager.hpp"
 #include <SDL3_image/SDL_image.h>
 #include <limits>
 

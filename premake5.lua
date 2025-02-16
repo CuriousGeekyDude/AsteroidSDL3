@@ -9,9 +9,9 @@ project "AsteroidSDL3"
 
 
 	vpaths {
-		["deps"] = {"dependencies/**.h", "dependencies/**.hpp", "dependencies/**.c", "dependencies/**.cpp"},
-        ["src"] = { "src/**.cpp" },
-        ["include"] = { "include/**.h", "include/**.hpp" },
+		["deps/**"] = {"dependencies/**.h", "dependencies/**.hpp", "dependencies/**.c", "dependencies/**.cpp"},
+        ["src/**"] = { "src/**.cpp" },
+        ["include/**"] = { "include/**.h", "include/**.hpp" },
     }
 
 	files{"include/**.hpp", 

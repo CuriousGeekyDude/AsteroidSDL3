@@ -5,7 +5,7 @@
 #include "EngineInitData.hpp"
 #include "Entity.hpp"
 #include "Time.hpp"
-#include "GpuResouceManager.hpp"
+#include "Systems/GpuResouceManager.hpp"
 #include <vector>
 #include <queue>
 #include <glm.hpp>
