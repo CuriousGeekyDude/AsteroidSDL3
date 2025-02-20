@@ -27,7 +27,8 @@ namespace Asteroid
 
 		bool Renderer::Init(SDL_Window* l_window)
 		{
-			if (nullptr == SDL_CreateRenderer(l_window, nullptr)) {
+			m_renderer = SDL_CreateRenderer(l_window, nullptr);
+			if (nullptr == m_renderer) {
 				SDL_Log("SDL failed to create the renderer: %s", SDL_GetError());
 				return false;
 			}
@@ -98,6 +99,22 @@ namespace Asteroid
 
 			return true;
 
+		}
+
+
+		bool Renderer::PresentToWindow()
+		{
+			if (false == SDL_RenderPresent(m_renderer)) {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		SDL_Renderer* Renderer::GetSDLRenderer()
+		{
+			return m_renderer;
 		}
 
 

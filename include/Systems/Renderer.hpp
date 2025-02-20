@@ -32,6 +32,10 @@ namespace Asteroid
 
 			bool RenderEntity(const RenderingData& l_renderData);
 
+			bool PresentToWindow();
+
+			SDL_Renderer* GetSDLRenderer();
+
 			~Renderer();
 
 		private:
