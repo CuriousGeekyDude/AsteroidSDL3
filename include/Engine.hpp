@@ -3,11 +3,13 @@
 
 
 #include "EngineInitData.hpp"
-#include "Entity.hpp"
+#include "Entities/Entity.hpp"
 #include "Time.hpp"
 #include "Systems/GpuResouceManager.hpp"
+#include "Systems/Renderer.hpp"
+
+#include <memory>
 #include <vector>
-#include <queue>
 #include <glm.hpp>
 
 
@@ -16,6 +18,9 @@ struct SDL_Renderer;
 
 namespace Asteroid
 {
+
+	
+
 
 	class Engine
 	{
@@ -34,25 +39,21 @@ namespace Asteroid
 
 	private:
 
-		void ProcessKeyboardInput();
-
-		bool ProcessPhysics();
-
-		bool RenderScene();
+		void InitEntities();
 
 	private:
 
 		EngineInitData m_initialData;
 
-		std::queue<glm::vec2> m_playerDeltaPosQueue;
 
-		std::vector<Entity> m_entities;
+		std::vector<std::unique_ptr<Entity>> m_entities;
 
 		Time m_trackLastFrameElapsedTime;
 
 		GpuResourceManager m_gpuResourceManager;
 
-		SDL_Renderer* m_renderer;
+		RenderSystem::Renderer m_renderer;
+
 		SDL_Window* m_window;
 	};
 
