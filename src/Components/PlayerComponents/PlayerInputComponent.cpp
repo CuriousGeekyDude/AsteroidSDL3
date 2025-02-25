@@ -15,8 +15,8 @@ namespace Asteroid
 {
 
 
-	PlayerInputComponent::PlayerInputComponent(MovementComponent* l_movementComponent)
-		:m_movementComponent(l_movementComponent)
+	PlayerInputComponent::PlayerInputComponent()
+		:m_keyStates{}
 	{
 
 	}
@@ -25,28 +25,41 @@ namespace Asteroid
 	bool PlayerInputComponent::Update(float l_lastFrameElapsedTime)
 	{
 		
-		glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
+		m_keyStates.fill(false);
 
-		ProcessKeyboardInput(l_lastFrameElapsedTime, lv_deltaTransform);
-		ProcessMouseInput(l_lastFrameElapsedTime, lv_deltaTransform);
+		//glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
 
-		m_movementComponent->UpdateDeltaTransform(lv_deltaTransform);
+		ProcessKeyboardInput();
+		ProcessMouseInput();
 
 		return true;
 
 	}
 
 
-	void PlayerInputComponent::ProcessKeyboardInput(float l_lastFrameElapsedTime, glm::mat3& l_deltaTransform)
+	void PlayerInputComponent::ProcessKeyboardInput()
 	{
 
-		glm::vec3 lv_deltaPos{0.f};
-		constexpr float lv_speedDamper{ 0.1f };
+		/*glm::vec3 lv_deltaPos{0.f};
+		constexpr float lv_speedDamper{ 0.1f };*/
 
 		const bool* lv_keyStates = SDL_GetKeyboardState(nullptr);
 
-
 		if (true == lv_keyStates[SDL_SCANCODE_W]) {
+			m_keyStates[(int)Keys::KEY_W] = true;
+		}
+		if (true == lv_keyStates[SDL_SCANCODE_S]) {
+			m_keyStates[(int)Keys::KEY_S] = true;
+		}
+		if (true == lv_keyStates[SDL_SCANCODE_D]) {
+			m_keyStates[(int)Keys::KEY_D] = true;
+		}
+		if (true == lv_keyStates[SDL_SCANCODE_A]) {
+			m_keyStates[(int)Keys::KEY_A] = true;
+		}
+
+
+		/*if (true == lv_keyStates[SDL_SCANCODE_W]) {
 			lv_deltaPos.y = -1.f * (lv_speedDamper * l_lastFrameElapsedTime);
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_S]) {
@@ -60,13 +73,18 @@ namespace Asteroid
 		}
 
 		l_deltaTransform[2][0] = lv_deltaPos.x;
-		l_deltaTransform[2][1] = lv_deltaPos.y;
+		l_deltaTransform[2][1] = lv_deltaPos.y;*/
 
 	}
 
-	void PlayerInputComponent::ProcessMouseInput(float l_lastFrameElapsedTime, glm::mat3& l_deltaTransform)
+	void PlayerInputComponent::ProcessMouseInput()
 	{
 
+	}
+
+	const std::array<bool, 4>& PlayerInputComponent::GetKeyStates() const
+	{
+		return m_keyStates;
 	}
 
 }

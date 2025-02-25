@@ -5,6 +5,7 @@
 
 #include "Components/InputComponent.hpp"
 #include <glm.hpp>
+#include <array>
 
 
 namespace Asteroid
@@ -16,25 +17,34 @@ namespace Asteroid
 	{
 
 	public:
-		PlayerInputComponent(MovementComponent* l_movementComponent);
+
+		enum class Keys
+		{
+			KEY_W = 0,
+			KEY_A = 1,
+			KEY_S = 2,
+			KEY_D = 3
+		};
+
+	public:
+
+		PlayerInputComponent();
 
 
 		bool Update(float l_lastFrameElapsedTime) override;
 
-
-
-	protected:
-
-
-		void ProcessKeyboardInput(float l_lastFrameElapsedTime, glm::mat3& l_deltaTransform);
-		void ProcessMouseInput(float l_lastFrameElapsedTime, glm::mat3& l_deltaTransform);
-
+		const std::array<bool, 4>& GetKeyStates() const;
 
 	protected:
 
 
-		MovementComponent* m_movementComponent;
+		void ProcessKeyboardInput();
+		void ProcessMouseInput();
 
+
+	protected:
+
+		std::array<bool, 4> m_keyStates;
 	};
 }
 
