@@ -25,7 +25,7 @@ namespace Asteroid
 	
 	public:
 
-		PlayerGraphicsComponent(const glm::vec2& l_initialPos, SDL_Texture* l_entityTexture
+		PlayerGraphicsComponent( uint32_t l_textureHandle
 								,MovementComponent* l_movementComponent
 								,RenderSystem::Renderer* l_renderer
 		                        ,Entity* l_entity);

@@ -9,9 +9,9 @@ namespace Asteroid
 {
 
 
-	GraphicsComponent::GraphicsComponent(const glm::vec2& l_initialPos, SDL_Texture* l_entityTexture
-	,RenderSystem::Renderer* l_renderer, Entity* l_entity)
-		:m_entity(l_entity),m_texture(l_entityTexture),
+	GraphicsComponent::GraphicsComponent(uint32_t l_textureHandle
+	,RenderSystem::Renderer* l_renderer, Entity* l_ownerEntity)
+		:m_ownerEntity(l_ownerEntity),m_textureHandle(l_textureHandle),
 		m_isVisible(true), m_renderer(l_renderer)
 	{
 	}

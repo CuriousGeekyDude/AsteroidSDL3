@@ -22,7 +22,7 @@ namespace Asteroid
 	{
 	public:
 
-		GraphicsComponent(const glm::vec2& l_initialPos, SDL_Texture* l_entityTexture
+		GraphicsComponent(uint32_t l_textureHandle
 		, RenderSystem::Renderer* l_renderer, Entity* l_entity);
 
 
@@ -31,9 +31,9 @@ namespace Asteroid
 	protected:
 
 	protected:
-		Entity* m_entity;
+		Entity* m_ownerEntity;
 		bool m_isVisible;
-		SDL_Texture* m_texture;
+		uint32_t m_textureHandle;
 		RenderSystem::Renderer* m_renderer;
 	};
 
