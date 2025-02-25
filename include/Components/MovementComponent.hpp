@@ -16,15 +16,9 @@ namespace Asteroid
 
 		virtual ~MovementComponent() = default;
 
-
-		bool Update(float l_lastFrameElapsedTime) override;
-
-		void UpdateDeltaTransform(const glm::mat3& l_deltaTransform);
-
 		const glm::mat3& GetTransform() const;
 
 	protected:
 		glm::mat3 m_transform{};
-		glm::mat3 m_deltaTransform{};
 	};
 }
