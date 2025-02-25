@@ -27,8 +27,6 @@ namespace Asteroid
 		
 		m_keyStates.fill(false);
 
-		//glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
-
 		ProcessKeyboardInput();
 		ProcessMouseInput();
 
@@ -38,10 +36,7 @@ namespace Asteroid
 
 
 	void PlayerInputComponent::ProcessKeyboardInput()
-	{
-
-		/*glm::vec3 lv_deltaPos{0.f};
-		constexpr float lv_speedDamper{ 0.1f };*/
+	{	
 
 		const bool* lv_keyStates = SDL_GetKeyboardState(nullptr);
 
@@ -57,23 +52,6 @@ namespace Asteroid
 		if (true == lv_keyStates[SDL_SCANCODE_A]) {
 			m_keyStates[(int)Keys::KEY_A] = true;
 		}
-
-
-		/*if (true == lv_keyStates[SDL_SCANCODE_W]) {
-			lv_deltaPos.y = -1.f * (lv_speedDamper * l_lastFrameElapsedTime);
-		}
-		if (true == lv_keyStates[SDL_SCANCODE_S]) {
-			lv_deltaPos.y = (lv_speedDamper * l_lastFrameElapsedTime);
-		}
-		if (true == lv_keyStates[SDL_SCANCODE_D]) {
-			lv_deltaPos.x = (lv_speedDamper * l_lastFrameElapsedTime);
-		}
-		if (true == lv_keyStates[SDL_SCANCODE_A]) {
-			lv_deltaPos.x = -1.f * (lv_speedDamper * l_lastFrameElapsedTime);
-		}
-
-		l_deltaTransform[2][0] = lv_deltaPos.x;
-		l_deltaTransform[2][1] = lv_deltaPos.y;*/
 
 	}
 
