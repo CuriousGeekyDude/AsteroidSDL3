@@ -5,8 +5,6 @@
 #include <glm.hpp>
 
 
-struct SDL_Texture;
-
 namespace Asteroid
 {
 
@@ -15,7 +13,7 @@ namespace Asteroid
 		struct RenderingData
 		{
 			glm::vec2 m_entityPos{};
-			SDL_Texture* m_entityTexture{};
+			uint32_t m_entityTextureHandle{};
 		};
 	}
 
