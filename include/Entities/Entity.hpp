@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "../Components/ComponentTypes.hpp"
 
 
 
@@ -22,11 +23,11 @@ namespace Asteroid
 
 		Entity(const glm::vec2& l_initialPos, uint32_t l_id);
 			
-		void AddComponent(std::string&& l_componentName, std::unique_ptr<Component>&& l_component);
+		void AddComponent(const ComponentTypes l_componentType, std::unique_ptr<Component>&& l_component);
 
-		Component* GetComponent(const std::string& l_componentName);
+		Component* GetComponent(const ComponentTypes l_componentType);
 
-		virtual bool Update(const float l_lastFrameElapsedTime) = 0;
+		bool Update(const float l_deltaTime);
 
 		const glm::vec2& GetInitialPos() const;
 
@@ -37,6 +38,6 @@ namespace Asteroid
 		glm::vec2 m_initialPos;
 		uint32_t m_id;
 
-		std::vector<std::pair<std::string ,std::unique_ptr<Component>>> m_components;
+		std::vector<std::pair<ComponentTypes ,std::unique_ptr<Component>>> m_components;
 	};
 }
