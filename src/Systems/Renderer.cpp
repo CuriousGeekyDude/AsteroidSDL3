@@ -6,6 +6,7 @@
 #include "Systems/Renderer.hpp"
 #include "Systems/Colors.hpp"
 #include "Systems/RenderingData.hpp"
+#include "Systems/GpuResouceManager.hpp"
 
 #include <glm.hpp>
 #include <SDL3/SDL_render.h>
@@ -18,8 +19,9 @@ namespace Asteroid
 
 	namespace RenderSystem
 	{
-		Renderer::Renderer()
+		Renderer::Renderer(GpuResourceManager* l_gpuResManager)
 			:m_renderer(nullptr)
+			,m_gpuResourceManager(l_gpuResManager)
 		{
 
 		}
@@ -84,14 +86,18 @@ namespace Asteroid
 		bool Renderer::RenderEntity(const RenderingData& l_renderData)
 		{
 
+			auto* lv_sdlTexture = m_gpuResourceManager->RetrieveGpuTexture(l_renderData.m_entityTextureHandle);
+
+			assert(lv_sdlTexture != nullptr);
+
 			SDL_FRect lv_dstRect;
 			lv_dstRect.x = l_renderData.m_entityPos.x;
 			lv_dstRect.y = l_renderData.m_entityPos.y;
-			lv_dstRect.w = (float)l_renderData.m_entityTexture->w;
-			lv_dstRect.h = (float)l_renderData.m_entityTexture->h;
+			lv_dstRect.w = (float)lv_sdlTexture->w;
+			lv_dstRect.h = (float)lv_sdlTexture->h;
 
 			if (false == SDL_RenderTexture(m_renderer
-				, l_renderData.m_entityTexture, nullptr, &lv_dstRect)) {
+				, lv_sdlTexture, nullptr, &lv_dstRect)) {
 				
 				SDL_Log("SDL failed to render the requested entity: %s\n", SDL_GetError());
 				return false;

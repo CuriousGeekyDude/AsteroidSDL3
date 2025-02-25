@@ -2,6 +2,7 @@
 
 
 
+#include <memory>
 
 struct SDL_Renderer;
 struct SDL_Window;
@@ -9,7 +10,8 @@ struct SDL_Window;
 
 namespace Asteroid
 {
-	
+	class GpuResourceManager;
+
 
 	namespace RenderSystem
 	{
@@ -18,11 +20,12 @@ namespace Asteroid
 
 		struct RenderingData;
 
+
 		class Renderer
 		{
 		public:
 
-			Renderer();
+			Renderer(GpuResourceManager* l_gpuResManager);
 
 			bool Init(SDL_Window* l_window);
 
@@ -40,6 +43,7 @@ namespace Asteroid
 
 		private:
 			SDL_Renderer* m_renderer;
+			GpuResourceManager* m_gpuResourceManager;
 		};
 	}
 }
