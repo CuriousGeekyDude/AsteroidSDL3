@@ -50,9 +50,9 @@ namespace Asteroid
 
 		Time m_trackLastFrameElapsedTime;
 
-		GpuResourceManager m_gpuResourceManager;
-
 		RenderSystem::Renderer m_renderer;
+
+		GpuResourceManager m_gpuResourceManager;
 
 		SDL_Window* m_window;
 	};

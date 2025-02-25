@@ -3,8 +3,8 @@
 #include "Engine.hpp"
 #include "Components/PlayerComponents/PlayerInputComponent.hpp"
 #include "Components/PlayerComponents/PlayerGraphicsComponent.hpp"
-#include "Components/MovementComponent.hpp"
-#include "Entities/PlayerEntity/PlayerEntity.hpp"
+#include "Components/PlayerComponents/PlayerMovementComponent.hpp"
+#include "Entities/Entity.hpp"
 #include "Systems/Colors.hpp"
 #include <SDL3/SDL.h>
 
@@ -13,6 +13,7 @@ namespace Asteroid
 	Engine::Engine(EngineInitData&& l_initialData)
 		:m_initialData(std::move(l_initialData))
 		,m_window(nullptr)
+		,m_renderer(&m_gpuResourceManager)
 	{
 		
 	}
@@ -112,17 +113,17 @@ namespace Asteroid
 
 	void Engine::InitEntities()
 	{
-		auto* lv_spaceShipGpuTexture = m_gpuResourceManager.RetrieveGpuTexture("Spaceship");
+		uint32_t lv_spaceShipGpuTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("Spaceship");
 
-		assert(nullptr != lv_spaceShipGpuTexture);
+		assert(std::numeric_limits<uint32_t>::max() != lv_spaceShipGpuTextureHandle);
 
-		auto lv_player = std::make_unique<PlayerEntity>(glm::vec2{ 0.f, 0.f }, 0);
-
-		lv_player->AddComponent("PlayerMovement", std::make_unique<MovementComponent>());
-		lv_player->AddComponent("PlayerInput", std::make_unique<PlayerInputComponent>((MovementComponent*)lv_player->GetComponent("PlayerMovement")));
-		lv_player->AddComponent("PlayerGraphics", 
+		auto lv_player = std::make_unique<Entity>(glm::vec2{ 0.f, 0.f }, 0);
+		
+		lv_player->AddComponent(ComponentTypes::INPUT, std::make_unique<PlayerInputComponent>());
+		lv_player->AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>((PlayerInputComponent*)lv_player->GetComponent(ComponentTypes::INPUT)));
+		lv_player->AddComponent(ComponentTypes::GRAPHICS, 
 			std::make_unique<PlayerGraphicsComponent>
-			(lv_player->GetInitialPos(), lv_spaceShipGpuTexture, (MovementComponent*)lv_player->GetComponent("PlayerMovement"), &m_renderer, lv_player.get()));
+			(lv_spaceShipGpuTextureHandle, (MovementComponent*)lv_player->GetComponent(ComponentTypes::MOVEMENT), &m_renderer, lv_player.get()));
 
 		m_entities.emplace_back(std::move(lv_player));
 
