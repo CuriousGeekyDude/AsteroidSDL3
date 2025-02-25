@@ -86,6 +86,15 @@ namespace Asteroid
 	}
 	
 
+	uint32_t GpuResourceManager::RetrieveGpuTextureHandle(const std::string& l_textureName)
+	{
+		if (m_textureNamesMappedToIndices.end() != m_textureNamesMappedToIndices.find(l_textureName)) {
+			return m_textureNamesMappedToIndices[l_textureName];
+		}
+
+		return std::numeric_limits<uint32_t >::max();
+	}
+
 
 	GpuResourceManager::~GpuResourceManager()
 	{

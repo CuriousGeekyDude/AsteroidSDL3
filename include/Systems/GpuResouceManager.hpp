@@ -30,6 +30,8 @@ namespace Asteroid
 		SDL_Texture* RetrieveGpuTexture(const std::string& l_textureName);
 		SDL_Texture* RetrieveGpuTexture(const uint32_t l_textureHandle);
 
+		uint32_t RetrieveGpuTextureHandle(const std::string& l_textureName);
+
 		~GpuResourceManager();
 
 	private:
