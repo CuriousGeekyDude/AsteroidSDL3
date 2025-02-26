@@ -4,7 +4,7 @@
 
 
 #include "Components/PlayerComponents/PlayerGraphicsComponent.hpp"
-#include "Components/MovementComponent.hpp"
+#include "Components/PlayerComponents/PlayerMovementComponent.hpp"
 #include "Systems/Renderer.hpp"
 #include "Systems/RenderingData.hpp"
 #include "Entities/Entity.hpp"
@@ -15,7 +15,7 @@ namespace Asteroid
 
 
 	PlayerGraphicsComponent::PlayerGraphicsComponent(uint32_t l_textureHandle
-	, MovementComponent* l_movementComponent
+	, PlayerMovementComponent* l_movementComponent
 	, RenderSystem::Renderer* l_renderer
 	,Entity* l_ownerEntity)
 		:GraphicsComponent(l_textureHandle, l_renderer, l_ownerEntity)

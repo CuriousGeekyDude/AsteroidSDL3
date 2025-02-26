@@ -12,7 +12,7 @@ struct SDL_Texture;
 
 namespace Asteroid
 {
-	class MovementComponent;
+	class PlayerMovementComponent;
 	class Entity;
 
 	namespace RenderSystem
@@ -26,7 +26,7 @@ namespace Asteroid
 	public:
 
 		PlayerGraphicsComponent( uint32_t l_textureHandle
-								,MovementComponent* l_movementComponent
+								, PlayerMovementComponent* l_movementComponent
 								,RenderSystem::Renderer* l_renderer
 		                        ,Entity* l_entity);
 
@@ -35,7 +35,7 @@ namespace Asteroid
 
 	protected:
 
-		MovementComponent* m_movementComponent;
+		PlayerMovementComponent* m_movementComponent;
 
 	};
 }
