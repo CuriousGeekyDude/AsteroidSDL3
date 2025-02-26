@@ -120,8 +120,8 @@ namespace Asteroid
 
 		auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, 0)));
 
-		lv_player.AddComponent(ComponentTypes::INPUT, std::make_unique<PlayerInputComponent>());
-		lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>((PlayerInputComponent*)lv_player.GetComponent(ComponentTypes::INPUT)));
+		lv_player.AddComponent(ComponentTypes::INPUT, std::make_unique<PlayerInputComponent>(&lv_player));
+		lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>((PlayerInputComponent*)lv_player.GetComponent(ComponentTypes::INPUT), &lv_player));
 		lv_player.AddComponent(ComponentTypes::GRAPHICS, 
 			std::make_unique<PlayerGraphicsComponent>
 			(lv_spaceShipGpuTextureHandle, (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT), &m_renderer, &lv_player));
