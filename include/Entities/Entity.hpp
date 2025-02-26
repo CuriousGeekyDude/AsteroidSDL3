@@ -31,13 +31,15 @@ namespace Asteroid
 
 		bool Update(const float l_deltaTime);
 
-		const glm::vec2& GetInitialPos() const;
+		const glm::vec2& GetCurrentPos() const;
+
+		void SetCurrentPos(const glm::vec2& l_newPos);
 
 		virtual ~Entity() = default;
 
 	protected:
 
-		glm::vec2 m_initialPos;
+		glm::vec2 m_currentPos;
 		uint32_t m_id;
 
 		std::vector<std::pair<ComponentTypes ,std::unique_ptr<Component>>> m_components;

@@ -9,7 +9,7 @@
 namespace Asteroid
 {
 	Entity::Entity(const glm::vec2& l_initialPos, uint32_t l_id)
-		:m_initialPos(l_initialPos), m_id(l_id)
+		:m_currentPos(l_initialPos), m_id(l_id)
 	{
 
 	}
@@ -29,9 +29,9 @@ namespace Asteroid
 	}
 
 
-	const glm::vec2& Entity::GetInitialPos() const
+	const glm::vec2& Entity::GetCurrentPos() const
 	{
-		return m_initialPos;
+		return m_currentPos;
 	}
 
 
@@ -44,6 +44,12 @@ namespace Asteroid
 		}
 
 		return true;
+	}
+
+
+	void Entity::SetCurrentPos(const glm::vec2& l_newPos)
+	{
+		m_currentPos = l_newPos;
 	}
 
 

@@ -6,6 +6,7 @@
 #include "Components/PlayerComponents/PlayerInputComponent.hpp"
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+#include "Entities/Entity.hpp"
 
 namespace Asteroid
 {
@@ -40,10 +41,16 @@ namespace Asteroid
 			lv_deltaPos.x = -1.f * (lv_speedDamper * l_deltaTime);
 		}
 
-		lv_deltaTransform[2][0] = lv_deltaPos.x;
-		lv_deltaTransform[2][1] = lv_deltaPos.y;
+		if (0 != lv_deltaPos.x || 0 != lv_deltaPos.y) {
+			lv_deltaTransform[2][0] = lv_deltaPos.x;
+			lv_deltaTransform[2][1] = lv_deltaPos.y;
 
-		m_transform = lv_deltaTransform*m_transform;
+			m_transform = lv_deltaTransform * m_transform;
+			auto& lv_currentPos = m_ownerEntity->GetCurrentPos();
+			auto lv_newPos3 = lv_deltaTransform * glm::vec3{ lv_currentPos, 1.f };
+
+			m_ownerEntity->SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });
+		}
 
 		return true;
 	}
