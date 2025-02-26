@@ -22,6 +22,8 @@ namespace Asteroid
 	public:
 
 		Entity(const glm::vec2& l_initialPos, uint32_t l_id);
+
+		Entity(Entity&&) = default;
 			
 		void AddComponent(const ComponentTypes l_componentType, std::unique_ptr<Component>&& l_component);
 
