@@ -16,11 +16,9 @@ namespace Asteroid
 
 
 	PlayerGraphicsComponent::PlayerGraphicsComponent(uint32_t l_textureHandle
-	, PlayerMovementComponent* l_movementComponent
 	, RenderSystem::Renderer* l_renderer
 	,Entity* l_ownerEntity)
 		:GraphicsComponent(l_textureHandle, l_renderer, l_ownerEntity)
-		,m_movementComponent(l_movementComponent)
 	{
 
 	}

@@ -123,8 +123,7 @@ namespace Asteroid
 		lv_player.AddComponent(ComponentTypes::INPUT, std::make_unique<PlayerInputComponent>(&lv_player));
 		lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>((PlayerInputComponent*)lv_player.GetComponent(ComponentTypes::INPUT), &lv_player));
 		lv_player.AddComponent(ComponentTypes::GRAPHICS, 
-			std::make_unique<PlayerGraphicsComponent>
-			(lv_spaceShipGpuTextureHandle, (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT), &m_renderer, &lv_player));
+			std::make_unique<PlayerGraphicsComponent>(lv_spaceShipGpuTextureHandle, &m_renderer, &lv_player));
 
 
 	}
