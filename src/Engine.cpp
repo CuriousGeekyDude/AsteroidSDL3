@@ -7,6 +7,7 @@
 #include "Entities/Entity.hpp"
 #include "Systems/Colors.hpp"
 #include <SDL3/SDL.h>
+#include <memory>
 
 namespace Asteroid
 {
@@ -97,7 +98,7 @@ namespace Asteroid
 
 			assert(true == m_renderer.ClearWindow());
 			for (auto& l_entity : m_entities) {
-				assert(l_entity->Update((float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime));
+				assert(l_entity.Update((float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime));
 			}
 			assert(true == m_renderer.PresentToWindow());
 			
@@ -117,15 +118,14 @@ namespace Asteroid
 
 		assert(std::numeric_limits<uint32_t>::max() != lv_spaceShipGpuTextureHandle);
 
-		auto lv_player = std::make_unique<Entity>(glm::vec2{ 0.f, 0.f }, 0);
-		
-		lv_player->AddComponent(ComponentTypes::INPUT, std::make_unique<PlayerInputComponent>());
-		lv_player->AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>((PlayerInputComponent*)lv_player->GetComponent(ComponentTypes::INPUT)));
-		lv_player->AddComponent(ComponentTypes::GRAPHICS, 
-			std::make_unique<PlayerGraphicsComponent>
-			(lv_spaceShipGpuTextureHandle, (MovementComponent*)lv_player->GetComponent(ComponentTypes::MOVEMENT), &m_renderer, lv_player.get()));
+		auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, 0)));
 
-		m_entities.emplace_back(std::move(lv_player));
+		lv_player.AddComponent(ComponentTypes::INPUT, std::make_unique<PlayerInputComponent>());
+		lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>((PlayerInputComponent*)lv_player.GetComponent(ComponentTypes::INPUT)));
+		lv_player.AddComponent(ComponentTypes::GRAPHICS, 
+			std::make_unique<PlayerGraphicsComponent>
+			(lv_spaceShipGpuTextureHandle, (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT), &m_renderer, &lv_player));
+
 
 	}
 

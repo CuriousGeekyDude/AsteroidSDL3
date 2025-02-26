@@ -3,12 +3,10 @@
 
 
 #include "EngineInitData.hpp"
-#include "Entities/Entity.hpp"
 #include "Time.hpp"
 #include "Systems/GpuResouceManager.hpp"
 #include "Systems/Renderer.hpp"
 
-#include <memory>
 #include <vector>
 #include <glm.hpp>
 
@@ -20,7 +18,7 @@ namespace Asteroid
 {
 
 	
-
+	class Entity;
 
 	class Engine
 	{
@@ -46,7 +44,7 @@ namespace Asteroid
 		EngineInitData m_initialData;
 
 
-		std::vector<std::unique_ptr<Entity>> m_entities;
+		std::vector<Entity> m_entities;
 
 		Time m_trackLastFrameElapsedTime;
 
