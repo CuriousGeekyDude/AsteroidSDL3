@@ -8,11 +8,13 @@
 
 namespace Asteroid
 {
+	class Entity;
+
 	class MovementComponent : public Component
 	{
 	public:
 		
-		MovementComponent();
+		MovementComponent(Entity* l_ownerEntity);
 
 		virtual ~MovementComponent() = default;
 

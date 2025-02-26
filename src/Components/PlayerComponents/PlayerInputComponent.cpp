@@ -15,8 +15,9 @@ namespace Asteroid
 {
 
 
-	PlayerInputComponent::PlayerInputComponent()
-		:m_keyStates{}
+	PlayerInputComponent::PlayerInputComponent(Entity* l_ownerEntity)
+		:InputComponent(l_ownerEntity)
+		, m_keyStates{}
 	{
 
 	}

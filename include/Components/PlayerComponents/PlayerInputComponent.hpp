@@ -12,6 +12,7 @@ namespace Asteroid
 {
 
 	class MovementComponent;
+	class Entity;
 
 	class PlayerInputComponent : public InputComponent
 	{
@@ -28,7 +29,7 @@ namespace Asteroid
 
 	public:
 
-		PlayerInputComponent();
+		PlayerInputComponent(Entity* l_ownerEntity);
 
 
 		bool Update(float l_lastFrameElapsedTime) override;

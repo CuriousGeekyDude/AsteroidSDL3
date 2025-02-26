@@ -31,7 +31,6 @@ namespace Asteroid
 	protected:
 
 	protected:
-		Entity* m_ownerEntity;
 		bool m_isVisible;
 		uint32_t m_textureHandle;
 		RenderSystem::Renderer* m_renderer;

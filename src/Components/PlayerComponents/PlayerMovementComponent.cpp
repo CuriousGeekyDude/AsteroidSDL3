@@ -9,8 +9,11 @@
 
 namespace Asteroid
 {
-	PlayerMovementComponent::PlayerMovementComponent(const PlayerInputComponent* l_playerInputComponent)
-		:m_playerInputComponent(l_playerInputComponent)
+	PlayerMovementComponent::PlayerMovementComponent(const PlayerInputComponent* l_playerInputComponent
+	, Entity* l_ownerEntity)
+		:MovementComponent(l_ownerEntity)
+		, m_playerInputComponent(l_playerInputComponent)
+		
 	{
 
 	}
