@@ -90,7 +90,7 @@ namespace Asteroid
 
 			SDL_Event lv_event;
 
-			if (true == SDL_PollEvent(&lv_event)) {
+			while (true == SDL_PollEvent(&lv_event)) {
 				if (SDL_EVENT_QUIT == lv_event.type) {
 					lv_quit = true;
 				}
