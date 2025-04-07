@@ -1,7 +1,6 @@
 
 
 #include "Engine.hpp"
-#include "Components/PlayerComponents/PlayerInputComponent.hpp"
 #include "Components/PlayerComponents/PlayerGraphicsComponent.hpp"
 #include "Components/PlayerComponents/PlayerMovementComponent.hpp"
 #include "Entities/Entity.hpp"
@@ -15,6 +14,7 @@ namespace Asteroid
 		:m_initialData(std::move(l_initialData))
 		,m_window(nullptr)
 		,m_renderer(&m_gpuResourceManager)
+		,m_inputSystem()
 	{
 		
 	}
@@ -96,6 +96,8 @@ namespace Asteroid
 				}
 			}
 
+			m_inputSystem.ProcessInput();
+
 			assert(true == m_renderer.ClearWindow());
 			for (auto& l_entity : m_entities) {
 				assert(l_entity.Update((float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime));
@@ -120,8 +122,7 @@ namespace Asteroid
 
 		auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, 0)));
 
-		lv_player.AddComponent(ComponentTypes::INPUT, std::make_unique<PlayerInputComponent>(&lv_player));
-		lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>((PlayerInputComponent*)lv_player.GetComponent(ComponentTypes::INPUT), &lv_player));
+		lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>( &lv_player, &m_inputSystem));
 		lv_player.AddComponent(ComponentTypes::GRAPHICS, 
 			std::make_unique<PlayerGraphicsComponent>(lv_spaceShipGpuTextureHandle, &m_renderer, &lv_player));
 

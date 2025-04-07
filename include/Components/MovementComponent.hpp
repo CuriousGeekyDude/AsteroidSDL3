@@ -9,12 +9,13 @@
 namespace Asteroid
 {
 	class Entity;
+	class InputSystem;
 
 	class MovementComponent : public Component
 	{
 	public:
 		
-		MovementComponent(Entity* l_ownerEntity);
+		MovementComponent(Entity* l_ownerEntity, const InputSystem* l_inputSystem);
 
 		virtual ~MovementComponent() = default;
 
@@ -22,5 +23,6 @@ namespace Asteroid
 
 	protected:
 		glm::mat3 m_transform{};
+		const InputSystem* m_inputSystem;
 	};
 }

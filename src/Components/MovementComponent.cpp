@@ -9,9 +9,10 @@
 namespace Asteroid
 {
 
-	MovementComponent::MovementComponent(Entity* l_ownerEntity)
+	MovementComponent::MovementComponent(Entity* l_ownerEntity, const InputSystem* l_inputSystem)
 		:Component(l_ownerEntity)
 		, m_transform(glm::identity<glm::mat3>())
+		, m_inputSystem(l_inputSystem)
 	{
 
 	}

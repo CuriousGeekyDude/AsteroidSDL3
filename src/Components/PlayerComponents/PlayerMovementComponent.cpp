@@ -3,17 +3,16 @@
 
 
 #include "Components/PlayerComponents/PlayerMovementComponent.hpp"
-#include "Components/PlayerComponents/PlayerInputComponent.hpp"
+#include "Systems/InputSystem.hpp"
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include "Entities/Entity.hpp"
 
 namespace Asteroid
 {
-	PlayerMovementComponent::PlayerMovementComponent(const PlayerInputComponent* l_playerInputComponent
-	, Entity* l_ownerEntity)
-		:MovementComponent(l_ownerEntity)
-		, m_playerInputComponent(l_playerInputComponent)
+	PlayerMovementComponent::PlayerMovementComponent(
+	Entity* l_ownerEntity, const InputSystem* l_inputSystem)
+		:MovementComponent(l_ownerEntity, l_inputSystem)
 		
 	{
 
@@ -26,18 +25,18 @@ namespace Asteroid
 		glm::vec3 lv_deltaPos{ 0.f };
 		constexpr float lv_speedDamper{ 0.1f };
 
-		const auto& lv_keyStates = m_playerInputComponent->GetKeyStates();
+		const auto& lv_keyStates = m_inputSystem->GetKeyStates();
 
-		if (true == lv_keyStates[(int)PlayerInputComponent::Keys::KEY_W]) {
+		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_W]) {
 			lv_deltaPos.y = -1.f * (lv_speedDamper * l_deltaTime);
 		}
-		if (true == lv_keyStates[(int)PlayerInputComponent::Keys::KEY_S]) {
+		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_S]) {
 			lv_deltaPos.y = (lv_speedDamper * l_deltaTime);
 		}
-		if (true == lv_keyStates[(int)PlayerInputComponent::Keys::KEY_D]) {
+		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_D]) {
 			lv_deltaPos.x = (lv_speedDamper * l_deltaTime);
 		}
-		if (true == lv_keyStates[(int)PlayerInputComponent::Keys::KEY_A]) {
+		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_A]) {
 			lv_deltaPos.x = -1.f * (lv_speedDamper * l_deltaTime);
 		}
 

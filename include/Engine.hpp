@@ -6,6 +6,7 @@
 #include "Time.hpp"
 #include "Systems/GpuResouceManager.hpp"
 #include "Systems/Renderer.hpp"
+#include "Systems/InputSystem.hpp"
 
 #include <vector>
 #include <glm.hpp>
@@ -49,6 +50,7 @@ namespace Asteroid
 		Time m_trackLastFrameElapsedTime;
 
 		RenderSystem::Renderer m_renderer;
+		InputSystem m_inputSystem;
 
 		GpuResourceManager m_gpuResourceManager;
 
