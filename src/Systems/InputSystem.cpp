@@ -4,8 +4,8 @@
 
 
 #include "Systems/InputSystem.hpp"
+#include "Systems/LogSystem.hpp"
 #include <SDL3/SDL_keyboard.h>
-#include <SDL3/SDL_log.h>
 
 
 namespace Asteroid
@@ -25,7 +25,7 @@ namespace Asteroid
 		const bool* lv_keyStates = SDL_GetKeyboardState(nullptr);
 
 		if (nullptr == lv_keyStates) {
-			SDL_Log("\nKeyboard state returned is null pointer. Exitting...\n");
+			LogSystem::LogCommandLine("Keyboard state returned is null pointer for the following reason: {4}. Exitting....\n", "ERROR", "INPUT-SYSTEM", __LINE__, __FILE__, SDL_GetError());
 			exit(EXIT_FAILURE);
 		}
 

@@ -10,8 +10,7 @@
 
 #include <glm.hpp>
 #include <SDL3/SDL_render.h>
-#include <SDL3/SDL_log.h>
-
+#include "Systems/LogSystem.hpp"
 
 
 namespace Asteroid
@@ -31,7 +30,7 @@ namespace Asteroid
 		{
 			m_renderer = SDL_CreateRenderer(l_window, nullptr);
 			if (nullptr == m_renderer) {
-				SDL_Log("SDL failed to create the renderer: %s", SDL_GetError());
+				LogSystem::LogCommandLine("SDL failed to create the renderer: {4}", "ERROR", "GRAPHICS", __LINE__, __FILE__, SDL_GetError());
 				return false;
 			}
 
@@ -65,7 +64,7 @@ namespace Asteroid
 
 			if (false == SDL_GetRenderDrawColor
 			(m_renderer, &lv_color.r, &lv_color.g, &lv_color.b, &lv_color.a)) {
-				SDL_Log("SDL failed to set the clear color to the requested one: %s\n", SDL_GetError());
+				LogSystem::LogCommandLine("SDL failed to set the clear color to the requested one: {4}", "ERROR", "GRAPHICS", __LINE__, __FILE__, SDL_GetError());
 				return false;
 			}
 
@@ -76,7 +75,7 @@ namespace Asteroid
 		bool Renderer::ClearWindow()
 		{
 			if (false == SDL_RenderClear(m_renderer)) {
-				SDL_Log("SDL failed to clear the swapchain: %s\n", SDL_GetError());
+				LogSystem::LogCommandLine("SDL failed to clear the swapchain: {4}", "ERROR", "GRAPHICS", __LINE__, __FILE__, SDL_GetError());
 				return false;
 			}
 
@@ -99,7 +98,7 @@ namespace Asteroid
 			if (false == SDL_RenderTexture(m_renderer
 				, lv_sdlTexture, nullptr, &lv_dstRect)) {
 				
-				SDL_Log("SDL failed to render the requested entity: %s\n", SDL_GetError());
+				LogSystem::LogCommandLine("SDL failed to render the requested entity: {4}", "ERROR", "GRAPHICS", __LINE__, __FILE__, SDL_GetError());
 				return false;
 			}
 

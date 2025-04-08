@@ -1,6 +1,7 @@
 
 
 #include "Systems/GpuResouceManager.hpp"
+#include "Systems/LogSystem.hpp"
 #include <SDL3_image/SDL_image.h>
 #include <limits>
 
@@ -13,16 +14,17 @@ namespace Asteroid
 		,const std::string& l_texturePath
 		, const std::string& l_nameToAssociateTextureWith)
 	{
-		SDL_Log("Attempting to load %s\n", l_texturePath.c_str());
+
+		LogSystem::LogCommandLine("Attempting to load {4}.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
 
 		auto* lv_gpuTexture = IMG_LoadTexture(l_renderer, l_texturePath.c_str());
 
 		if (nullptr == lv_gpuTexture) {
-			SDL_Log("Failed to load texture %s\n", l_texturePath.c_str());
+			LogSystem::LogCommandLine("Failed to load texture {4}.", "WARNING", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
 			return nullptr;
 		}
 
-		SDL_Log("%s was loaded successfully.\n", l_texturePath.c_str());
+		LogSystem::LogCommandLine("{4} was loaded successfully.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
 
 		m_gpuTextures.push_back(lv_gpuTexture);
 
@@ -38,16 +40,17 @@ namespace Asteroid
 		, const std::string& l_texturePath
 		, const std::string& l_nameToAssociateTextureWith)
 	{
-		SDL_Log("Attempting to load %s\n", l_texturePath.c_str());
+		LogSystem::LogCommandLine("Attempting to load {4}.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
 
 		auto* lv_gpuTexture = IMG_LoadTexture(l_renderer, l_texturePath.c_str());
 
 		if (nullptr == lv_gpuTexture) {
-			SDL_Log("Failed to load texture %s\n", l_texturePath.c_str());
-			return std::numeric_limits<uint32_t>::max();
+
+			LogSystem::LogCommandLine("Failed to load texture {4}.", "WARNING", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
+			return UINT32_MAX;
 		}
 
-		SDL_Log("%s was loaded successfully.\n", l_texturePath.c_str());
+		LogSystem::LogCommandLine("{4} was loaded successfully.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
 
 		m_gpuTextures.push_back(lv_gpuTexture);
 
@@ -59,15 +62,16 @@ namespace Asteroid
 
 	SDL_Texture* GpuResourceManager::RetrieveGpuTexture(const std::string& l_textureName)
 	{
-		SDL_Log("Attempting to retrieve gpu texture %s\n", l_textureName.c_str());
+
+		LogSystem::LogCommandLine("Attempting to retrieve gpu texture {4}.", "INFO", "GPU-RESOURCE-FETCH", __LINE__, __FILE__, l_textureName.c_str());
 
 
 		if (m_textureNamesMappedToIndices.end() != m_textureNamesMappedToIndices.find(l_textureName)) {
-			SDL_Log("Retrieve of gpu texture %s was successfull.\n", l_textureName.c_str());
+			LogSystem::LogCommandLine("Retrieve of gpu texture {4} was successfull.", "INFO", "GPU-RESOURCE-FETCH", __LINE__, __FILE__, l_textureName.c_str());
 			return m_gpuTextures[m_textureNamesMappedToIndices[l_textureName]];
 		}
 
-		SDL_Log("Retrieve of gpu texture %s failed.\n", l_textureName.c_str());
+		LogSystem::LogCommandLine("Retrieve of gpu texture {4} failed.", "WARNING", "GPU-RESOURCE-FETCH", __LINE__, __FILE__, l_textureName.c_str());
 
 		return nullptr;
 	}
@@ -76,7 +80,7 @@ namespace Asteroid
 
 		if (false == m_gpuTextures.empty()) {
 			if (l_textureHandle >= (uint32_t)m_gpuTextures.size()) {
-				SDL_Log("Texture handle is bigger than the size of the gpu textures vector.\n");
+				LogSystem::LogCommandLine("Texture handle is bigger than the size of the gpu textures vector.", "WARNING", "GPU-RESOURCE-FETCH", __LINE__, __FILE__);
 				return nullptr;
 			}
 			return m_gpuTextures[l_textureHandle];
@@ -92,7 +96,7 @@ namespace Asteroid
 			return m_textureNamesMappedToIndices[l_textureName];
 		}
 
-		return std::numeric_limits<uint32_t >::max();
+		return UINT32_MAX;
 	}
 
 

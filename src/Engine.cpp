@@ -5,6 +5,7 @@
 #include "Components/PlayerComponents/PlayerMovementComponent.hpp"
 #include "Entities/Entity.hpp"
 #include "Systems/Colors.hpp"
+#include "Systems/LogSystem.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
 
@@ -22,21 +23,30 @@ namespace Asteroid
 
 	bool Engine::Init()
 	{
+		LogSystem::LogCommandLine("****Engine initialization has begun****\n");
+
 		if (false == SDL_SetAppMetadata(m_initialData.m_appName.c_str()
 			, m_initialData.m_appVersion.c_str(), nullptr)) {
-			SDL_Log("SDL Failed to create metadata for the app: %s ", SDL_GetError());
+
+			LogSystem::LogCommandLine("SDL Failed to create metadata for the app."
+				, "ERROR",  "INITIALIZATION", __LINE__, __FILE__);
+
 		}
 
-		SDL_Log("Metadata creation was successfull.\n");
+		LogSystem::LogCommandLine("Metadata creation was successfull."
+			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
+
 
 		if (false == SDL_InitSubSystem(SDL_INIT_VIDEO)) {
-			SDL_Log("SDL failed to initialize at least one of the requested subsystems: %s", SDL_GetError());
+			LogSystem::LogCommandLine("SDL failed to initialize at least one of the requested subsystems: {4}."
+				, "ERROR", "INITIALIZATION", __LINE__, __FILE__, SDL_GetError());
 			return false;
 		}
 
-		SDL_Log("Initialization of all the requested subsystems was successfull.\n");
 
 
+		LogSystem::LogCommandLine("Initialization of all the requested subsystems was successfull."
+			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
 
 		
 		m_window = SDL_CreateWindow
@@ -46,19 +56,23 @@ namespace Asteroid
 			, SDL_WINDOW_RESIZABLE);
 		
 		if(nullptr == m_window){
-			
-			SDL_Log("SDL failed to create window: %s", SDL_GetError());
+			LogSystem::LogCommandLine("SDL failed to create window: {4}."
+				, "ERROR", "INITIALIZATION", __LINE__, __FILE__, SDL_GetError());
 			return false;
 
 		}
 
-		SDL_Log("Window creation was successfull.\n");
+		LogSystem::LogCommandLine("Window creation was successfull."
+			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
 
 		
 		m_renderer.Init(m_window);
 		m_renderer.SetClearColor(RenderSystem::Colors::BLACK);
 
-		SDL_Log("Creating textures on Gpu commencing....\n");
+
+
+		LogSystem::LogCommandLine("Creating textures on Gpu commencing...."
+			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
 		for (auto& l_mapPairNameToPath : m_initialData.m_mappedTextureNamesToTheirPaths) {
 			
 			m_gpuResourceManager.CreateGpuTextureReturnHandle(m_renderer.GetSDLRenderer()
@@ -66,15 +80,16 @@ namespace Asteroid
 
 
 		}
-		SDL_Log("Creation of all textures on gpu was successful.\n");
+		LogSystem::LogCommandLine("Creation of all textures on gpu was successful."
+			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
 
-
-		SDL_Log("Initializing the entities....\n");
+		LogSystem::LogCommandLine("Initializing the entities...."
+			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
 
 		InitEntities();
 
-		SDL_Log("Initializing entities was successful.\n");
-
+		LogSystem::LogCommandLine("Initializing entities was successful."
+			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
 
 		return true;
 	}
@@ -118,7 +133,7 @@ namespace Asteroid
 	{
 		uint32_t lv_spaceShipGpuTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("Spaceship");
 
-		assert(std::numeric_limits<uint32_t>::max() != lv_spaceShipGpuTextureHandle);
+		assert(UINT32_MAX != lv_spaceShipGpuTextureHandle);
 
 		auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, 0)));
 
