@@ -4,9 +4,9 @@
 
 
 #include "Systems/LogSystem.hpp"
-#include <string>
 #include <cassert>
 #include <array>
+#include <fstream>
 
 
 namespace Asteroid
@@ -133,10 +133,16 @@ namespace Asteroid
 			, const int l_lineNumber, const char* l_filePath
 			, const char* l_userMsg, const char* l_extraMsg)
 		{
+			static uint64_t lv_flushToFileCounter{};
+			static std::ofstream lv_logFile{"Logging/LogFile.txt", std::ofstream::app | std::ofstream::trunc};
 			const char* lv_msg = ConstructLogMsg(l_level, l_category, l_lineNumber, l_filePath, l_userMsg, l_extraMsg);
 			if (nullptr == lv_msg) { return; }
 			PrintCmd(lv_msg);
 			PrintVisualStdConsole(lv_msg);
+			lv_logFile << lv_msg << "\n";
+
+			if (Severity::FAILURE == l_level || 0 == lv_flushToFileCounter % 10) { lv_logFile.flush(); }
+			++lv_flushToFileCounter;
 		}
 
 	}

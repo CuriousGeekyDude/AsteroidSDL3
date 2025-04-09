@@ -57,11 +57,11 @@ namespace Asteroid
 
 #define LOG(l_level, l_category, l_userMsg, l_extraMsg) LogSystem::Log(l_level, l_category, __LINE__, __FILE__, l_userMsg, l_extraMsg);
 
-#define SetVerbosity(l_level) LogSystem::SetVerbosity(l_level);
+#define Set_Verbosity(l_level) LogSystem::SetVerbosity(l_level);
 #else
 
 #define LOG(l_level, l_category, l_userMsg, l_extraMsg)
-#define SetVerbosity(l_level)
+#define Set_Verbosity(l_level)
 
 #endif
 
