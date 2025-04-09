@@ -7,9 +7,11 @@
 #include "Systems/Colors.hpp"
 #include "Systems/RenderingData.hpp"
 #include "Systems/GpuResouceManager.hpp"
-
 #include <glm.hpp>
 #include <SDL3/SDL_render.h>
+
+
+#define LOGGING
 #include "Systems/LogSystem.hpp"
 
 
@@ -28,9 +30,11 @@ namespace Asteroid
 
 		bool Renderer::Init(SDL_Window* l_window)
 		{
+			using namespace LogSystem;
+
 			m_renderer = SDL_CreateRenderer(l_window, nullptr);
 			if (nullptr == m_renderer) {
-				LogSystem::LogCommandLine("SDL failed to create the renderer: {4}", "ERROR", "GRAPHICS", __LINE__, __FILE__, SDL_GetError());
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to create the renderer ", SDL_GetError());
 				return false;
 			}
 
@@ -40,6 +44,8 @@ namespace Asteroid
 
 		bool Renderer::SetClearColor(const Colors& l_clearColor)
 		{
+			using namespace LogSystem;
+
 			glm::u8vec4 lv_color;
 
 			switch (l_clearColor) {
@@ -64,7 +70,8 @@ namespace Asteroid
 
 			if (false == SDL_GetRenderDrawColor
 			(m_renderer, &lv_color.r, &lv_color.g, &lv_color.b, &lv_color.a)) {
-				LogSystem::LogCommandLine("SDL failed to set the clear color to the requested one: {4}", "ERROR", "GRAPHICS", __LINE__, __FILE__, SDL_GetError());
+
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to set the clear color to the requested one ", SDL_GetError());
 				return false;
 			}
 
@@ -74,8 +81,10 @@ namespace Asteroid
 
 		bool Renderer::ClearWindow()
 		{
+			using namespace LogSystem;
+
 			if (false == SDL_RenderClear(m_renderer)) {
-				LogSystem::LogCommandLine("SDL failed to clear the swapchain: {4}", "ERROR", "GRAPHICS", __LINE__, __FILE__, SDL_GetError());
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to clear the swapchain ", SDL_GetError());
 				return false;
 			}
 
@@ -84,7 +93,7 @@ namespace Asteroid
 
 		bool Renderer::RenderEntity(const RenderingData& l_renderData)
 		{
-
+			using namespace LogSystem;
 			auto* lv_sdlTexture = m_gpuResourceManager->RetrieveGpuTexture(l_renderData.m_entityTextureHandle);
 
 			assert(lv_sdlTexture != nullptr);
@@ -97,8 +106,8 @@ namespace Asteroid
 
 			if (false == SDL_RenderTexture(m_renderer
 				, lv_sdlTexture, nullptr, &lv_dstRect)) {
-				
-				LogSystem::LogCommandLine("SDL failed to render the requested entity: {4}", "ERROR", "GRAPHICS", __LINE__, __FILE__, SDL_GetError());
+
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to render the requested entity ", SDL_GetError());
 				return false;
 			}
 

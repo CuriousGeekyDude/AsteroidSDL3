@@ -3,7 +3,7 @@
 
 #include "Entities/Entity.hpp"
 #include "Components/Component.hpp"
-#include <SDL3/SDL_log.h>
+#include "Systems/LogSystem.hpp"
 
 
 namespace Asteroid
@@ -18,9 +18,11 @@ namespace Asteroid
 	void Entity::AddComponent(const ComponentTypes l_componentType
 		,std::unique_ptr<Component>&& l_component)
 	{
+		using namespace LogSystem;
 		for (auto& l_component : m_components) {
 			if (l_componentType == l_component.first) {
-				SDL_Log("Attempting to add duplicate component types to an entity: Add component request rejected.\n");
+				LOG(Severity::INFO, Channel::INITIALIZATION
+					, "Attempting to add duplicate component types to an entity: Add component request rejected.\n", nullptr);
 				return;
 			}
 		}

@@ -1,7 +1,10 @@
 
 
 #include "Systems/GpuResouceManager.hpp"
+
+#define LOGGING
 #include "Systems/LogSystem.hpp"
+
 #include <SDL3_image/SDL_image.h>
 #include <limits>
 
@@ -14,17 +17,20 @@ namespace Asteroid
 		,const std::string& l_texturePath
 		, const std::string& l_nameToAssociateTextureWith)
 	{
+		using namespace LogSystem;
 
-		LogSystem::LogCommandLine("Attempting to load {4}.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
+		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to load ", l_texturePath.c_str());
+
+		//LogSystem::LogCommandLine("Attempting to load {4}.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, );
 
 		auto* lv_gpuTexture = IMG_LoadTexture(l_renderer, l_texturePath.c_str());
 
 		if (nullptr == lv_gpuTexture) {
-			LogSystem::LogCommandLine("Failed to load texture {4}.", "WARNING", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
+			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture ", l_texturePath.c_str());
 			return nullptr;
 		}
 
-		LogSystem::LogCommandLine("{4} was loaded successfully.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
+		LOG(Severity::INFO, Channel::GRAPHICS, l_texturePath.c_str(), " was loaded successfully.");
 
 		m_gpuTextures.push_back(lv_gpuTexture);
 
@@ -40,17 +46,20 @@ namespace Asteroid
 		, const std::string& l_texturePath
 		, const std::string& l_nameToAssociateTextureWith)
 	{
-		LogSystem::LogCommandLine("Attempting to load {4}.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
+		using namespace LogSystem;
+
+		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to load ", l_texturePath.c_str());
 
 		auto* lv_gpuTexture = IMG_LoadTexture(l_renderer, l_texturePath.c_str());
 
 		if (nullptr == lv_gpuTexture) {
 
-			LogSystem::LogCommandLine("Failed to load texture {4}.", "WARNING", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
+			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture ", l_texturePath.c_str());
 			return UINT32_MAX;
 		}
 
-		LogSystem::LogCommandLine("{4} was loaded successfully.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, l_texturePath.c_str());
+
+		LOG(Severity::INFO, Channel::GRAPHICS, l_texturePath.c_str() , " was loaded successfully.");
 
 		m_gpuTextures.push_back(lv_gpuTexture);
 
@@ -62,25 +71,30 @@ namespace Asteroid
 
 	SDL_Texture* GpuResourceManager::RetrieveGpuTexture(const std::string& l_textureName)
 	{
+		using namespace LogSystem;
 
-		LogSystem::LogCommandLine("Attempting to retrieve gpu texture {4}.", "INFO", "GPU-RESOURCE-FETCH", __LINE__, __FILE__, l_textureName.c_str());
+		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to retrieve gpu texture ", l_textureName.c_str());
 
 
 		if (m_textureNamesMappedToIndices.end() != m_textureNamesMappedToIndices.find(l_textureName)) {
-			LogSystem::LogCommandLine("Retrieve of gpu texture {4} was successfull.", "INFO", "GPU-RESOURCE-FETCH", __LINE__, __FILE__, l_textureName.c_str());
+
+			LOG(Severity::INFO, Channel::GRAPHICS
+				, "Retrieve of the following gpu texture was successful  ", l_textureName.c_str());
 			return m_gpuTextures[m_textureNamesMappedToIndices[l_textureName]];
 		}
 
-		LogSystem::LogCommandLine("Retrieve of gpu texture {4} failed.", "WARNING", "GPU-RESOURCE-FETCH", __LINE__, __FILE__, l_textureName.c_str());
-
+		LOG(Severity::WARNING, Channel::GRAPHICS
+			, "Retrieve of the following gpu texture failed  ", l_textureName.c_str());
 		return nullptr;
 	}
 	SDL_Texture* GpuResourceManager::RetrieveGpuTexture(const uint32_t l_textureHandle)
 	{
+		using namespace LogSystem;
 
 		if (false == m_gpuTextures.empty()) {
 			if (l_textureHandle >= (uint32_t)m_gpuTextures.size()) {
-				LogSystem::LogCommandLine("Texture handle is bigger than the size of the gpu textures vector.", "WARNING", "GPU-RESOURCE-FETCH", __LINE__, __FILE__);
+
+				LOG(Severity::WARNING, Channel::GRAPHICS,"Texture handle is bigger than the size of the gpu textures vector.", nullptr);
 				return nullptr;
 			}
 			return m_gpuTextures[l_textureHandle];

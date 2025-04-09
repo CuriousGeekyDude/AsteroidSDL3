@@ -5,8 +5,7 @@
 #include <Windows.h>
 #include <format>
 #include <string_view>
-#include <string>
-
+#include <array>
 
 namespace Asteroid
 {
@@ -14,49 +13,57 @@ namespace Asteroid
 	namespace LogSystem
 	{
 
-
-		std::wstring ConvertCharToWchar(const std::string& l_string);
-
-
-		template<typename ...args>
-		void LogVisualStudioConsole(const char* l_formattedMsg, args&& ...l_args)
+		enum class Severity
 		{
-			if constexpr (0 == sizeof...(l_args)) {
-				OutputDebugString(ConvertCharToWchar(l_formattedMsg).data());
-			}
-			else {
+			FAILURE = 0,
+			WARNING,
+			INFO
+		};
 
-
-				std::string lv_constructMsg
-				{"\n\n-------------------------------------------------------\n\n** [{0}] ** [{1}] ** [line {2} of file {3}]: "};
-				lv_constructMsg += l_formattedMsg;
-
-				std::string lv_formattedMsg = std::move(std::vformat(lv_constructMsg, std::make_format_args(l_args...)));
-
-				OutputDebugString(ConvertCharToWchar(lv_formattedMsg).data());
-
-			}
-		}
-
-		template<typename ...args>
-		void LogCommandLine(const char* l_formattedMsg, args&& ... l_arg)
+		enum class Channel
 		{
-			if constexpr (0 == sizeof...(l_arg)) {
-				printf(l_formattedMsg);
-			}
-			else {
+			GRAPHICS = 0,
+			PHYSICS,
+			INITIALIZATION
+		};
 
-				std::string lv_constructMsg
-				{ "\n\n-------------------------------------------------------\n\n** [{0}] ** [{1}] ** [line {2} of file {3}]: " };
-				lv_constructMsg += l_formattedMsg;
 
-				std::string lv_formattedMsg = std::move(std::vformat(lv_constructMsg, std::make_format_args(l_arg...)));
+		wchar_t* ConvertCharToWchar(const char* l_string);
 
-				printf(lv_formattedMsg.c_str());
-			}
-		}
+		
+
+		void SetVerbosity(const Severity l_level);
+
+		//This function ,in addition to constructing a log message,
+		// is also used to set the severity since it has the current
+		// severity as a static variable
+		const char* ConstructLogMsg(const Severity l_level, const Channel l_category
+			, const int l_lineNumber, const char* l_filePath, const char* l_userMsg
+			, const char* l_extraMsg = nullptr);
+
+		void PrintCmd(const char* l_msg);
+
+		void PrintVisualStdConsole(const char* l_msg);
+
+
+		void Log(const Severity l_level, const Channel l_category
+			, const int l_lineNumber, const char* l_filePath
+			, const char* l_userMsg, const char* l_extraMsg = nullptr);
 
 	}
+
+
+#ifdef LOGGING
+
+#define LOG(l_level, l_category, l_userMsg, l_extraMsg) LogSystem::Log(l_level, l_category, __LINE__, __FILE__, l_userMsg, l_extraMsg);
+
+#define SetVerbosity(l_level) LogSystem::SetVerbosity(l_level);
+#else
+
+#define LOG(l_level, l_category, l_userMsg, l_extraMsg)
+#define SetVerbosity(l_level)
+
+#endif
 
 
 }

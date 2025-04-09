@@ -5,6 +5,8 @@
 #include "Components/PlayerComponents/PlayerMovementComponent.hpp"
 #include "Entities/Entity.hpp"
 #include "Systems/Colors.hpp"
+
+#define LOGGING
 #include "Systems/LogSystem.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
@@ -23,30 +25,37 @@ namespace Asteroid
 
 	bool Engine::Init()
 	{
-		LogSystem::LogCommandLine("****Engine initialization has begun****\n");
+		using namespace LogSystem;
+		LOG(Severity::INFO, Channel::INITIALIZATION, "****Engine initialization has begun****\n", nullptr);
+		//LogSystem::LogCommandLine("****Engine initialization has begun****\n");
 
 		if (false == SDL_SetAppMetadata(m_initialData.m_appName.c_str()
 			, m_initialData.m_appVersion.c_str(), nullptr)) {
 
-			LogSystem::LogCommandLine("SDL Failed to create metadata for the app."
-				, "ERROR",  "INITIALIZATION", __LINE__, __FILE__);
+			LOG(Severity::FAILURE, Channel::INITIALIZATION, "SDL Failed to create metadata for the app.", nullptr);
+
+
+			/*LogSystem::LogCommandLine("SDL Failed to create metadata for the app."
+				, "ERROR",  "INITIALIZATION", __LINE__, __FILE__);*/
 
 		}
 
-		LogSystem::LogCommandLine("Metadata creation was successfull."
-			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
+
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Metadata creation was successfull.", nullptr);
+
+		/*LogSystem::LogCommandLine(""
+			, "INFO", "INITIALIZATION", __LINE__, __FILE__);*/
 
 
 		if (false == SDL_InitSubSystem(SDL_INIT_VIDEO)) {
-			LogSystem::LogCommandLine("SDL failed to initialize at least one of the requested subsystems: {4}."
-				, "ERROR", "INITIALIZATION", __LINE__, __FILE__, SDL_GetError());
+
+			LOG(Severity::FAILURE, Channel::INITIALIZATION
+				, "SDL failed to initialize at least one of the requested subsystems: ", SDL_GetError());
 			return false;
 		}
 
-
-
-		LogSystem::LogCommandLine("Initialization of all the requested subsystems was successfull."
-			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
+		LOG(Severity::INFO, Channel::INITIALIZATION
+			, "Initialization of all the requested subsystems was successfull.", nullptr);
 
 		
 		m_window = SDL_CreateWindow
@@ -56,40 +65,35 @@ namespace Asteroid
 			, SDL_WINDOW_RESIZABLE);
 		
 		if(nullptr == m_window){
-			LogSystem::LogCommandLine("SDL failed to create window: {4}."
-				, "ERROR", "INITIALIZATION", __LINE__, __FILE__, SDL_GetError());
+
+			LOG(Severity::FAILURE, Channel::INITIALIZATION, "SDL failed to create window: ", SDL_GetError());
 			return false;
 
 		}
 
-		LogSystem::LogCommandLine("Window creation was successfull."
-			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Window creation was successfull.", nullptr);
 
 		
 		m_renderer.Init(m_window);
 		m_renderer.SetClearColor(RenderSystem::Colors::BLACK);
 
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Creating textures on Gpu commencing....", nullptr);
 
-
-		LogSystem::LogCommandLine("Creating textures on Gpu commencing...."
-			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
 		for (auto& l_mapPairNameToPath : m_initialData.m_mappedTextureNamesToTheirPaths) {
 			
 			m_gpuResourceManager.CreateGpuTextureReturnHandle(m_renderer.GetSDLRenderer()
 				, l_mapPairNameToPath.second, l_mapPairNameToPath.first);
-
-
 		}
-		LogSystem::LogCommandLine("Creation of all textures on gpu was successful."
-			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
 
-		LogSystem::LogCommandLine("Initializing the entities...."
-			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Creation of all textures on gpu was successful.", nullptr);
+
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Initializing the entities....", nullptr);
 
 		InitEntities();
 
-		LogSystem::LogCommandLine("Initializing entities was successful."
-			, "INFO", "INITIALIZATION", __LINE__, __FILE__);
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Initializing entities was successful.", nullptr);
+
+		
 
 		return true;
 	}

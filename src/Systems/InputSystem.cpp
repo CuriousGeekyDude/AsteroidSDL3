@@ -4,6 +4,8 @@
 
 
 #include "Systems/InputSystem.hpp"
+
+#define LOGGING
 #include "Systems/LogSystem.hpp"
 #include <SDL3/SDL_keyboard.h>
 
@@ -22,10 +24,14 @@ namespace Asteroid
 
 	void InputSystem::ProcessKeyboard()
 	{
+		using namespace LogSystem;
+
 		const bool* lv_keyStates = SDL_GetKeyboardState(nullptr);
 
 		if (nullptr == lv_keyStates) {
-			LogSystem::LogCommandLine("Keyboard state returned is null pointer for the following reason: {4}. Exitting....\n", "ERROR", "INPUT-SYSTEM", __LINE__, __FILE__, SDL_GetError());
+			LOG(Severity::FAILURE, Channel::GRAPHICS, "Keyboard state returned is null pointer for the following reason: ", SDL_GetError());
+
+			//LogSystem::LogCommandLine("Keyboard state returned is null pointer for the following reason: {4}. Exitting....\n", "ERROR", "INPUT-SYSTEM", __LINE__, __FILE__, SDL_GetError());
 			exit(EXIT_FAILURE);
 		}
 
