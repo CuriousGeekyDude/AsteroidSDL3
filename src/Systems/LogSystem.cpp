@@ -29,7 +29,7 @@ namespace Asteroid
 		}
 
 
-
+		
 
 
 		const char* ConstructLogMsg(const Severity l_level, const Channel l_category
@@ -47,10 +47,13 @@ namespace Asteroid
 				return nullptr;
 			}
 
+			if (-2 == l_lineNumber) {
+				lv_possibleCurrentLevel = lv_currentVerbosity;
+				return nullptr;
+			}
+
 			memset(&lv_formattedMsg, 0, sizeof(char) * lv_finalMsgSize);
 			memset(&lv_finalMsg, 0, sizeof(char) * lv_finalMsgSize);
-
-			if ((int)l_level < (int)lv_currentVerbosity) { return nullptr; }
 
 			char lv_templatePartOfMsg1[] = "\n\n---------------------------\n\n[%s] [%s] [line %d in file %s]: %s\n";
 			char lv_templatePartOfMsg2[] = "\n\n---------------------------\n\n[%s] [%s] [line %d in file %s]: %s : %s \n";
@@ -118,6 +121,11 @@ namespace Asteroid
 			ConstructLogMsg(l_level, Channel::INITIALIZATION, -1, nullptr, nullptr);
 		}
 
+		void UpdateToCurrentVerbosity()
+		{
+			ConstructLogMsg(Severity::INFO, Channel::INITIALIZATION, -2, nullptr, nullptr);
+
+		}
 
 		void PrintCmd(const char* l_msg)
 		{
@@ -133,16 +141,29 @@ namespace Asteroid
 			, const int l_lineNumber, const char* l_filePath
 			, const char* l_userMsg, const char* l_extraMsg)
 		{
-			static uint64_t lv_flushToFileCounter{};
-			static std::ofstream lv_logFile{"Logging/LogFile.txt", std::ofstream::app | std::ofstream::trunc};
+			static std::ofstream lv_logFile{};
+			static uint64_t lv_counter{};
+
+			if (0 == lv_counter) {
+				lv_logFile.open("Logging/LogFile.txt", std::ofstream::trunc);
+			}
+			else {
+				lv_logFile.open("Logging/LogFile.txt", std::ofstream::app);
+			}
+
 			const char* lv_msg = ConstructLogMsg(l_level, l_category, l_lineNumber, l_filePath, l_userMsg, l_extraMsg);
 			if (nullptr == lv_msg) { return; }
-			PrintCmd(lv_msg);
-			PrintVisualStdConsole(lv_msg);
-			lv_logFile << lv_msg << "\n";
 
-			if (Severity::FAILURE == l_level || 0 == lv_flushToFileCounter % 10) { lv_logFile.flush(); }
-			++lv_flushToFileCounter;
+			UpdateToCurrentVerbosity();
+
+			if ((int)l_level <= (int)lv_possibleCurrentLevel) {
+				PrintCmd(lv_msg);
+				PrintVisualStdConsole(lv_msg);
+			}
+			lv_logFile << lv_msg << "\n";
+			lv_logFile.flush();
+			lv_logFile.close();
+			++lv_counter;
 		}
 
 	}

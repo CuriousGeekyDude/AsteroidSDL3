@@ -87,7 +87,10 @@ namespace Asteroid
 
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Creation of all textures on gpu was successful.", nullptr);
 
+
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Initializing the entities....", nullptr);
+
+		Set_Verbosity(Severity::WARNING);
 
 		InitEntities();
 
@@ -126,6 +129,8 @@ namespace Asteroid
 
 			m_trackLastFrameElapsedTime.m_lastFrameElapsedTime = SDL_GetTicks() - m_trackLastFrameElapsedTime.m_currentTime;
 		}
+		Set_Verbosity(LogSystem::Severity::INFO);
+		LOG(LogSystem::Severity::INFO, LogSystem::Channel::GRAPHICS, "End of game loop.", nullptr);
 
 		return true;
 

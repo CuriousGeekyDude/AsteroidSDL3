@@ -51,11 +51,17 @@
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 90 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initializing the entities....
+[INFO] [INITIALIZATION] [line 91 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initializing the entities....
 
 
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 94 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initializing entities was successful.
+[INFO] [INITIALIZATION] [line 97 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initializing entities was successful.
+
+
+
+---------------------------
+
+[INFO] [GRAPHICS] [line 133 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: End of game loop.
 

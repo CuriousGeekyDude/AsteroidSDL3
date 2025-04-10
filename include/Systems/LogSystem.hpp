@@ -30,8 +30,10 @@ namespace Asteroid
 
 		wchar_t* ConvertCharToWchar(const char* l_string);
 
-		
+		static Severity lv_possibleCurrentLevel{ Severity::INFO };
 
+
+		void UpdateToCurrentVerbosity();
 		void SetVerbosity(const Severity l_level);
 
 		//This function ,in addition to constructing a log message,
