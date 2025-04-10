@@ -2,32 +2,32 @@
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 29 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: ****Engine initialization has begun****
+[INFO] [INITIALIZATION] [line 32 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: ****Engine initialization has begun****
 
 
 
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 44 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Metadata creation was successfull.
+[INFO] [INITIALIZATION] [line 47 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Metadata creation was successfull.
 
 
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 58 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initialization of all the requested subsystems was successfull.
+[INFO] [INITIALIZATION] [line 61 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initialization of all the requested subsystems was successfull.
 
 
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 74 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Window creation was successfull.
+[INFO] [INITIALIZATION] [line 77 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Window creation was successfull.
 
 
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 80 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Creating textures on Gpu commencing....
+[INFO] [INITIALIZATION] [line 83 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Creating textures on Gpu commencing....
 
 
 
@@ -45,23 +45,23 @@
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 88 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Creation of all textures on gpu was successful.
+[INFO] [INITIALIZATION] [line 91 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Creation of all textures on gpu was successful.
 
 
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 91 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initializing the entities....
+[INFO] [INITIALIZATION] [line 94 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initializing the entities....
 
 
 
 ---------------------------
 
-[INFO] [INITIALIZATION] [line 97 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initializing entities was successful.
+[INFO] [INITIALIZATION] [line 100 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: Initializing entities was successful.
 
 
 
 ---------------------------
 
-[INFO] [GRAPHICS] [line 133 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: End of game loop.
+[INFO] [GRAPHICS] [line 208 in file C:\Users\farhan\source\repos\AsteroidSDL3\src\Engine.cpp]: End of game loop.
 
