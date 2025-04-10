@@ -50,7 +50,9 @@ namespace Asteroid
 		if (true == lv_keyStates[SDL_SCANCODE_A]) {
 			m_keyStates[(int)Keys::KEY_A] = true;
 		}
-
+		if (true == lv_keyStates[SDL_SCANCODE_F1]) {
+			m_keyStates[(int)Keys::KEY_F1] = true;
+		}
 
 
 	}
