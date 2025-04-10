@@ -62,10 +62,8 @@ namespace Asteroid
 
 		
 		m_window = SDL_CreateWindow
-			(m_initialData.m_windowTitle.c_str()
-			, (int)m_initialData.m_width
-			, (int)m_initialData.m_height
-			, SDL_WINDOW_RESIZABLE);
+			(m_initialData.m_windowTitle.c_str(),0,0
+			, SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED);
 		
 		if(nullptr == m_window){
 
@@ -194,10 +192,7 @@ namespace Asteroid
 				ImGui::End();
 			}
 
-			// Rendering
 			ImGui::Render();
-			//SDL_RenderSetScale(renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-			
 			ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), m_renderer.GetSDLRenderer());
 
 			assert(true == m_renderer.PresentToWindow());

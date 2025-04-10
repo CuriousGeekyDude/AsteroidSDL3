@@ -13,8 +13,6 @@ int main()
 	lv_engineInitialData.m_appName = "AsteroidSDL3";
 	lv_engineInitialData.m_windowTitle = "Asteroid Game";
 	lv_engineInitialData.m_appVersion = "Version 1.0";
-	lv_engineInitialData.m_height = 512;
-	lv_engineInitialData.m_width = 512;
 	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
 		.emplace(std::pair<std::string, std::string>("Spaceship", "Assets/spaceship.png"));
 
