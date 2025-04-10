@@ -140,6 +140,8 @@ namespace Asteroid
 				if (SDL_EVENT_QUIT == lv_event.type) {
 					lv_quit = true;
 				}
+
+				if(t)
 			}
 
 			m_inputSystem.ProcessInput();

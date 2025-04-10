@@ -67,4 +67,13 @@ namespace Asteroid
 	}
 
 
+	bool InputSystem::IsKeyPressed(Keys l_key)
+	{
+		if (true == m_keyStates[(int)l_key]) {
+			return true;
+		}
+		return false;
+	}
+
+
 }

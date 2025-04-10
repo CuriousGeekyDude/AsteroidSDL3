@@ -35,6 +35,9 @@ namespace Asteroid
 
 		void ProcessInput();
 
+
+		bool IsKeyPressed(Keys l_key);
+
 	private:
 
 		void ProcessKeyboard();
