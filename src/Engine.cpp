@@ -225,6 +225,11 @@ namespace Asteroid
 
 	Engine::~Engine()
 	{
+
+		ImGui_ImplSDLRenderer3_Shutdown();
+		ImGui_ImplSDL3_Shutdown();
+		ImGui::DestroyContext();
+
 		SDL_DestroyWindow(m_window);
 	}
 }
