@@ -51,7 +51,7 @@ namespace Asteroid
 
 	private:
 		static constexpr uint32_t m_totalNumInputKeysToProcess{ (uint32_t)Keys::KEY_MAXIMUM };
-		std::array<bool, m_totalNumInputKeysToProcess> m_keyStates;
+		std::array<bool, m_totalNumInputKeysToProcess> m_keyStatesPressed;
 
 	};
 
