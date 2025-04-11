@@ -15,7 +15,7 @@ namespace Asteroid
 
 	public:
 
-		enum class Keys
+		enum class Keys : uint32_t
 		{
 			KEY_W = 0,
 			KEY_A = 1,
@@ -38,20 +38,22 @@ namespace Asteroid
 
 		const bool* GetKeyStates() const;
 
-		void ProcessInput();
+		void ProcessInput(const SDL_Event& l_event);
 
 
 		bool IsKeyPressed(Keys l_key);
 
-		static bool IsKeyUp(const SDL_Event& l_event, SDL_Scancode l_key);
+		bool IsKeyUp(const Keys l_key);
 
 	private:
 
-		void ProcessKeyboard();
+		void ProcessKeyboard(const SDL_Event& l_event);
+		
 
 	private:
 		static constexpr uint32_t m_totalNumInputKeysToProcess{ (uint32_t)Keys::KEY_MAXIMUM };
 		std::array<bool, m_totalNumInputKeysToProcess> m_keyStatesPressed;
+		std::array<bool, m_totalNumInputKeysToProcess> m_keyStatesUp;
 
 	};
 

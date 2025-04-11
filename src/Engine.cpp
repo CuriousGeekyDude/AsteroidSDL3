@@ -137,8 +137,9 @@ namespace Asteroid
 			while (true == SDL_PollEvent(&lv_event)) {
 
 				ImGui_ImplSDL3_ProcessEvent(&lv_event);
+				m_inputSystem.ProcessInput(lv_event);
 
-				if (true == m_inputSystem.IsKeyUp(lv_event, SDL_SCANCODE_F1)) {
+				if (true == m_inputSystem.IsKeyUp(InputSystem::Keys::KEY_F1)) {
 					if (0 == lv_HideOrShow % 2) {
 						show_demo_window = false;
 
@@ -156,7 +157,6 @@ namespace Asteroid
 				}
 			}
 
-			m_inputSystem.ProcessInput();
 
 			assert(true == m_renderer.ClearWindow());
 			for (auto& l_entity : m_entities) {
