@@ -404,3 +404,6 @@ FodyWeavers.xsd
 *.sln
 *.vcxproj
 *.vcxproj.filters
+Logging/
+imgui.ini
+
