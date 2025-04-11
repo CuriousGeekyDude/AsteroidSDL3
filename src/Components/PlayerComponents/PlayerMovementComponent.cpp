@@ -23,21 +23,20 @@ namespace Asteroid
 	{
 		glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
 		glm::vec3 lv_deltaPos{ 0.f };
-		constexpr float lv_speedDamper{ 0.1f };
 
 		const auto& lv_keyStates = m_inputSystem->GetKeyStates();
 
 		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_W]) {
-			lv_deltaPos.y = -1.f * (lv_speedDamper * l_deltaTime);
+			lv_deltaPos.y = -1.f * (m_speed * l_deltaTime);
 		}
 		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_S]) {
-			lv_deltaPos.y = (lv_speedDamper * l_deltaTime);
+			lv_deltaPos.y = (m_speed * l_deltaTime);
 		}
 		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_D]) {
-			lv_deltaPos.x = (lv_speedDamper * l_deltaTime);
+			lv_deltaPos.x = (m_speed * l_deltaTime);
 		}
 		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_A]) {
-			lv_deltaPos.x = -1.f * (lv_speedDamper * l_deltaTime);
+			lv_deltaPos.x = -1.f * (m_speed * l_deltaTime);
 		}
 
 		if (0 != lv_deltaPos.x || 0 != lv_deltaPos.y) {
