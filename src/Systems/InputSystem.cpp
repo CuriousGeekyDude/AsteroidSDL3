@@ -75,5 +75,16 @@ namespace Asteroid
 		return false;
 	}
 
+	bool InputSystem::IsKeyUp(const SDL_Event& l_event, SDL_Scancode l_key)
+	{
+		if (SDL_EVENT_KEY_UP == l_event.type) {
 
+			if (l_key == l_event.key.scancode) {
+				return true;
+			}
+
+		}
+
+		return false;
+	}
 }

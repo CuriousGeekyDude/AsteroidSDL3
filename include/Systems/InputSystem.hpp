@@ -4,7 +4,7 @@
 
 
 #include <array>
-
+#include <SDL3/SDL_events.h>
 
 
 namespace Asteroid
@@ -37,6 +37,8 @@ namespace Asteroid
 
 
 		bool IsKeyPressed(Keys l_key);
+
+		static bool IsKeyUp(const SDL_Event& l_event, SDL_Scancode l_key);
 
 	private:
 
