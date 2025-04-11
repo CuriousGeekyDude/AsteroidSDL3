@@ -30,13 +30,12 @@ namespace Asteroid
 	bool Engine::Init()
 	{
 		using namespace LogSystem;
-		LOG(Severity::INFO, Channel::INITIALIZATION, "****Engine initialization has begun****\n", nullptr);
-		//LogSystem::LogCommandLine("****Engine initialization has begun****\n");
+		LOG(Severity::INFO, Channel::INITIALIZATION, "****Engine initialization has begun****\n");
 
 		if (false == SDL_SetAppMetadata(m_initialData.m_appName.c_str()
 			, m_initialData.m_appVersion.c_str(), nullptr)) {
 
-			LOG(Severity::FAILURE, Channel::INITIALIZATION, "SDL Failed to create metadata for the app.", nullptr);
+			LOG(Severity::FAILURE, Channel::INITIALIZATION, "SDL Failed to create metadata for the app.");
 
 
 			/*LogSystem::LogCommandLine("SDL Failed to create metadata for the app."
@@ -45,7 +44,7 @@ namespace Asteroid
 		}
 
 
-		LOG(Severity::INFO, Channel::INITIALIZATION, "Metadata creation was successfull.", nullptr);
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Metadata creation was successfull.");
 
 		/*LogSystem::LogCommandLine(""
 			, "INFO", "INITIALIZATION", __LINE__, __FILE__);*/
@@ -54,12 +53,12 @@ namespace Asteroid
 		if (false == SDL_InitSubSystem(SDL_INIT_VIDEO)) {
 
 			LOG(Severity::FAILURE, Channel::INITIALIZATION
-				, "SDL failed to initialize at least one of the requested subsystems: ", SDL_GetError());
+				, "SDL failed to initialize at least one of the requested subsystems: %s", SDL_GetError());
 			return false;
 		}
 
 		LOG(Severity::INFO, Channel::INITIALIZATION
-			, "Initialization of all the requested subsystems was successfull.", nullptr);
+			, "Initialization of all the requested subsystems was successfull.");
 
 		
 		m_window = SDL_CreateWindow
@@ -73,13 +72,13 @@ namespace Asteroid
 
 		}
 
-		LOG(Severity::INFO, Channel::INITIALIZATION, "Window creation was successfull.", nullptr);
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Window creation was successfull.");
 
 		
 		m_renderer.Init(m_window);
 		m_renderer.SetClearColor(RenderSystem::Colors::BLACK);
 
-		LOG(Severity::INFO, Channel::INITIALIZATION, "Creating textures on Gpu commencing....", nullptr);
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Creating textures on Gpu commencing....");
 
 		for (auto& l_mapPairNameToPath : m_initialData.m_mappedTextureNamesToTheirPaths) {
 			
@@ -87,16 +86,16 @@ namespace Asteroid
 				, l_mapPairNameToPath.second, l_mapPairNameToPath.first);
 		}
 
-		LOG(Severity::INFO, Channel::INITIALIZATION, "Creation of all textures on gpu was successful.", nullptr);
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Creation of all textures on gpu was successful.");
 
 
-		LOG(Severity::INFO, Channel::INITIALIZATION, "Initializing the entities....", nullptr);
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Initializing the entities....");
 
 		Set_Verbosity(Severity::WARNING);
 
 		InitEntities();
 
-		LOG(Severity::INFO, Channel::INITIALIZATION, "Initializing entities was successful.", nullptr);
+		LOG(Severity::INFO, Channel::INITIALIZATION, "Initializing entities was successful.");
 
 		
 

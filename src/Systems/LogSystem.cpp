@@ -30,16 +30,26 @@ namespace Asteroid
 
 
 		
+		int ConstructFinalMsg(char* const l_finalMsg, const char* const l_formattedMsg
+			, size_t l_sizeOfFinalMsg,va_list l_argList)
+		{
+			int lv_numberCharsWritten = vsnprintf(l_finalMsg, l_sizeOfFinalMsg, l_formattedMsg, l_argList);
 
+			return lv_numberCharsWritten;
+		}
 
-		const char* ConstructLogMsg(const Severity l_level, const Channel l_category
-			, const int l_lineNumber, const char* l_filePath, const char* l_userMsg, const char* l_extraMsg)
+		const char* PrepareAndConstructLogMsg(const Severity l_level, const Channel l_category
+			, const int l_lineNumber, const char* l_filePath, const char* l_userMsg, va_list l_argList)
 		{
 			constexpr size_t lv_finalMsgSize{ 2028 };
 			static char lv_finalMsg[lv_finalMsgSize];
 			static char lv_formattedMsg[lv_finalMsgSize];
 			static Severity lv_currentVerbosity = Severity::INFO;
 
+
+			if (nullptr == l_userMsg) {
+				return nullptr;
+			}
 
 			//Setting verbosity
 			if (-1 == l_lineNumber) {
@@ -55,19 +65,13 @@ namespace Asteroid
 			memset(&lv_formattedMsg, 0, sizeof(char) * lv_finalMsgSize);
 			memset(&lv_finalMsg, 0, sizeof(char) * lv_finalMsgSize);
 
-			char lv_templatePartOfMsg1[] = "\n\n---------------------------\n\n[%s] [%s] [line %d in file %s]: %s\n";
-			char lv_templatePartOfMsg2[] = "\n\n---------------------------\n\n[%s] [%s] [line %d in file %s]: %s : %s \n";
+			char lv_templatePartOfMsg1[] = "\n\n---------------------------\n\n[%s] [%s] [line %d in file %s]: ";
+			
+			constexpr uint32_t lv_remainingSizeFinalMsg = lv_finalMsgSize - (sizeof(lv_templatePartOfMsg1) / sizeof(char));
 
+			
 
-			if (nullptr == l_userMsg) {
-				return nullptr;
-			}
-			if (nullptr == l_extraMsg) {
-				memcpy(&lv_formattedMsg, &lv_templatePartOfMsg1, sizeof(lv_templatePartOfMsg1) / sizeof(char));
-			}
-			else {
-				memcpy(&lv_formattedMsg, &lv_templatePartOfMsg2, sizeof(lv_templatePartOfMsg2) / sizeof(char));
-			}
+			memcpy(&lv_formattedMsg, &lv_templatePartOfMsg1, sizeof(lv_templatePartOfMsg1));
 
 			std::array<char, 64> lv_severity{};
 			if (Severity::FAILURE == l_level) {
@@ -99,16 +103,37 @@ namespace Asteroid
 			}
 
 
-			int lv_totalNumCharsWritten{};
-			if (nullptr == l_extraMsg) {
-				lv_totalNumCharsWritten = snprintf(lv_finalMsg, lv_finalMsgSize - 1, lv_formattedMsg, lv_severity.data(), lv_channel.data(), l_lineNumber, l_filePath, l_userMsg);
-			}
-			else {
-				lv_totalNumCharsWritten = snprintf(lv_finalMsg, lv_finalMsgSize - 1, lv_formattedMsg, lv_severity.data(), lv_channel.data(), l_lineNumber, l_filePath, l_userMsg, l_extraMsg);
+
+			int lv_totalNumCharWritten = snprintf(lv_finalMsg, lv_finalMsgSize
+				, lv_formattedMsg, lv_severity.data(), lv_channel.data(), l_lineNumber, l_filePath);
+
+			if (-1 == lv_totalNumCharWritten) {
+				OutputDebugString(L"snprintf() failed to produce formatted string for logging.\n");
+				exit(EXIT_FAILURE);
 			}
 
-			if (-1 == lv_totalNumCharsWritten) {
-				OutputDebugString(L"snprintf() failed to produce formatted string for logging.\n");
+			size_t lv_totalFinalMsgFilled{};
+			for (size_t i = 0; i < lv_finalMsgSize; ++i) {
+				if ('\0' == lv_finalMsg[i]) {
+					break;
+				}
+				++lv_totalFinalMsgFilled;
+			}
+
+			uint32_t lv_totalCharUserMsg{};
+			for (uint32_t i = 0; i < lv_remainingSizeFinalMsg; ++i) {
+				if ('\0' == l_userMsg[i]) {
+					break;
+				}
+				++lv_totalCharUserMsg;
+			}
+			memcpy(&lv_finalMsg[lv_totalFinalMsgFilled], l_userMsg, (size_t)sizeof(char) * lv_totalCharUserMsg);
+
+			lv_totalNumCharWritten = ConstructFinalMsg(lv_finalMsg, lv_finalMsg, lv_finalMsgSize, l_argList);
+			
+
+			if (-1 == lv_totalNumCharWritten) {
+				OutputDebugString(L"ConstructFinalMsg() failed to produce formatted string for logging.\n");
 				exit(EXIT_FAILURE);
 			}
 
@@ -118,12 +143,14 @@ namespace Asteroid
 
 		void SetVerbosity(const Severity l_level)
 		{
-			ConstructLogMsg(l_level, Channel::INITIALIZATION, -1, nullptr, nullptr);
+			va_list lv_dummyList = nullptr;
+			PrepareAndConstructLogMsg(l_level, Channel::INITIALIZATION, -1, nullptr, nullptr, lv_dummyList);
 		}
 
 		void UpdateToCurrentVerbosity()
 		{
-			ConstructLogMsg(Severity::INFO, Channel::INITIALIZATION, -2, nullptr, nullptr);
+			va_list lv_dummyList = nullptr;
+			PrepareAndConstructLogMsg(Severity::INFO, Channel::INITIALIZATION, -2, nullptr, nullptr, lv_dummyList);
 
 		}
 
@@ -139,7 +166,7 @@ namespace Asteroid
 
 		void Log(const Severity l_level, const Channel l_category
 			, const int l_lineNumber, const char* l_filePath
-			, const char* l_userMsg, const char* l_extraMsg)
+			, const char* l_userMsg,...)
 		{
 			static std::ofstream lv_logFile{};
 			static uint64_t lv_counter{};
@@ -151,7 +178,12 @@ namespace Asteroid
 				lv_logFile.open("Logging/LogFile.txt", std::ofstream::app);
 			}
 
-			const char* lv_msg = ConstructLogMsg(l_level, l_category, l_lineNumber, l_filePath, l_userMsg, l_extraMsg);
+
+			va_list lv_argList;
+			va_start(lv_argList, l_userMsg);
+			const char* lv_msg = PrepareAndConstructLogMsg(l_level, l_category, l_lineNumber, l_filePath, l_userMsg, lv_argList);
+			va_end(lv_argList);
+
 			if (nullptr == lv_msg) { return; }
 
 			UpdateToCurrentVerbosity();
