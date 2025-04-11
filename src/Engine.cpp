@@ -175,15 +175,18 @@ namespace Asteroid
 
 			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 			{
-				static float f = 0.0f;
+				static float f = 0.1f;
+
+				auto& lv_player = m_entities[m_playerEntityHandle];
 
 				ImGui::Begin("Player Info");                          // Create a window called "Hello, world!" and append into it.
 
 
 				ImGui::SliderFloat("Speed", &f,0.1f, 5.f, "%.3f");
 				
+				auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
+				lv_movementComp->SetSpeed(f);
 				
-
 
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 				ImGui::End();
