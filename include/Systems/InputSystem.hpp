@@ -41,7 +41,7 @@ namespace Asteroid
 		void ProcessInput(const SDL_Event& l_event);
 
 
-		bool IsKeyPressed(Keys l_key);
+		bool IsKeyPressed(const Keys l_key);
 
 		bool IsKeyUp(const Keys l_key);
 

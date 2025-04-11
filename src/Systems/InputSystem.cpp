@@ -89,7 +89,7 @@ namespace Asteroid
 	}
 
 
-	bool InputSystem::IsKeyPressed(Keys l_key)
+	bool InputSystem::IsKeyPressed(const Keys l_key)
 	{
 		if (true == m_keyStatesPressed[(int)l_key]) {
 			return true;
