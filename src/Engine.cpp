@@ -9,6 +9,7 @@
 #define LOGGING
 #include "Systems/LogSystem.hpp"
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlrenderer3.h>
 #include <SDL3/SDL.h>
@@ -132,16 +133,28 @@ namespace Asteroid
 			m_trackLastFrameElapsedTime.m_currentTime = SDL_GetTicks();
 
 			SDL_Event lv_event;
+			static uint64_t lv_HideOrShow{};
 
 			while (true == SDL_PollEvent(&lv_event)) {
 
 				ImGui_ImplSDL3_ProcessEvent(&lv_event);
 
+				if (true == m_inputSystem.IsKeyUp(lv_event, SDL_SCANCODE_F1)) {
+					if (0 == lv_HideOrShow % 2) {
+						show_demo_window = false;
+
+					}
+					else {
+						show_demo_window = true;
+
+					}
+					++lv_HideOrShow;
+				}
+
+
 				if (SDL_EVENT_QUIT == lv_event.type) {
 					lv_quit = true;
 				}
-
-				if(t)
 			}
 
 			m_inputSystem.ProcessInput();
@@ -169,6 +182,11 @@ namespace Asteroid
 				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
 				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+
+
+				
+				
+
 				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 				ImGui::Checkbox("Another Window", &show_another_window);
 
