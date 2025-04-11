@@ -21,7 +21,12 @@ namespace Asteroid
 			KEY_A = 1,
 			KEY_S = 2,
 			KEY_D = 3,
-			KEY_F1 = 4
+			KEY_F1 = 4,
+
+
+			//Maximum number of possible keys. 
+			// Not to be used as index into key states.
+			KEY_MAXIMUM = 1024,
 		};
 
 
@@ -45,7 +50,7 @@ namespace Asteroid
 		void ProcessKeyboard();
 
 	private:
-		static constexpr uint32_t m_totalNumInputKeysToProcess{ 5U };
+		static constexpr uint32_t m_totalNumInputKeysToProcess{ (uint32_t)Keys::KEY_MAXIMUM };
 		std::array<bool, m_totalNumInputKeysToProcess> m_keyStates;
 
 	};
