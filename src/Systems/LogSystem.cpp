@@ -128,8 +128,9 @@ namespace Asteroid
 				++lv_totalCharUserMsg;
 			}
 			memcpy(&lv_finalMsg[lv_totalFinalMsgFilled], l_userMsg, (size_t)sizeof(char) * lv_totalCharUserMsg);
+			memcpy(lv_formattedMsg, lv_finalMsg, sizeof(char) * lv_finalMsgSize);
 
-			lv_totalNumCharWritten = ConstructFinalMsg(lv_finalMsg, lv_finalMsg, lv_finalMsgSize, l_argList);
+			lv_totalNumCharWritten = ConstructFinalMsg(lv_finalMsg, lv_formattedMsg, lv_finalMsgSize, l_argList);
 			
 
 			if (-1 == lv_totalNumCharWritten) {

@@ -34,7 +34,7 @@ namespace Asteroid
 
 			m_renderer = SDL_CreateRenderer(l_window, nullptr);
 			if (nullptr == m_renderer) {
-				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to create the renderer ", SDL_GetError());
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to create the renderer %s", SDL_GetError());
 				return false;
 			}
 
@@ -71,7 +71,7 @@ namespace Asteroid
 			if (false == SDL_GetRenderDrawColor
 			(m_renderer, &lv_color.r, &lv_color.g, &lv_color.b, &lv_color.a)) {
 
-				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to set the clear color to the requested one ", SDL_GetError());
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to set the clear color to the requested one %s", SDL_GetError());
 				return false;
 			}
 
@@ -84,7 +84,7 @@ namespace Asteroid
 			using namespace LogSystem;
 
 			if (false == SDL_RenderClear(m_renderer)) {
-				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to clear the swapchain ", SDL_GetError());
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to clear the swapchain %s", SDL_GetError());
 				return false;
 			}
 
@@ -107,7 +107,7 @@ namespace Asteroid
 			if (false == SDL_RenderTexture(m_renderer
 				, lv_sdlTexture, nullptr, &lv_dstRect)) {
 
-				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to render the requested entity ", SDL_GetError());
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to render the requested entity %s", SDL_GetError());
 				return false;
 			}
 

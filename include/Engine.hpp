@@ -46,7 +46,7 @@ namespace Asteroid
 
 		//Wanted to have pointer here but vector of entities might grow
 		//and invalidate the ptr.
-		uint32_t m_playerEntityHandle;
+		uint32_t m_playerEntityHandle{};
 		std::vector<Entity> m_entities;
 
 		Time m_trackLastFrameElapsedTime;

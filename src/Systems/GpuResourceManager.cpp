@@ -19,18 +19,18 @@ namespace Asteroid
 	{
 		using namespace LogSystem;
 
-		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to load ", l_texturePath.c_str());
+		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to load %s", l_texturePath.c_str());
 
 		//LogSystem::LogCommandLine("Attempting to load {4}.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, );
 
 		auto* lv_gpuTexture = IMG_LoadTexture(l_renderer, l_texturePath.c_str());
 
 		if (nullptr == lv_gpuTexture) {
-			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture ", l_texturePath.c_str());
+			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture %s", l_texturePath.c_str());
 			return nullptr;
 		}
 
-		LOG(Severity::INFO, Channel::GRAPHICS, l_texturePath.c_str(), " was loaded successfully.");
+		LOG(Severity::INFO, Channel::GRAPHICS, "%s was loaded successfully.", l_texturePath.c_str());
 
 		m_gpuTextures.push_back(lv_gpuTexture);
 
@@ -48,18 +48,18 @@ namespace Asteroid
 	{
 		using namespace LogSystem;
 
-		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to load ", l_texturePath.c_str());
+		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to load %s", l_texturePath.c_str());
 
 		auto* lv_gpuTexture = IMG_LoadTexture(l_renderer, l_texturePath.c_str());
 
 		if (nullptr == lv_gpuTexture) {
 
-			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture ", l_texturePath.c_str());
+			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture %s", l_texturePath.c_str());
 			return UINT32_MAX;
 		}
 
 
-		LOG(Severity::INFO, Channel::GRAPHICS, l_texturePath.c_str() , " was loaded successfully.");
+		LOG(Severity::INFO, Channel::GRAPHICS, "%s was loaded successfully.",l_texturePath.c_str());
 
 		m_gpuTextures.push_back(lv_gpuTexture);
 
@@ -73,18 +73,18 @@ namespace Asteroid
 	{
 		using namespace LogSystem;
 
-		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to retrieve gpu texture ", l_textureName.c_str());
+		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to retrieve gpu texture %s", l_textureName.c_str());
 
 
 		if (m_textureNamesMappedToIndices.end() != m_textureNamesMappedToIndices.find(l_textureName)) {
 
 			LOG(Severity::INFO, Channel::GRAPHICS
-				, "Retrieve of the following gpu texture was successful  ", l_textureName.c_str());
+				, "Retrieve of the following gpu texture was successful  %s", l_textureName.c_str());
 			return m_gpuTextures[m_textureNamesMappedToIndices[l_textureName]];
 		}
 
 		LOG(Severity::WARNING, Channel::GRAPHICS
-			, "Retrieve of the following gpu texture failed  ", l_textureName.c_str());
+			, "Retrieve of the following gpu texture failed  %s", l_textureName.c_str());
 		return nullptr;
 	}
 	SDL_Texture* GpuResourceManager::RetrieveGpuTexture(const uint32_t l_textureHandle)

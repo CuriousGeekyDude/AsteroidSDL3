@@ -37,18 +37,10 @@ namespace Asteroid
 
 			LOG(Severity::FAILURE, Channel::INITIALIZATION, "SDL Failed to create metadata for the app.");
 
-
-			/*LogSystem::LogCommandLine("SDL Failed to create metadata for the app."
-				, "ERROR",  "INITIALIZATION", __LINE__, __FILE__);*/
-
 		}
 
 
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Metadata creation was successfull.");
-
-		/*LogSystem::LogCommandLine(""
-			, "INFO", "INITIALIZATION", __LINE__, __FILE__);*/
-
 
 		if (false == SDL_InitSubSystem(SDL_INIT_VIDEO)) {
 
@@ -67,7 +59,7 @@ namespace Asteroid
 		
 		if(nullptr == m_window){
 
-			LOG(Severity::FAILURE, Channel::INITIALIZATION, "SDL failed to create window: ", SDL_GetError());
+			LOG(Severity::FAILURE, Channel::INITIALIZATION, "SDL failed to create window: %s", SDL_GetError());
 			return false;
 
 		}
@@ -201,7 +193,7 @@ namespace Asteroid
 			m_trackLastFrameElapsedTime.m_lastFrameElapsedTime = SDL_GetTicks() - m_trackLastFrameElapsedTime.m_currentTime;
 		}
 		Set_Verbosity(LogSystem::Severity::INFO);
-		LOG(LogSystem::Severity::INFO, LogSystem::Channel::GRAPHICS, "End of game loop.", nullptr);
+		LOG(LogSystem::Severity::INFO, LogSystem::Channel::GRAPHICS, "End of game loop.");
 
 		return true;
 
