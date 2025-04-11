@@ -21,4 +21,10 @@ namespace Asteroid
 	{
 		return m_transform;
 	}
+
+
+	void MovementComponent::SetSpeed(const float l_newSpeed)
+	{
+		m_speed = l_newSpeed;
+	}
 }

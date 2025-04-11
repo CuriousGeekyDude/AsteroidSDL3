@@ -21,8 +21,15 @@ namespace Asteroid
 
 		const glm::mat3& GetTransform() const;
 
+		void SetSpeed(const float l_newSpeed);
+
 	protected:
 		glm::mat3 m_transform{};
 		const InputSystem* m_inputSystem;
+
+		/// <summary>
+		///Default speed for every component that moves.
+		/// </summary>
+		float m_speed{0.1f};
 	};
 }
