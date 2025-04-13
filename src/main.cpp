@@ -14,7 +14,7 @@ int main()
 	lv_engineInitialData.m_windowTitle = "Asteroid Game";
 	lv_engineInitialData.m_appVersion = "Version 1.0";
 	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
-		.emplace(std::pair<std::string, std::string>("Spaceship", "Assets/spaceship.png"));
+		.emplace(std::pair<std::string, std::string>("Spaceship", "Assets/DarkRaiderSpaceship.png"));
 
 
 	
