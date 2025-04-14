@@ -31,6 +31,8 @@ namespace Asteroid
 		RenderSystem::RenderingData lv_renderData{};
 		lv_renderData.m_entityPos = lv_currentPos;
 		lv_renderData.m_entityTextureHandle = m_textureHandle;
+		lv_renderData.m_widthToRender = 90;
+		lv_renderData.m_heightToRender = 90;
 
 		if (false == m_renderer->RenderEntity(lv_renderData)) {
 			return false;

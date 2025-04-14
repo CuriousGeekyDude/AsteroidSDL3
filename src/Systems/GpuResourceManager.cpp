@@ -61,6 +61,8 @@ namespace Asteroid
 
 		LOG(Severity::INFO, Channel::GRAPHICS, "%s was loaded successfully.",l_texturePath.c_str());
 
+		SDL_SetTextureScaleMode(lv_gpuTexture, SDL_SCALEMODE_LINEAR);
+
 		m_gpuTextures.push_back(lv_gpuTexture);
 
 		m_textureNamesMappedToIndices.insert
