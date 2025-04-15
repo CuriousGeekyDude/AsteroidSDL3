@@ -60,8 +60,10 @@ namespace Asteroid
 
 	private:
 
-		void ProcessKeyboard(const SDL_Event& l_event);
-		void ProcessMouse(const SDL_Event& l_event);
+		void RegisterKeyboardInputs(const SDL_Event& l_event);
+		void RegisterMouseInputs(const SDL_Event& l_event);
+
+		
 		
 
 	private:

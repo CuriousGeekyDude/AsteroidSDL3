@@ -22,7 +22,7 @@ namespace Asteroid
 	}
 
 
-	void InputSystem::ProcessKeyboard(const SDL_Event& l_event)
+	void InputSystem::RegisterKeyboardInputs(const SDL_Event& l_event)
 	{
 		using namespace LogSystem;
 
@@ -81,7 +81,7 @@ namespace Asteroid
 
 
 
-	void InputSystem::ProcessMouse(const SDL_Event& l_event)
+	void InputSystem::RegisterMouseInputs(const SDL_Event& l_event)
 	{
 		memset(m_mouseStatesPressed.data(), 0, sizeof(bool) * m_mouseStatesPressed.size());
 		memset(m_mouseStatesUp.data(), 0, sizeof(bool) * m_mouseStatesUp.size());
@@ -138,8 +138,8 @@ namespace Asteroid
 	void InputSystem::ProcessInput(const SDL_Event& l_event)
 	{
 
-		ProcessKeyboard(l_event);
-		ProcessMouse(l_event);
+		RegisterKeyboardInputs(l_event);
+		RegisterMouseInputs(l_event);
 
 	}
 
