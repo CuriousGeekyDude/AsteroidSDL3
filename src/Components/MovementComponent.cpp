@@ -23,7 +23,7 @@ namespace Asteroid
 	}
 
 
-	void MovementComponent::SetSpeed(const float l_newSpeed)
+	void MovementComponent::SetSpeed(const glm::vec2& l_newSpeed)
 	{
 		m_speed = l_newSpeed;
 	}

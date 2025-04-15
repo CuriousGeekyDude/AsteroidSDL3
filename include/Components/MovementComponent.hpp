@@ -21,7 +21,7 @@ namespace Asteroid
 
 		const glm::mat3& GetTransform() const;
 
-		void SetSpeed(const float l_newSpeed);
+		void SetSpeed(const glm::vec2& l_newSpeed);
 
 	protected:
 		glm::mat3 m_transform{};
@@ -30,6 +30,6 @@ namespace Asteroid
 		/// <summary>
 		///Default speed for every component that moves.
 		/// </summary>
-		float m_speed{0.1f};
+		glm::vec2 m_speed{0.f};
 	};
 }

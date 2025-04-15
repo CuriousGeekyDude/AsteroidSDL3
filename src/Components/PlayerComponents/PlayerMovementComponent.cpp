@@ -6,6 +6,7 @@
 #include "Systems/InputSystem.hpp"
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+#include <algorithm>
 #include "Entities/Entity.hpp"
 
 namespace Asteroid
@@ -22,33 +23,48 @@ namespace Asteroid
 	bool PlayerMovementComponent::Update(float l_deltaTime)
 	{
 		glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
-		glm::vec3 lv_deltaPos{ 0.f };
+		bool lv_keyIsPressed = false;
+		float lv_d = l_deltaTime / (1.f + l_deltaTime);
 
 		const auto& lv_keyStates = m_inputSystem->GetKeyStates();
 
 		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_W]) {
-			lv_deltaPos.y = -1.f * (m_speed * l_deltaTime);
+			m_speed += glm::vec2(0.f, -0.01f * lv_d);
+			lv_keyIsPressed = true;
 		}
 		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_S]) {
-			lv_deltaPos.y = (m_speed * l_deltaTime);
+			m_speed += glm::vec2(0.f, 0.01f * lv_d);
+			lv_keyIsPressed = true;
+
+
 		}
 		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_D]) {
-			lv_deltaPos.x = (m_speed * l_deltaTime);
+
+			m_speed += glm::vec2(0.01f * lv_d, 0.f);
+			lv_keyIsPressed = true;
+
+
 		}
 		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_A]) {
-			lv_deltaPos.x = -1.f * (m_speed * l_deltaTime);
+			
+			m_speed += glm::vec2(-0.01f * lv_d, 0.f);
+			lv_keyIsPressed = true;
+
+
 		}
+		if (false == lv_keyIsPressed) {
+			m_speed = m_speed * (1-std::expf(-l_deltaTime*30.f));
+ 		}
+		m_speed = glm::vec2(std::clamp(m_speed.x, -0.3f, 0.3f), std::clamp(m_speed.y, -0.3f, 0.3f));
+		lv_deltaTransform[2][0] = m_speed.x;
+		lv_deltaTransform[2][1] = m_speed.y;
 
-		if (0 != lv_deltaPos.x || 0 != lv_deltaPos.y) {
-			lv_deltaTransform[2][0] = lv_deltaPos.x;
-			lv_deltaTransform[2][1] = lv_deltaPos.y;
+		m_transform = lv_deltaTransform * m_transform;
+		auto& lv_currentPos = m_ownerEntity->GetCurrentPos();
+		auto lv_newPos3 = lv_deltaTransform * glm::vec3{ lv_currentPos, 1.f };
 
-			m_transform = lv_deltaTransform * m_transform;
-			auto& lv_currentPos = m_ownerEntity->GetCurrentPos();
-			auto lv_newPos3 = lv_deltaTransform * glm::vec3{ lv_currentPos, 1.f };
-
-			m_ownerEntity->SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });
-		}
+		m_ownerEntity->SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });
+		
 
 		return true;
 	}
