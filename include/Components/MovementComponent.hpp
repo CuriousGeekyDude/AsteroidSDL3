@@ -25,6 +25,7 @@ namespace Asteroid
 
 	protected:
 		glm::mat3 m_transform{};
+		float m_theta{};
 		const InputSystem* m_inputSystem;
 
 		/// <summary>
