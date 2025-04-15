@@ -89,6 +89,8 @@ namespace Asteroid
 
 	void InputSystem::RegisterMouseInputs(const SDL_Event& l_event)
 	{
+
+
 		memset(m_mouseStatesPressed.data(), 0, sizeof(bool) * m_mouseStatesPressed.size());
 		memset(m_mouseStatesUp.data(), 0, sizeof(bool) * m_mouseStatesUp.size());
 		m_totalNumLeftMouseClicks = 0;
@@ -137,6 +139,9 @@ namespace Asteroid
 			}
 		}
 
+		if (true == m_mouseHidden) {
+			SDL_GetMouseState(&m_mousePosRelToWindow.x, &m_mousePosRelToWindow.y);
+		}
 		
 
 	}
@@ -168,7 +173,7 @@ namespace Asteroid
 				LOG(Severity::WARNING, Channel::INPUT, "Failed to show the cursor due to : %s\n", SDL_GetError());
 			}
 
-			m_mouseHidden = lv_result;
+			m_mouseHidden = false;
 		}
 	}
 
@@ -224,4 +229,10 @@ namespace Asteroid
 	{
 		return m_totalNumLeftMouseClicks;
 	}
+
+	const glm::vec2& InputSystem::GetMousePosRelativeToWindow() const
+	{
+		return m_mousePosRelToWindow;
+	}
+
 }

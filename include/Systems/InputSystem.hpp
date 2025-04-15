@@ -3,6 +3,7 @@
 
 
 
+#include <glm.hpp>
 #include <array>
 #include <SDL3/SDL_events.h>
 
@@ -57,6 +58,8 @@ namespace Asteroid
 		uint8_t TotalNumConsecutiveRightClicks();
 		uint8_t TotalNumConsecutiveLeftClicks();
 
+		const glm::vec2& GetMousePosRelativeToWindow() const;
+
 
 
 	private:
@@ -76,6 +79,7 @@ namespace Asteroid
 		std::array<bool, 2> m_mouseStatesPressed;
 		std::array<bool, 2> m_mouseStatesUp;
 
+		glm::vec2 m_mousePosRelToWindow{};
 		//1 means 1 click, 2 means 2 clicks , 3 means 3 clicks, ....
 		//But for practical reasons we only record the first 3 consecutive clicks
 		uint8_t m_totalNumLeftMouseClicks;
