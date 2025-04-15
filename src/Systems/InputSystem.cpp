@@ -173,7 +173,7 @@ namespace Asteroid
 				LOG(Severity::WARNING, Channel::INPUT, "Failed to show the cursor due to : %s\n", SDL_GetError());
 			}
 
-			m_mouseHidden = false;
+			m_mouseHidden = !lv_result;
 		}
 	}
 
