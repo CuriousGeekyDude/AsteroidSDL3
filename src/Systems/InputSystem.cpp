@@ -85,15 +85,41 @@ namespace Asteroid
 	{
 		memset(m_mouseStatesPressed.data(), 0, sizeof(bool) * m_mouseStatesPressed.size());
 		memset(m_mouseStatesUp.data(), 0, sizeof(bool) * m_mouseStatesUp.size());
-
+		m_totalNumLeftMouseClicks = 0;
+		m_totalNumRightMouseClicks = 0;
 
 		if (SDL_EVENT_MOUSE_BUTTON_DOWN == l_event.button.type) {
 			if (SDL_BUTTON_LEFT == l_event.button.button) {
+
 				m_mouseStatesPressed[(int)Mouse::LEFT] = true;
+
+				if (1 == l_event.button.clicks) {
+					m_totalNumLeftMouseClicks = 1;
+				}
+				else if (2 == l_event.button.clicks) {
+					m_totalNumLeftMouseClicks = 2;
+				}
+				else if (3 == l_event.button.clicks) {
+					m_totalNumLeftMouseClicks = 3;
+				}
 			}
 			if (SDL_BUTTON_RIGHT == l_event.button.button) {
+
 				m_mouseStatesPressed[(int)Mouse::RIGHT] = true;
+
+				if (1 == l_event.button.clicks) {
+					m_totalNumRightMouseClicks = 1;
+				}
+				else if (2 == l_event.button.clicks) {
+					m_totalNumRightMouseClicks = 2;
+				}
+				else if (3 == l_event.button.clicks) {
+					m_totalNumRightMouseClicks = 3;
+				}
 			}
+
+
+			
 		}
 		if (SDL_EVENT_MOUSE_BUTTON_UP == l_event.button.type) {
 			
@@ -105,6 +131,7 @@ namespace Asteroid
 			}
 		}
 
+		
 
 	}
 
@@ -147,5 +174,14 @@ namespace Asteroid
 			return true;
 		}
 		return false;
+	}
+
+	uint8_t InputSystem::TotalNumConsecutiveRightClicks()
+	{
+		return m_totalNumRightMouseClicks;
+	}
+	uint8_t InputSystem::TotalNumConsecutiveLeftClicks()
+	{
+		return m_totalNumLeftMouseClicks;
 	}
 }

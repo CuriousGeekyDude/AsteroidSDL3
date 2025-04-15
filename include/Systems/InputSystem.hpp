@@ -53,6 +53,11 @@ namespace Asteroid
 		bool IsMouseButtonPressed(const Mouse l_mouseButton);
 		bool IsMouseButtonUp(const Mouse l_mouseButton);
 
+		uint8_t TotalNumConsecutiveRightClicks();
+		uint8_t TotalNumConsecutiveLeftClicks();
+
+
+
 	private:
 
 		void ProcessKeyboard(const SDL_Event& l_event);
@@ -66,6 +71,15 @@ namespace Asteroid
 
 		std::array<bool, 2> m_mouseStatesPressed;
 		std::array<bool, 2> m_mouseStatesUp;
+
+		//1 means 1 click, 2 means 2 clicks , 3 means 3 clicks, ....
+		//But for practical reasons we only record the first 3 consecutive clicks
+		uint8_t m_totalNumLeftMouseClicks;
+
+
+		//1 means 1 click, 2 means 2 clicks , 3 means 3 clicks, ....
+		//But for practical reasons we only record the first 3 consecutive clicks
+		uint8_t m_totalNumRightMouseClicks;
 
 	};
 
