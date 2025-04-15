@@ -80,11 +80,39 @@ namespace Asteroid
 	}
 
 
+
+	void InputSystem::ProcessMouse(const SDL_Event& l_event)
+	{
+		memset(m_mouseStatesPressed.data(), 0, sizeof(bool) * m_mouseStatesPressed.size());
+		memset(m_mouseStatesUp.data(), 0, sizeof(bool) * m_mouseStatesUp.size());
+
+
+		if (SDL_EVENT_MOUSE_BUTTON_DOWN == l_event.button.type) {
+			if (SDL_BUTTON_LEFT == l_event.button.button) {
+				m_mouseStatesPressed[(int)Mouse::LEFT] = true;
+			}
+			if (SDL_BUTTON_RIGHT == l_event.button.button) {
+				m_mouseStatesPressed[(int)Mouse::RIGHT] = true;
+			}
+		}
+		if (SDL_EVENT_MOUSE_BUTTON_UP == l_event.button.type) {
+			
+			if (SDL_BUTTON_LEFT == l_event.button.button) {
+				m_mouseStatesUp[(int)Mouse::LEFT] = true;
+			}
+			if (SDL_BUTTON_RIGHT == l_event.button.button) {
+				m_mouseStatesUp[(int)Mouse::RIGHT] = true;
+			}
+		}
+
+
+	}
+
 	void InputSystem::ProcessInput(const SDL_Event& l_event)
 	{
 
 		ProcessKeyboard(l_event);
-
+		ProcessMouse(l_event);
 
 	}
 
@@ -103,6 +131,21 @@ namespace Asteroid
 			return true;
 		}
 
+		return false;
+	}
+
+	bool InputSystem::IsMouseButtonPressed(const Mouse l_mouseButton)
+	{
+		if (true == m_mouseStatesPressed[(int)l_mouseButton]) {
+			return true;
+		}
+		return false;
+	}
+	bool InputSystem::IsMouseButtonUp(const Mouse l_mouseButton)
+	{
+		if (true == m_mouseStatesUp[(int)l_mouseButton]) {
+			return true;
+		}
 		return false;
 	}
 }

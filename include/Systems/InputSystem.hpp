@@ -29,6 +29,11 @@ namespace Asteroid
 			KEY_MAXIMUM = 1024,
 		};
 
+		enum class Mouse
+		{
+			LEFT = 0,
+			RIGHT = 1
+		};
 
 	public:
 
@@ -45,15 +50,22 @@ namespace Asteroid
 
 		bool IsKeyUp(const Keys l_key);
 
+		bool IsMouseButtonPressed(const Mouse l_mouseButton);
+		bool IsMouseButtonUp(const Mouse l_mouseButton);
+
 	private:
 
 		void ProcessKeyboard(const SDL_Event& l_event);
+		void ProcessMouse(const SDL_Event& l_event);
 		
 
 	private:
 		static constexpr uint32_t m_totalNumInputKeysToProcess{ (uint32_t)Keys::KEY_MAXIMUM };
 		std::array<bool, m_totalNumInputKeysToProcess> m_keyStatesPressed;
 		std::array<bool, m_totalNumInputKeysToProcess> m_keyStatesUp;
+
+		std::array<bool, 2> m_mouseStatesPressed;
+		std::array<bool, 2> m_mouseStatesUp;
 
 	};
 
