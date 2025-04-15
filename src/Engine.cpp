@@ -129,7 +129,7 @@ namespace Asteroid
 			while (true == SDL_PollEvent(&lv_event)) {
 
 				ImGui_ImplSDL3_ProcessEvent(&lv_event);
-				m_inputSystem.ProcessInput(lv_event);
+				m_inputSystem.ProcessInput(lv_event, m_window);
 
 				if (true == m_inputSystem.IsKeyUp(InputSystem::Keys::KEY_F1)) {
 					if (0 == lv_HideOrShow % 2) {

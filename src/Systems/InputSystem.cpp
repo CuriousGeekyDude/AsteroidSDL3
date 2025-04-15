@@ -8,6 +8,7 @@
 #define LOGGING
 #include "Systems/LogSystem.hpp"
 #include <SDL3/SDL_keyboard.h>
+#include <SDL3/SDL_mouse.h>
 
 
 namespace Asteroid
@@ -54,7 +55,9 @@ namespace Asteroid
 		if (true == lv_keyStates[SDL_SCANCODE_F1]) {
 			m_keyStatesPressed[(int)Keys::KEY_F1] = true;
 		}
-
+		if (SDL_SCANCODE_C == l_event.key.scancode) {
+			m_keyStatesPressed[(int)Keys::KEY_C] = true;
+		}
 
 		if (SDL_EVENT_KEY_UP == l_event.type) {
 
@@ -72,6 +75,9 @@ namespace Asteroid
 			}
 			if (SDL_SCANCODE_F1 == l_event.key.scancode) {
 				m_keyStatesUp[(int)Keys::KEY_F1] = true;
+			}
+			if (SDL_SCANCODE_C == l_event.key.scancode) {
+				m_keyStatesUp[(int)Keys::KEY_C] = true;
 			}
 
 		}
@@ -135,11 +141,45 @@ namespace Asteroid
 
 	}
 
-	void InputSystem::ProcessInput(const SDL_Event& l_event)
+
+	void InputSystem::ProcessKeyboardInputs(SDL_Window* l_window)
+	{
+		using namespace LogSystem;
+
+		if (false == m_mouseHidden && true == m_keyStatesPressed[(int)Keys::KEY_C]) {
+			bool lv_result = SDL_SetWindowRelativeMouseMode(l_window ,true);
+
+			if (false == lv_result) {
+				LOG(Severity::WARNING, Channel::INPUT, "Failed to hide the cursor due to : %s\n", SDL_GetError());
+			}
+			m_mouseHidden = lv_result;
+		}
+	}
+
+
+	void InputSystem::ProcessMouseInputs(SDL_Window* l_window)
+	{
+		using namespace LogSystem;
+
+		if (true == m_mouseHidden && 3 == m_totalNumLeftMouseClicks) {
+			bool lv_result = SDL_SetWindowRelativeMouseMode(l_window, false);
+
+			if (false == lv_result) {
+				LOG(Severity::WARNING, Channel::INPUT, "Failed to show the cursor due to : %s\n", SDL_GetError());
+			}
+
+			m_mouseHidden = lv_result;
+		}
+	}
+
+	void InputSystem::ProcessInput(const SDL_Event& l_event, SDL_Window* l_window)
 	{
 
 		RegisterKeyboardInputs(l_event);
 		RegisterMouseInputs(l_event);
+
+		ProcessKeyboardInputs(l_window);
+		ProcessMouseInputs(l_window);
 
 	}
 
