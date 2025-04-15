@@ -24,7 +24,8 @@ namespace Asteroid
 		{
 			GRAPHICS = 0,
 			PHYSICS,
-			INITIALIZATION
+			INITIALIZATION,
+			INPUT
 		};
 
 
