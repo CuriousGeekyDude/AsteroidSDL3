@@ -27,4 +27,9 @@ namespace Asteroid
 	{
 		m_speed = l_newSpeed;
 	}
+
+	float MovementComponent::GetCurrentAngleOfRotation() const
+	{
+		return m_theta;
+	}
 }

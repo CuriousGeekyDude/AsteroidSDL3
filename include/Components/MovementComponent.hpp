@@ -23,6 +23,8 @@ namespace Asteroid
 
 		void SetSpeed(const glm::vec2& l_newSpeed);
 
+		float GetCurrentAngleOfRotation() const;
+
 	protected:
 		glm::mat3 m_transform{};
 		float m_theta{};
