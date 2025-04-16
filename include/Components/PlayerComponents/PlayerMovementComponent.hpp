@@ -20,7 +20,6 @@ namespace Asteroid
 		bool Update(float l_deltaTime) override;
 
 	private:
-
 	};
 
 }

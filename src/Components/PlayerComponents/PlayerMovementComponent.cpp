@@ -64,24 +64,37 @@ namespace Asteroid
 		auto lv_newPos3 = lv_deltaTransform * glm::vec3{ lv_currentPos, 1.f };
 		m_ownerEntity->SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });
 
-		const auto& lv_mouseRelPos = m_inputSystem->GetMousePosRelativeToWindow();
-		
-		const glm::vec2 lv_directionVector = lv_mouseRelPos -  glm::vec2{ lv_newPos3.x, lv_newPos3.y };
 
-		if (0 != glm::dot(lv_directionVector, lv_directionVector)) {
 
-			glm::vec2 lv_normalizedDirectionVector = glm::normalize(lv_directionVector);
-			m_theta = 0.f;
+		if (true == m_inputSystem->IsMouseHidden()) {
 
-			if (lv_normalizedDirectionVector.y < 0) {
-				lv_normalizedDirectionVector *= -1.f;
-				m_theta = glm::pi<float>() + glm::acos(lv_normalizedDirectionVector.x);
+			const auto& lv_mouseRelPos = m_inputSystem->GetMousePosRelativeToWindow();
+			glm::vec2 lv_directionVector{lv_mouseRelPos.x - lv_newPos3.x, -lv_mouseRelPos.y + lv_newPos3.y};
+			
+			if (0 != glm::dot(lv_directionVector, lv_directionVector)) {
+
+				glm::vec2 lv_normalizedDirectionVector = glm::normalize(lv_directionVector);
+
+				if (lv_normalizedDirectionVector.y < 0) {
+					lv_normalizedDirectionVector *= -1.f;
+					m_theta = glm::pi<float>() + glm::acos(lv_normalizedDirectionVector.x);
+				}
+				else {
+					m_theta = glm::acos(lv_normalizedDirectionVector.x);
+				}
+				m_theta = m_theta - (glm::pi<float>()/2.f);
+				m_theta *= -1.f;
+				m_theta = glm::degrees<float>(m_theta);
 			}
 			else {
-				m_theta = glm::acos(lv_normalizedDirectionVector.x);
+				m_theta = 0.f;
 			}
-			m_theta *= -1.f;
+			
 		}
+		else {
+			m_theta = 0.f;
+		}
+		
 		
 		
 

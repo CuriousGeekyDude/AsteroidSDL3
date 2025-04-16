@@ -172,7 +172,7 @@ namespace Asteroid
 
 				ImGui::Begin("Player Info");                          // Create a window called "Hello, world!" and append into it.
 
-
+				ImGui::Text("Angle of rotation: %f", -((PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))->GetCurrentAngleOfRotation());
 				//ImGui::SliderFloat("Speed", &f,0.1f, 5.f, "%.3f");
 				
 				/*auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
@@ -213,7 +213,7 @@ namespace Asteroid
 
 			lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>(&lv_player, &m_inputSystem));
 			lv_player.AddComponent(ComponentTypes::GRAPHICS,
-				std::make_unique<PlayerGraphicsComponent>(lv_spaceShipGpuTextureHandle, &m_renderer, &lv_player));
+				std::make_unique<PlayerGraphicsComponent>(lv_spaceShipGpuTextureHandle, &m_renderer, &lv_player, *((PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))));
 
 			m_playerEntityHandle = (uint32_t)(m_entities.size() - 1);
 		}
