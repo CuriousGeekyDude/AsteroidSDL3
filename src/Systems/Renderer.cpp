@@ -104,12 +104,17 @@ namespace Asteroid
 			lv_dstRect.w = (0 == l_renderData.m_widthToRender) ? (float)lv_sdlTexture->w : (float)l_renderData.m_widthToRender;
 			lv_dstRect.h = (0 == l_renderData.m_widthToRender) ? (float)lv_sdlTexture->h : (float)l_renderData.m_heightToRender;
 
-			if (false == SDL_RenderTexture(m_renderer
-				, lv_sdlTexture, nullptr, &lv_dstRect)) {
+			SDL_FPoint lv_centerOfRotation{};
+			lv_centerOfRotation.x = l_renderData.m_centerOfRotation.x;
+			lv_centerOfRotation.y = l_renderData.m_centerOfRotation.y;
+
+			if (false == SDL_RenderTextureRotated(m_renderer
+				, lv_sdlTexture, nullptr, &lv_dstRect, l_renderData.m_angleOfRotation, &lv_centerOfRotation, SDL_FLIP_NONE)) {
 
 				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL failed to render the requested entity %s", SDL_GetError());
 				return false;
 			}
+			
 
 			return true;
 
