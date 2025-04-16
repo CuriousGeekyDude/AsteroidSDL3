@@ -60,7 +60,7 @@ namespace Asteroid
 
 		const glm::vec2& GetMousePosRelativeToWindow() const;
 
-
+		bool IsMouseHidden() const;
 
 	private:
 

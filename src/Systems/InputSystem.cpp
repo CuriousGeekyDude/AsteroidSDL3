@@ -139,9 +139,7 @@ namespace Asteroid
 			}
 		}
 
-		if (true == m_mouseHidden) {
-			SDL_GetMouseState(&m_mousePosRelToWindow.x, &m_mousePosRelToWindow.y);
-		}
+		
 		
 
 	}
@@ -174,6 +172,10 @@ namespace Asteroid
 			}
 
 			m_mouseHidden = !lv_result;
+		}
+
+		if (true == m_mouseHidden) {
+			SDL_GetMouseState(&m_mousePosRelToWindow.x, &m_mousePosRelToWindow.y);
 		}
 	}
 
@@ -235,4 +237,9 @@ namespace Asteroid
 		return m_mousePosRelToWindow;
 	}
 
+
+	bool InputSystem::IsMouseHidden() const
+	{
+		return m_mouseHidden;
+	}
 }
