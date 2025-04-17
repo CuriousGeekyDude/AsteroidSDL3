@@ -8,8 +8,8 @@
 
 namespace Asteroid
 {
-	Entity::Entity(const glm::vec2& l_initialPos, uint32_t l_id)
-		:m_currentPos(l_initialPos), m_id(l_id)
+	Entity::Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive)
+		:m_currentPos(l_initialPos), m_id(l_id), m_isActive(l_isActive)
 	{
 
 	}
@@ -48,6 +48,12 @@ namespace Asteroid
 		return true;
 	}
 
+
+
+	bool Entity::IsActive() const
+	{
+		return m_isActive;
+	}
 
 	void Entity::SetCurrentPos(const glm::vec2& l_newPos)
 	{
