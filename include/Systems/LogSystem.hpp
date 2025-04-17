@@ -25,7 +25,9 @@ namespace Asteroid
 			GRAPHICS = 0,
 			PHYSICS,
 			INITIALIZATION,
-			INPUT
+			INPUT,
+			MEMORY,
+			PROGRAM_LOGIC
 		};
 
 
