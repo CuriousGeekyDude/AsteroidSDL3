@@ -9,6 +9,7 @@
 #include <string>
 #include <memory>
 #include "../Components/ComponentTypes.hpp"
+#include "EntityType.hpp"
 
 
 
@@ -21,7 +22,7 @@ namespace Asteroid
 	{
 	public:
 
-		Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive);
+		Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive, const EntityType l_type);
 
 		Entity(Entity&&) = default;
 			
@@ -39,11 +40,14 @@ namespace Asteroid
 
 		virtual ~Entity() = default;
 
+		uint32_t GetID() const;
+
 	protected:
 
 		glm::vec2 m_currentPos;
 		uint32_t m_id;
 		bool m_isActive;
+		EntityType m_type;
 
 		std::vector<std::pair<ComponentTypes ,std::unique_ptr<Component>>> m_components;
 	};

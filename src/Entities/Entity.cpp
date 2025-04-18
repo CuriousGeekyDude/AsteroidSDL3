@@ -8,8 +8,9 @@
 
 namespace Asteroid
 {
-	Entity::Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive)
+	Entity::Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive, const EntityType l_type)
 		:m_currentPos(l_initialPos), m_id(l_id), m_isActive(l_isActive)
+		,m_type(l_type)
 	{
 
 	}
@@ -71,5 +72,10 @@ namespace Asteroid
 		}
 
 		return nullptr;
+	}
+
+	uint32_t Entity::GetID() const
+	{
+		return m_id;
 	}
 }
