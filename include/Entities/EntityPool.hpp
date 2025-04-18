@@ -5,6 +5,7 @@
 #include <vector>
 #include "EntityHandle.hpp"
 #include "Entity.hpp"
+#include "EntityType.hpp"
 
 
 
@@ -24,7 +25,7 @@ namespace Asteroid
 
 	public:
 
-		EntityPool();
+		EntityPool(const EntityType l_type);
 
 		void Init(const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities);
 
@@ -36,7 +37,13 @@ namespace Asteroid
 
 	private:
 		std::vector<uint32_t> m_entityIndicesAndStates{};
+
+		//The index here is in terms of the index of entity in the
+		//entities vector that has all the entities of the game
 		uint32_t m_nextInactiveIndex{0U};
+
+
+		EntityType m_type;
 
 	};
 }

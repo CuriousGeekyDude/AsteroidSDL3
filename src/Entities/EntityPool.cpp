@@ -11,7 +11,8 @@
 
 namespace Asteroid
 {
-	EntityPool::EntityPool()
+	EntityPool::EntityPool(const EntityType l_type)
+		:m_type(l_type)
 	{
 
 	}
