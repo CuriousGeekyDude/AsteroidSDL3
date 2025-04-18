@@ -25,9 +25,9 @@ namespace Asteroid
 
 	public:
 
-		EntityPool(const EntityType l_type);
+		EntityPool();
 
-		void Init(const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities);
+		void Init(const EntityType l_type, const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities);
 
 		EntityHandle GetNextInactiveEntityHandle() const;
 
@@ -43,7 +43,7 @@ namespace Asteroid
 		uint32_t m_nextInactiveIndex{0U};
 
 
-		EntityType m_type;
+		EntityType m_type{};
 
 	};
 }

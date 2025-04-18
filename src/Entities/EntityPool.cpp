@@ -11,16 +11,16 @@
 
 namespace Asteroid
 {
-	EntityPool::EntityPool(const EntityType l_type)
-		:m_type(l_type)
+	EntityPool::EntityPool()
 	{
 
 	}
 
-	void EntityPool::Init(const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities)
+	void EntityPool::Init(const EntityType l_type, const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities)
 	{
 		m_entityIndicesAndStates.resize(l_totalNumEntities);
 		m_nextInactiveIndex = l_firstEntityIndex;
+		m_type = l_type;
 
 		for (uint32_t i = 0; i < l_totalNumEntities; ++i) {
 			m_entityIndicesAndStates[i] = i + l_firstEntityIndex;
