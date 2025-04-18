@@ -45,6 +45,11 @@ namespace Asteroid
 
 		uint32_t GetID() const;
 
+
+	public:
+
+		EntityConnector& m_entityConnector;
+
 	protected:
 
 		glm::vec2 m_currentPos;
@@ -52,7 +57,6 @@ namespace Asteroid
 		bool m_isActive;
 		EntityType m_type;
 
-		EntityConnector& m_entityConnector;
 
 		std::vector<std::pair<ComponentTypes ,std::unique_ptr<Component>>> m_components;
 	};
