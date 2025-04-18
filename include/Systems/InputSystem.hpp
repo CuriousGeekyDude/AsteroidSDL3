@@ -24,6 +24,7 @@ namespace Asteroid
 			KEY_D = 3,
 			KEY_F1 = 4,
 			KEY_C = 5,
+			KEY_F = 6
 
 
 			//Maximum number of possible keys. 

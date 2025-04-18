@@ -58,6 +58,9 @@ namespace Asteroid
 		if (SDL_SCANCODE_C == l_event.key.scancode) {
 			m_keyStatesPressed[(int)Keys::KEY_C] = true;
 		}
+		if (SDL_SCANCODE_F == l_event.key.scancode) {
+			m_keyStatesPressed[(int)Keys::KEY_F] = true;
+		}
 
 		if (SDL_EVENT_KEY_UP == l_event.type) {
 
@@ -78,6 +81,9 @@ namespace Asteroid
 			}
 			if (SDL_SCANCODE_C == l_event.key.scancode) {
 				m_keyStatesUp[(int)Keys::KEY_C] = true;
+			}
+			if (SDL_SCANCODE_F == l_event.key.scancode) {
+				m_keyStatesUp[(int)Keys::KEY_F] = true;
 			}
 
 		}
