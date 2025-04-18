@@ -2,7 +2,7 @@
 
 
 #include "Systems/EntityConnector.hpp"
-#include "Entities/PlayerEntity/PlayerEntity.hpp"
+#include "Entities/Entity.hpp"
 #include <limits>
 
 
@@ -34,9 +34,6 @@ namespace Asteroid
 			}
 
 		}
-
-		
-
 
 	}
 }
