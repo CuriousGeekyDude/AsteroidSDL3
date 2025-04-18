@@ -8,9 +8,10 @@
 
 namespace Asteroid
 {
-	Entity::Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive, const EntityType l_type)
+	Entity::Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive, const EntityType l_type
+				  ,EntityConnector& l_entityConnector)
 		:m_currentPos(l_initialPos), m_id(l_id), m_isActive(l_isActive)
-		,m_type(l_type)
+		,m_type(l_type), m_entityConnector(l_entityConnector)
 	{
 
 	}
@@ -31,6 +32,12 @@ namespace Asteroid
 		m_components.emplace_back(std::pair<ComponentTypes, std::unique_ptr<Component>>(l_componentType, std::move(l_component)));
 	}
 
+
+
+	EntityType Entity::GetType() const
+	{
+		return m_type;
+	}
 
 	const glm::vec2& Entity::GetCurrentPos() const
 	{

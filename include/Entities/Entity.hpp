@@ -17,12 +17,13 @@ namespace Asteroid
 {
 
 	class Component;
+	class EntityConnector;
 
 	class Entity
 	{
 	public:
 
-		Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive, const EntityType l_type);
+		Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive, const EntityType l_type, EntityConnector& l_entityConnector);
 
 		Entity(Entity&&) = default;
 			
@@ -38,6 +39,8 @@ namespace Asteroid
 
 		bool IsActive() const;
 
+		EntityType GetType() const;
+
 		virtual ~Entity() = default;
 
 		uint32_t GetID() const;
@@ -48,6 +51,8 @@ namespace Asteroid
 		uint32_t m_id;
 		bool m_isActive;
 		EntityType m_type;
+
+		EntityConnector& m_entityConnector;
 
 		std::vector<std::pair<ComponentTypes ,std::unique_ptr<Component>>> m_components;
 	};
