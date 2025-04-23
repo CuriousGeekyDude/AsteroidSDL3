@@ -3,9 +3,9 @@
 
 
 #include "Entities/EntityPool.hpp"
-
-#define LOGGING
-#include "Systems/LogSystem.hpp"
+#include "Entities/Entity.hpp"
+#include <utility>
+#include <limits>
 
 
 
@@ -18,76 +18,95 @@ namespace Asteroid
 
 	void EntityPool::Init(const EntityType l_type, const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities)
 	{
-		m_entityIndicesAndStates.resize(l_totalNumEntities);
+		m_inactiveEntityIndices.resize(l_totalNumEntities);
+		m_activeEntityIndicesFromOldestToNewest.resize(l_totalNumEntities);
 		m_nextInactiveIndex = l_firstEntityIndex;
 		m_type = l_type;
+		m_firstEntityIndex = l_firstEntityIndex;
 
 		for (uint32_t i = 0; i < l_totalNumEntities; ++i) {
-			m_entityIndicesAndStates[i] = i + l_firstEntityIndex;
-			m_entityIndicesAndStates[i] &= (uint32_t)EntityState::INACTIVE;
+			m_inactiveEntityIndices[i] = i + l_firstEntityIndex;
+			m_activeEntityIndicesFromOldestToNewest[i] = std::numeric_limits<uint32_t>::max();
 		}
 
 	}
 
-	EntityHandle EntityPool::GetNextInactiveEntityHandle() const
+	EntityHandle EntityPool::GetNextInactiveEntityHandle()
 	{
-		using namespace LogSystem;
 
-		if (UINT32_MAX == m_nextInactiveIndex) {
-			LOG(Severity::WARNING, Channel::PROGRAM_LOGIC, "The pool ran out of entities to provide you with. Allocate more entities and resize.\n");
+		if (std::numeric_limits<uint32_t>::max() == m_nextInactiveIndex) {
+			uint32_t lv_firstElement = m_activeEntityIndicesFromOldestToNewest[0];
+
+			for (size_t i = 0; i < m_activeEntityIndicesFromOldestToNewest.size(); ++i) {
+				if (m_activeEntityIndicesFromOldestToNewest.size() != (i + 1)) {
+					m_activeEntityIndicesFromOldestToNewest[i] = m_activeEntityIndicesFromOldestToNewest[i + 1];
+				}
+			}
+
+			m_activeEntityIndicesFromOldestToNewest.back() = lv_firstElement;
+
+			return EntityHandle(lv_firstElement);
 		}
-		
-		return EntityHandle(m_nextInactiveIndex);
+		else {
+
+			for (size_t i = 0; i < m_activeEntityIndicesFromOldestToNewest.size(); ++i) {
+				if (std::numeric_limits<uint32_t>::max() == m_activeEntityIndicesFromOldestToNewest[i]) {
+					m_activeEntityIndicesFromOldestToNewest[i] = m_nextInactiveIndex;
+					break;
+				}
+			}
+
+			return EntityHandle(m_nextInactiveIndex);
+		}
+
 	}
 
-	void EntityPool::ResizePool(const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities)
+	void EntityPool::Update(const std::vector<Entity>& l_entities)
 	{
-		uint32_t lv_oldSize = (uint32_t)m_entityIndicesAndStates.size();
-		m_entityIndicesAndStates.resize(l_totalNumEntities + lv_oldSize);
-
-		for (uint32_t i = 0; i < (uint32_t)m_entityIndicesAndStates.size(); ++i) {
-
-			m_entityIndicesAndStates[i + lv_oldSize] = i + lv_oldSize;
-			m_entityIndicesAndStates[i + lv_oldSize] &= (uint32_t)EntityState::INACTIVE;
-
-		}
-		m_nextInactiveIndex = l_firstEntityIndex;
-
-	}
-
-	void EntityPool::UpdateEntityStates(const std::vector<Entity>& l_entities)
-	{
-		if (true == m_entityIndicesAndStates.empty()) {
+		if (true == m_inactiveEntityIndices.empty() || true == m_activeEntityIndicesFromOldestToNewest.empty()) {
 			return;
 		}
 		else {
-			uint32_t lv_firstIndexOfEntity = m_entityIndicesAndStates[0];
 
-			//To get rid of the last 31st bit
-			lv_firstIndexOfEntity &= (uint32_t)EntityState::INACTIVE;
+			for (uint32_t i = 0; i < (uint32_t)m_inactiveEntityIndices.size(); ++i) {
 
-			for (uint32_t i = 0; i < (uint32_t)m_entityIndicesAndStates.size(); ++i) {
-
-				uint32_t lv_currentIndex = i + lv_firstIndexOfEntity;
-
-				if (true == l_entities[lv_currentIndex].IsActive()) {
-					m_entityIndicesAndStates[lv_currentIndex] |= (uint32_t)EntityState::ACTIVE;
+				if (true == l_entities[i + m_firstEntityIndex].IsActive()) {
+					m_inactiveEntityIndices[i] = std::numeric_limits<uint32_t>::max();
 				}
 				else {
-					m_entityIndicesAndStates[lv_currentIndex] &= (uint32_t)EntityState::INACTIVE;
+					m_inactiveEntityIndices[i] = i + m_firstEntityIndex;
+					m_activeEntityIndicesFromOldestToNewest[i] = std::numeric_limits<uint32_t>::max();
 				}
 			}
 		}
 
-		m_nextInactiveIndex = UINT32_MAX;
-		for (size_t i = 0; i < m_entityIndicesAndStates.size(); ++i) {
-			if ((uint32_t)EntityState::ACTIVE == (m_entityIndicesAndStates[i] & (uint32_t)EntityState::ACTIVE)) {
-				continue;
-			}
-			else {
-				m_nextInactiveIndex = ((uint32_t)EntityState::INACTIVE & m_entityIndicesAndStates[i]);
+		m_nextInactiveIndex = std::numeric_limits<uint32_t>::max();
+		for (size_t i = 0; i < m_inactiveEntityIndices.size(); ++i) {
+			
+			if (std::numeric_limits<uint32_t>::max() != m_inactiveEntityIndices[i]) {
+				m_nextInactiveIndex = m_inactiveEntityIndices[i];
 				break;
 			}
+
 		}
+
+
+		//This vector could have the meaningful entity indices and max() interleaved after the updates above.
+		//Therefore in order to make sure all meaningful entity indices are adjacent to each other,
+		//we scan the whole vector and put them next to each other.
+		for (size_t i = 0; i < m_activeEntityIndicesFromOldestToNewest.size(); ++i) {
+
+			if (std::numeric_limits<uint32_t>::max() == m_activeEntityIndicesFromOldestToNewest[i]) {
+				for (size_t j = i + 1; j < m_activeEntityIndicesFromOldestToNewest.size(); ++j) {
+					if (std::numeric_limits<uint32_t>::max() != m_activeEntityIndicesFromOldestToNewest[j]) {
+						m_activeEntityIndicesFromOldestToNewest[i] = m_activeEntityIndicesFromOldestToNewest[j];
+						m_activeEntityIndicesFromOldestToNewest[j] = std::numeric_limits<uint32_t>::max();
+						break;
+					}
+				}
+			}
+		}
+
+
 	}
 }
