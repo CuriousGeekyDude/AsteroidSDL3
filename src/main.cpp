@@ -16,7 +16,7 @@ int main()
 	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
 		.emplace(std::pair<std::string, std::string>("Spaceship", "Assets/DarkRaiderSpaceship.png"));
 	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
-		.emplace(std::pair<std::string, std::string>("bullet", "Assets/bullet.jpg"));
+		.emplace(std::pair<std::string, std::string>("LaserBeam", "Assets/LaserBeam.png"));
 
 
 	
