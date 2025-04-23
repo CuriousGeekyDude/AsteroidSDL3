@@ -23,13 +23,13 @@ namespace Asteroid
 	{
 	public:
 
-		Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive, const EntityType l_type, EntityConnector& l_entityConnector);
+		Entity(const glm::vec2& l_initialPos, uint32_t l_id, const bool l_isActive, const EntityType l_type);
 
 		Entity(Entity&&) = default;
 			
 		void AddComponent(const ComponentTypes l_componentType, std::unique_ptr<Component>&& l_component);
 
-		Component* GetComponent(const ComponentTypes l_componentType);
+		Component* GetComponent(const ComponentTypes l_componentType) const;
 
 		bool Update(const float l_deltaTime);
 
@@ -46,9 +46,9 @@ namespace Asteroid
 		uint32_t GetID() const;
 
 
-	public:
+		void SetInactive();
 
-		EntityConnector& m_entityConnector;
+		void SetActive();
 
 	protected:
 
