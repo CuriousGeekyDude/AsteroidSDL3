@@ -24,12 +24,12 @@ namespace Asteroid
 			KEY_D = 3,
 			KEY_F1 = 4,
 			KEY_C = 5,
-			KEY_F = 6
+			KEY_F = 6,
 
 
 			//Maximum number of possible keys. 
 			// Not to be used as index into key states.
-			KEY_MAXIMUM = 1024,
+			KEY_MAXIMUM = 1024
 		};
 
 		enum class Mouse
@@ -44,22 +44,22 @@ namespace Asteroid
 		InputSystem() = default;
 
 
-		const bool* GetKeyStates() const;
-
 		void ProcessInput(const SDL_Event& l_event, SDL_Window* l_window);
 
 
-		bool IsKeyPressed(const Keys l_key);
+		bool IsKeyPressedNoRepetition(const Keys l_key) const;
+		bool IsKeyPressedWithRepetition(const Keys l_key) const;
+		bool IsKeyUp(const Keys l_key) const;
 
-		bool IsKeyUp(const Keys l_key);
+		bool IsMouseButtonPressed(const Mouse l_mouseButton) const;
+		bool IsMouseButtonUp(const Mouse l_mouseButton) const;
 
-		bool IsMouseButtonPressed(const Mouse l_mouseButton);
-		bool IsMouseButtonUp(const Mouse l_mouseButton);
-
-		uint8_t TotalNumConsecutiveRightClicks();
-		uint8_t TotalNumConsecutiveLeftClicks();
+		uint8_t TotalNumConsecutiveRightClicks() const;
+		uint8_t TotalNumConsecutiveLeftClicks() const;
 
 		const glm::vec2& GetMousePosRelativeToWindow() const;
+
+		void FlushKeysWithRepetition();
 
 		bool IsMouseHidden() const;
 
@@ -74,8 +74,9 @@ namespace Asteroid
 
 	private:
 		static constexpr uint32_t m_totalNumInputKeysToProcess{ (uint32_t)Keys::KEY_MAXIMUM };
-		std::array<bool, m_totalNumInputKeysToProcess> m_keyStatesPressed;
+		std::array<bool, m_totalNumInputKeysToProcess> m_keyStatesPressedNoRepetition;
 		std::array<bool, m_totalNumInputKeysToProcess> m_keyStatesUp;
+		std::array<bool, m_totalNumInputKeysToProcess> m_keyStatesPressedWithRepetition;
 
 		std::array<bool, 2> m_mouseStatesPressed;
 		std::array<bool, 2> m_mouseStatesUp;

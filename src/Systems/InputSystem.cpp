@@ -5,7 +5,6 @@
 
 #include "Systems/InputSystem.hpp"
 
-#define LOGGING
 #include "Systems/LogSystem.hpp"
 #include <SDL3/SDL_keyboard.h>
 #include <SDL3/SDL_mouse.h>
@@ -14,13 +13,6 @@
 namespace Asteroid
 {
 
-
-	const bool* InputSystem::GetKeyStates() const
-	{
-
-		return m_keyStatesPressed.data();
-
-	}
 
 
 	void InputSystem::RegisterKeyboardInputs(const SDL_Event& l_event)
@@ -32,35 +24,63 @@ namespace Asteroid
 		if (nullptr == lv_keyStates) {
 			LOG(Severity::FAILURE, Channel::GRAPHICS, "Keyboard state returned is null pointer for the following reason: %s", SDL_GetError());
 
-			//LogSystem::LogCommandLine("Keyboard state returned is null pointer for the following reason: {4}. Exitting....\n", "ERROR", "INPUT-SYSTEM", __LINE__, __FILE__, SDL_GetError());
 			exit(EXIT_FAILURE);
 		}
 
 		
-		memset(m_keyStatesPressed.data(), 0, sizeof(bool)*m_keyStatesPressed.size());
+		memset(m_keyStatesPressedNoRepetition.data(), 0, sizeof(bool) * m_keyStatesPressedNoRepetition.size());
 		memset(m_keyStatesUp.data(), 0, sizeof(bool) * m_keyStatesUp.size());
 
 		if (true == lv_keyStates[SDL_SCANCODE_W]) {
-			m_keyStatesPressed[(int)Keys::KEY_W] = true;
+			m_keyStatesPressedNoRepetition[(int)Keys::KEY_W] = true;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_S]) {
-			m_keyStatesPressed[(int)Keys::KEY_S] = true;
+			m_keyStatesPressedNoRepetition[(int)Keys::KEY_S] = true;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_D]) {
-			m_keyStatesPressed[(int)Keys::KEY_D] = true;
+			m_keyStatesPressedNoRepetition[(int)Keys::KEY_D] = true;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_A]) {
-			m_keyStatesPressed[(int)Keys::KEY_A] = true;
+			m_keyStatesPressedNoRepetition[(int)Keys::KEY_A] = true;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_F1]) {
-			m_keyStatesPressed[(int)Keys::KEY_F1] = true;
+			m_keyStatesPressedNoRepetition[(int)Keys::KEY_F1] = true;
 		}
-		if (SDL_SCANCODE_C == l_event.key.scancode) {
-			m_keyStatesPressed[(int)Keys::KEY_C] = true;
+		if (true == lv_keyStates[SDL_SCANCODE_C]) {
+			m_keyStatesPressedNoRepetition[(int)Keys::KEY_C] = true;
 		}
-		if (SDL_SCANCODE_F == l_event.key.scancode) {
-			m_keyStatesPressed[(int)Keys::KEY_F] = true;
+		if (true == lv_keyStates[SDL_SCANCODE_F]) {
+			m_keyStatesPressedNoRepetition[(int)Keys::KEY_F] = true;
 		}
+
+
+		if (SDL_EVENT_KEY_DOWN == l_event.type) {
+
+			if (SDL_SCANCODE_W == l_event.key.scancode && false == l_event.key.repeat) {
+				m_keyStatesPressedWithRepetition[(int)Keys::KEY_W] = true;
+			}
+			if (SDL_SCANCODE_S == l_event.key.scancode && false == l_event.key.repeat) {
+				m_keyStatesPressedWithRepetition[(int)Keys::KEY_S] = true;
+			}
+			if (SDL_SCANCODE_D == l_event.key.scancode && false == l_event.key.repeat) {
+				m_keyStatesPressedWithRepetition[(int)Keys::KEY_D] = true;
+			}
+			if (SDL_SCANCODE_A == l_event.key.scancode && false == l_event.key.repeat) {
+				m_keyStatesPressedWithRepetition[(int)Keys::KEY_A] = true;
+			}
+			if (SDL_SCANCODE_F1 == l_event.key.scancode && false == l_event.key.repeat) {
+				m_keyStatesPressedWithRepetition[(int)Keys::KEY_F1] = true;
+			}
+			if (SDL_SCANCODE_C == l_event.key.scancode && false == l_event.key.repeat) {
+				m_keyStatesPressedWithRepetition[(int)Keys::KEY_C] = true;
+			}
+			if (SDL_SCANCODE_F == l_event.key.scancode && false == l_event.key.repeat) {
+				m_keyStatesPressedWithRepetition[(int)Keys::KEY_F] = true;
+			}
+
+		}
+
+
 
 		if (SDL_EVENT_KEY_UP == l_event.type) {
 
@@ -151,11 +171,18 @@ namespace Asteroid
 	}
 
 
+	void InputSystem::FlushKeysWithRepetition()
+	{
+		
+		memset(m_keyStatesPressedWithRepetition.data(), 0, sizeof(bool) * m_keyStatesPressedWithRepetition.size());
+	}
+
+
 	void InputSystem::ProcessKeyboardInputs(SDL_Window* l_window)
 	{
 		using namespace LogSystem;
 
-		if (false == m_mouseHidden && true == m_keyStatesPressed[(int)Keys::KEY_C]) {
+		if (false == m_mouseHidden && true == m_keyStatesPressedNoRepetition[(int)Keys::KEY_C]) {
 			bool lv_result = SDL_SetWindowRelativeMouseMode(l_window ,true);
 
 			if (false == lv_result) {
@@ -197,15 +224,24 @@ namespace Asteroid
 	}
 
 
-	bool InputSystem::IsKeyPressed(const Keys l_key)
+	bool InputSystem::IsKeyPressedNoRepetition(const Keys l_key) const
 	{
-		if (true == m_keyStatesPressed[(int)l_key]) {
+		if (true == m_keyStatesPressedNoRepetition[(int)l_key]) {
 			return true;
 		}
 		return false;
 	}
 
-	bool InputSystem::IsKeyUp(const Keys l_key)
+
+	bool InputSystem::IsKeyPressedWithRepetition(const Keys l_key) const
+	{
+		if (true == m_keyStatesPressedWithRepetition[(int)l_key]) {
+			return true;
+		}
+		return false;
+	}
+
+	bool InputSystem::IsKeyUp(const Keys l_key) const
 	{
 		if (true == m_keyStatesUp[(int)l_key]) {
 			return true;
@@ -214,14 +250,14 @@ namespace Asteroid
 		return false;
 	}
 
-	bool InputSystem::IsMouseButtonPressed(const Mouse l_mouseButton)
+	bool InputSystem::IsMouseButtonPressed(const Mouse l_mouseButton) const
 	{
 		if (true == m_mouseStatesPressed[(int)l_mouseButton]) {
 			return true;
 		}
 		return false;
 	}
-	bool InputSystem::IsMouseButtonUp(const Mouse l_mouseButton)
+	bool InputSystem::IsMouseButtonUp(const Mouse l_mouseButton) const
 	{
 		if (true == m_mouseStatesUp[(int)l_mouseButton]) {
 			return true;
@@ -229,11 +265,11 @@ namespace Asteroid
 		return false;
 	}
 
-	uint8_t InputSystem::TotalNumConsecutiveRightClicks()
+	uint8_t InputSystem::TotalNumConsecutiveRightClicks() const
 	{
 		return m_totalNumRightMouseClicks;
 	}
-	uint8_t InputSystem::TotalNumConsecutiveLeftClicks()
+	uint8_t InputSystem::TotalNumConsecutiveLeftClicks() const
 	{
 		return m_totalNumLeftMouseClicks;
 	}
