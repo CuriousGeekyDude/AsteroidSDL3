@@ -101,7 +101,18 @@ namespace Asteroid
 				char lv_tempChannel[] = "PHYSICS";
 				memcpy(lv_channel.data(), &lv_tempChannel, sizeof(lv_tempChannel));
 			}
-
+			if (Channel::INPUT == l_category) {
+				char lv_tempChannel[] = "INPUT";
+				memcpy(lv_channel.data(), &lv_tempChannel, sizeof(lv_tempChannel));
+			}
+			if (Channel::MEMORY == l_category) {
+				char lv_tempChannel[] = "MEMORY";
+				memcpy(lv_channel.data(), &lv_tempChannel, sizeof(lv_tempChannel));
+			}
+			if (Channel::PROGRAM_LOGIC == l_category) {
+				char lv_tempChannel[] = "PROGRAM_LOGIC";
+				memcpy(lv_channel.data(), &lv_tempChannel, sizeof(lv_tempChannel));
+			}
 
 
 			int lv_totalNumCharWritten = snprintf(lv_finalMsg, lv_finalMsgSize
