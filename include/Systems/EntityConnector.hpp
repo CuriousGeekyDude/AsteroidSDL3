@@ -4,10 +4,12 @@
 #include <vector>
 #include <glm.hpp>
 #include "Entities/EntityType.hpp"
+#include "Entities/EntityHandle.hpp"
 
 namespace Asteroid
 {
 	class Entity;
+	class Engine;
 
 	class EntityConnector final
 	{
@@ -22,15 +24,16 @@ namespace Asteroid
 
 	public:
 
-		EntityConnector(const std::vector<Entity>& l_entities);
+		EntityConnector(Engine* l_engine);
 
 		const glm::vec2& RequestPositionFromPlayer();
+		float RequestAngleRotationFromPlayer();
 
-
+		const glm::vec2& RequestSpeedFromPlayer();
 
 	private:
 		static constexpr uint32_t m_totalNumCachedIndices{32U};
-		const std::vector<Entity>& m_entities;
+		Engine* m_engine;
 		std::vector<uint32_t> m_frequentlyUsedEntityIndices;
 	};
 }
