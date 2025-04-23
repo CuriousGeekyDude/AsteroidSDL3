@@ -2,7 +2,6 @@
 
 #include "Systems/GpuResouceManager.hpp"
 
-#define LOGGING
 #include "Systems/LogSystem.hpp"
 
 #include <SDL3_image/SDL_image.h>
@@ -26,7 +25,7 @@ namespace Asteroid
 		auto* lv_gpuTexture = IMG_LoadTexture(l_renderer, l_texturePath.c_str());
 
 		if (nullptr == lv_gpuTexture) {
-			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture %s", l_texturePath.c_str());
+			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture %s for the following reason: %s", l_texturePath.c_str(), SDL_GetError());
 			return nullptr;
 		}
 
@@ -54,7 +53,7 @@ namespace Asteroid
 
 		if (nullptr == lv_gpuTexture) {
 
-			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture %s", l_texturePath.c_str());
+			LOG(Severity::WARNING, Channel::GRAPHICS, "Failed to load texture %s due to following reasons: %s", l_texturePath.c_str(), SDL_GetError());
 			return UINT32_MAX;
 		}
 
