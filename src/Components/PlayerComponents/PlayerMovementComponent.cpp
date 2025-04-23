@@ -4,16 +4,15 @@
 
 #include "Components/PlayerComponents/PlayerMovementComponent.hpp"
 #include "Systems/InputSystem.hpp"
-#include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <algorithm>
+#include "Engine.hpp"
 #include "Entities/Entity.hpp"
+#include <algorithm>
 
 namespace Asteroid
 {
 	PlayerMovementComponent::PlayerMovementComponent(
-	Entity* l_ownerEntity, const InputSystem* l_inputSystem)
-		:MovementComponent(l_ownerEntity, l_inputSystem)
+	EntityHandle l_ownerEntityHandle, Engine* l_engine)
+		:MovementComponent(l_ownerEntityHandle, l_engine)
 		
 	{
 
@@ -24,51 +23,52 @@ namespace Asteroid
 	{
 		glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
 		bool lv_keyIsPressed = false;
-		float lv_d = l_deltaTime / (1.f + l_deltaTime);
+		float lv_d = (1 - std::expf(-l_deltaTime * 0.16f));
+		float lv_damper{ 0.064f };
+		
+		const auto& lv_inputSystem = m_engine->GetInputSystem();
 
-		const auto& lv_keyStates = m_inputSystem->GetKeyStates();
-
-		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_W]) {
-			m_speed += glm::vec2(0.f, -0.01f * lv_d);
+		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_W)) {
+			m_speed += glm::vec2(0.f, -lv_damper * lv_d * l_deltaTime);
 			lv_keyIsPressed = true;
 		}
-		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_S]) {
-			m_speed += glm::vec2(0.f, 0.01f * lv_d);
-			lv_keyIsPressed = true;
-
-
-		}
-		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_D]) {
-
-			m_speed += glm::vec2(0.01f * lv_d, 0.f);
+		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_S)) {
+			m_speed += glm::vec2(0.f, lv_damper * lv_d * l_deltaTime);
 			lv_keyIsPressed = true;
 
 
 		}
-		if (true == lv_keyStates[(int)InputSystem::Keys::KEY_A]) {
+		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_D)) {
+			m_speed += glm::vec2(lv_damper * lv_d * l_deltaTime, 0.f);
+			lv_keyIsPressed = true;
+		}
+		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_A)) {
 			
-			m_speed += glm::vec2(-0.01f * lv_d, 0.f);
+			m_speed += glm::vec2(-lv_damper * lv_d * l_deltaTime, 0.f);
 			lv_keyIsPressed = true;
 
 
 		}
 		if (false == lv_keyIsPressed) {
-			m_speed = m_speed * (1-std::expf(-l_deltaTime*30.f));
+			m_speed = m_speed * lv_d * l_deltaTime* lv_damper;
  		}
-		m_speed = glm::vec2(std::clamp(m_speed.x, -0.3f, 0.3f), std::clamp(m_speed.y, -0.3f, 0.3f));
+		const float lv_speedLimit{3.5f};
+		m_speed = glm::vec2(std::clamp(m_speed.x, -lv_speedLimit, lv_speedLimit), std::clamp(m_speed.y, -lv_speedLimit, lv_speedLimit));
 		lv_deltaTransform[2][0] = m_speed.x;
 		lv_deltaTransform[2][1] = m_speed.y;
 
+		auto& lv_ownerEntity = m_engine->GetEntityFromHandle(m_ownerEntityHandle);
+
 		m_transform = lv_deltaTransform * m_transform;
-		auto& lv_currentPos = m_ownerEntity->GetCurrentPos();
+		auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();
 		auto lv_newPos3 = lv_deltaTransform * glm::vec3{ lv_currentPos, 1.f };
-		m_ownerEntity->SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });
+		lv_ownerEntity.SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });
 
 
 
-		if (true == m_inputSystem->IsMouseHidden()) {
+		if (true == lv_inputSystem.IsMouseHidden()) {
 
-			const auto& lv_mouseRelPos = m_inputSystem->GetMousePosRelativeToWindow();
+			const auto& lv_mouseRelPos = lv_inputSystem.GetMousePosRelativeToWindow();
 			glm::vec2 lv_directionVector{lv_mouseRelPos.x - lv_newPos3.x, -lv_mouseRelPos.y + lv_newPos3.y};
 			
 			if (0 != glm::dot(lv_directionVector, lv_directionVector)) {

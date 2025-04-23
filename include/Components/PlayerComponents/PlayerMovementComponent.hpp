@@ -2,24 +2,23 @@
 
 
 #include "../MovementComponent.hpp"
-
+#include "Entities/EntityHandle.hpp"
 
 
 
 namespace Asteroid
 {
 
-	class Entity;
-
 	class PlayerMovementComponent : public MovementComponent
 	{
 	public:
 
-		PlayerMovementComponent(Entity* l_ownerEntity, const InputSystem* l_inputSystem);
+		PlayerMovementComponent(EntityHandle l_ownerEntityHandle, Engine* l_engine);
 
 		bool Update(float l_deltaTime) override;
 
 	private:
+
 	};
 
 }

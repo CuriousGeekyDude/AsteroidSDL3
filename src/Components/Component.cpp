@@ -9,8 +9,8 @@
 
 namespace Asteroid
 {
-	Component::Component(Entity* l_ownerEntity)
-		:m_ownerEntity(l_ownerEntity)
+	Component::Component(EntityHandle l_ownerEntityHandle, Engine* l_engine)
+		:m_ownerEntityHandle(l_ownerEntityHandle), m_engine(l_engine)
 	{
 
 	}
