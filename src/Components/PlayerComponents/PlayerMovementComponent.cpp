@@ -26,31 +26,35 @@ namespace Asteroid
 		float lv_d = (1 - std::expf(-l_deltaTime * 0.16f));
 		float lv_damper{ 0.064f };
 		
+		float lv_tempSpeed{ lv_damper * lv_d * l_deltaTime };
+
+
 		const auto& lv_inputSystem = m_engine->GetInputSystem();
 
 		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_W)) {
-			m_speed += glm::vec2(0.f, -lv_damper * lv_d * l_deltaTime);
+			m_speed += glm::vec2(0.f, -lv_tempSpeed);
 			lv_keyIsPressed = true;
 		}
 		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_S)) {
-			m_speed += glm::vec2(0.f, lv_damper * lv_d * l_deltaTime);
+			m_speed += glm::vec2(0.f, lv_tempSpeed);
 			lv_keyIsPressed = true;
 
 
 		}
 		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_D)) {
-			m_speed += glm::vec2(lv_damper * lv_d * l_deltaTime, 0.f);
+			m_speed += glm::vec2(lv_tempSpeed, 0.f);
 			lv_keyIsPressed = true;
 		}
 		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_A)) {
 			
-			m_speed += glm::vec2(-lv_damper * lv_d * l_deltaTime, 0.f);
+			m_speed += glm::vec2(-lv_tempSpeed, 0.f);
 			lv_keyIsPressed = true;
 
 
 		}
 		if (false == lv_keyIsPressed) {
-			m_speed = m_speed * lv_d * l_deltaTime* lv_damper;
+			lv_tempSpeed = std::clamp(lv_tempSpeed, 0.001f, 0.99f);
+			m_speed = m_speed * lv_tempSpeed;
  		}
 		const float lv_speedLimit{3.5f};
 		m_speed = glm::vec2(std::clamp(m_speed.x, -lv_speedLimit, lv_speedLimit), std::clamp(m_speed.y, -lv_speedLimit, lv_speedLimit));
