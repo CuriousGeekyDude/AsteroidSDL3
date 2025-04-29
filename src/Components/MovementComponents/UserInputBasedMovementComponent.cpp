@@ -2,14 +2,14 @@
 
 
 
-#include "Components/PlayerComponents/PlayerMovementComponent.hpp"
+#include "Components/MovementComponents/UserInputBasedMovementComponent.hpp"
 #include "Engine.hpp"
 #include "Components/UpdateComponents.hpp"
 #include <algorithm>
 
 namespace Asteroid
 {
-	PlayerMovementComponent::PlayerMovementComponent(EntityHandle l_ownerEntityHandle)
+	UserInputBasedMovementComponent::UserInputBasedMovementComponent(EntityHandle l_ownerEntityHandle)
 		:MovementComponent(l_ownerEntityHandle)
 		
 	{
@@ -17,7 +17,7 @@ namespace Asteroid
 	}
 
 
-	bool PlayerMovementComponent::Update(UpdateComponents& l_updateContext)
+	bool UserInputBasedMovementComponent::Update(UpdateComponents& l_updateContext)
 	{
 		glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
 		bool lv_keyIsPressed = false;
@@ -79,22 +79,22 @@ namespace Asteroid
 
 				if (lv_normalizedDirectionVector.y < 0) {
 					lv_normalizedDirectionVector *= -1.f;
-					m_theta = glm::pi<float>() + glm::acos(lv_normalizedDirectionVector.x);
+					m_thetaDegrees = glm::pi<float>() + glm::acos(lv_normalizedDirectionVector.x);
 				}
 				else {
-					m_theta = glm::acos(lv_normalizedDirectionVector.x);
+					m_thetaDegrees = glm::acos(lv_normalizedDirectionVector.x);
 				}
-				m_theta = m_theta - (glm::pi<float>()/2.f);
-				m_theta *= -1.f;
-				m_theta = glm::degrees<float>(m_theta);
+				m_thetaDegrees = m_thetaDegrees - (glm::pi<float>()/2.f);
+				m_thetaDegrees *= -1.f;
+				m_thetaDegrees = glm::degrees<float>(m_thetaDegrees);
 			}
 			else {
-				m_theta = 0.f;
+				m_thetaDegrees = 0.f;
 			}
 			
 		}
 		else {
-			m_theta = 0.f;
+			m_thetaDegrees = 0.f;
 		}
 		
 		

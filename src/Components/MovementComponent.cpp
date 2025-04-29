@@ -34,11 +34,11 @@ namespace Asteroid
 
 	float MovementComponent::GetCurrentAngleOfRotation() const
 	{
-		return m_theta;
+		return m_thetaDegrees;
 	}
 
 	void MovementComponent::SetAngleOfRotation(const float l_theta)
 	{
-		m_theta = l_theta;
+		m_thetaDegrees = l_theta;
 	}
 }
