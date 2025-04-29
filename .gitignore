@@ -406,7 +406,5 @@ FodyWeavers.xsd
 *.vcxproj.filters
 Logging/
 imgui.ini
-InitFiles/
-Assets/
 UsefulPowershellScripts/
 Init
