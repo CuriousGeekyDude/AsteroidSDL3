@@ -27,55 +27,61 @@ namespace Asteroid
 			exit(EXIT_FAILURE);
 		}
 
+		memset(m_keyStates.data(), (int)KeyStates::INVALID, sizeof(KeyStates) * m_keyStates.size());
 		
-		memset(m_keyStatesPressedNoRepetition.data(), 0, sizeof(bool) * m_keyStatesPressedNoRepetition.size());
-		memset(m_keyStatesUp.data(), 0, sizeof(bool) * m_keyStatesUp.size());
 
 		if (true == lv_keyStates[SDL_SCANCODE_W]) {
-			m_keyStatesPressedNoRepetition[(int)Keys::KEY_W] = true;
+			m_keyStates[(int)Keys::KEY_W] = KeyStates::KEY_DOWN_REPETITION_ALLOWED;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_S]) {
-			m_keyStatesPressedNoRepetition[(int)Keys::KEY_S] = true;
+			m_keyStates[(int)Keys::KEY_S] = KeyStates::KEY_DOWN_REPETITION_ALLOWED;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_D]) {
-			m_keyStatesPressedNoRepetition[(int)Keys::KEY_D] = true;
+			m_keyStates[(int)Keys::KEY_D] = KeyStates::KEY_DOWN_REPETITION_ALLOWED;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_A]) {
-			m_keyStatesPressedNoRepetition[(int)Keys::KEY_A] = true;
+			m_keyStates[(int)Keys::KEY_A] = KeyStates::KEY_DOWN_REPETITION_ALLOWED;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_F1]) {
-			m_keyStatesPressedNoRepetition[(int)Keys::KEY_F1] = true;
+			m_keyStates[(int)Keys::KEY_F1] = KeyStates::KEY_DOWN_REPETITION_ALLOWED;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_C]) {
-			m_keyStatesPressedNoRepetition[(int)Keys::KEY_C] = true;
+			m_keyStates[(int)Keys::KEY_C] = KeyStates::KEY_DOWN_REPETITION_ALLOWED;
 		}
 		if (true == lv_keyStates[SDL_SCANCODE_F]) {
-			m_keyStatesPressedNoRepetition[(int)Keys::KEY_F] = true;
+			m_keyStates[(int)Keys::KEY_F] = KeyStates::KEY_DOWN_REPETITION_ALLOWED;
 		}
+		if (true == lv_keyStates[SDL_SCANCODE_T]) {
+			m_keyStates[(int)Keys::KEY_T] = KeyStates::KEY_DOWN_REPETITION_ALLOWED;
+		}
+
 
 
 		if (SDL_EVENT_KEY_DOWN == l_event.type) {
 
 			if (SDL_SCANCODE_W == l_event.key.scancode && false == l_event.key.repeat) {
-				m_keyStatesPressedWithRepetition[(int)Keys::KEY_W] = true;
+				m_notAllowedRepetitionKeys[(int)Keys::KEY_W] = true;
 			}
 			if (SDL_SCANCODE_S == l_event.key.scancode && false == l_event.key.repeat) {
-				m_keyStatesPressedWithRepetition[(int)Keys::KEY_S] = true;
+				m_notAllowedRepetitionKeys[(int)Keys::KEY_S] = true;
 			}
 			if (SDL_SCANCODE_D == l_event.key.scancode && false == l_event.key.repeat) {
-				m_keyStatesPressedWithRepetition[(int)Keys::KEY_D] = true;
+				m_notAllowedRepetitionKeys[(int)Keys::KEY_D] = true;
 			}
 			if (SDL_SCANCODE_A == l_event.key.scancode && false == l_event.key.repeat) {
-				m_keyStatesPressedWithRepetition[(int)Keys::KEY_A] = true;
+				m_notAllowedRepetitionKeys[(int)Keys::KEY_A] = true;
 			}
 			if (SDL_SCANCODE_F1 == l_event.key.scancode && false == l_event.key.repeat) {
-				m_keyStatesPressedWithRepetition[(int)Keys::KEY_F1] = true;
+				m_notAllowedRepetitionKeys[(int)Keys::KEY_F1] = true;
 			}
 			if (SDL_SCANCODE_C == l_event.key.scancode && false == l_event.key.repeat) {
-				m_keyStatesPressedWithRepetition[(int)Keys::KEY_C] = true;
+				m_notAllowedRepetitionKeys[(int)Keys::KEY_C] = true;
 			}
 			if (SDL_SCANCODE_F == l_event.key.scancode && false == l_event.key.repeat) {
-				m_keyStatesPressedWithRepetition[(int)Keys::KEY_F] = true;
+				m_notAllowedRepetitionKeys[(int)Keys::KEY_F] = true;
+			}
+			if (SDL_SCANCODE_T == l_event.key.scancode && false == l_event.key.repeat) {
+				m_notAllowedRepetitionKeys[(int)Keys::KEY_T] = true;
 			}
 
 		}
@@ -85,25 +91,28 @@ namespace Asteroid
 		if (SDL_EVENT_KEY_UP == l_event.type) {
 
 			if (SDL_SCANCODE_W == l_event.key.scancode) {
-				m_keyStatesUp[(int)Keys::KEY_W] = true;
+				m_keyStates[(int)Keys::KEY_W] = KeyStates::KEY_UP;
 			}
 			if (SDL_SCANCODE_S == l_event.key.scancode) {
-				m_keyStatesUp[(int)Keys::KEY_S] = true;
+				m_keyStates[(int)Keys::KEY_S] = KeyStates::KEY_UP;
 			}
 			if (SDL_SCANCODE_D == l_event.key.scancode) {
-				m_keyStatesUp[(int)Keys::KEY_D] = true;
+				m_keyStates[(int)Keys::KEY_D] = KeyStates::KEY_UP;
 			}
 			if (SDL_SCANCODE_A == l_event.key.scancode) {
-				m_keyStatesUp[(int)Keys::KEY_A] = true;
+				m_keyStates[(int)Keys::KEY_A] = KeyStates::KEY_UP;
 			}
 			if (SDL_SCANCODE_F1 == l_event.key.scancode) {
-				m_keyStatesUp[(int)Keys::KEY_F1] = true;
+				m_keyStates[(int)Keys::KEY_F1] = KeyStates::KEY_UP;
 			}
 			if (SDL_SCANCODE_C == l_event.key.scancode) {
-				m_keyStatesUp[(int)Keys::KEY_C] = true;
+				m_keyStates[(int)Keys::KEY_C] = KeyStates::KEY_UP;
 			}
 			if (SDL_SCANCODE_F == l_event.key.scancode) {
-				m_keyStatesUp[(int)Keys::KEY_F] = true;
+				m_keyStates[(int)Keys::KEY_F] = KeyStates::KEY_UP;
+			}
+			if (SDL_SCANCODE_T == l_event.key.scancode) {
+				m_keyStates[(int)Keys::KEY_T] = KeyStates::KEY_UP;
 			}
 
 		}
@@ -171,10 +180,11 @@ namespace Asteroid
 	}
 
 
-	void InputSystem::FlushKeysWithRepetition()
+	void InputSystem::FlushNotAllowedRepetitionKeys()
 	{
 		
-		memset(m_keyStatesPressedWithRepetition.data(), 0, sizeof(bool) * m_keyStatesPressedWithRepetition.size());
+		memset(m_notAllowedRepetitionKeys.data(), 0, sizeof(bool) * m_notAllowedRepetitionKeys.size());
+
 	}
 
 
@@ -182,7 +192,7 @@ namespace Asteroid
 	{
 		using namespace LogSystem;
 
-		if (false == m_mouseHidden && true == m_keyStatesPressedNoRepetition[(int)Keys::KEY_C]) {
+		if (false == m_mouseHidden && true == m_notAllowedRepetitionKeys[(int)Keys::KEY_C]) {
 			bool lv_result = SDL_SetWindowRelativeMouseMode(l_window ,true);
 
 			if (false == lv_result) {
@@ -224,18 +234,18 @@ namespace Asteroid
 	}
 
 
-	bool InputSystem::IsKeyPressedNoRepetition(const Keys l_key) const
+	bool InputSystem::IsNoRepetitionAllowedKeyPressed(const Keys l_key) const
 	{
-		if (true == m_keyStatesPressedNoRepetition[(int)l_key]) {
+		if (true == m_notAllowedRepetitionKeys[(int)l_key]) {
 			return true;
 		}
 		return false;
 	}
 
 
-	bool InputSystem::IsKeyPressedWithRepetition(const Keys l_key) const
+	bool InputSystem::IsRepetitionAllowedKeyPressed(const Keys l_key) const
 	{
-		if (true == m_keyStatesPressedWithRepetition[(int)l_key]) {
+		if (KeyStates::KEY_DOWN_REPETITION_ALLOWED == m_keyStates[(int)l_key]) {
 			return true;
 		}
 		return false;
@@ -243,7 +253,7 @@ namespace Asteroid
 
 	bool InputSystem::IsKeyUp(const Keys l_key) const
 	{
-		if (true == m_keyStatesUp[(int)l_key]) {
+		if (KeyStates::KEY_UP == m_keyStates[(int)l_key]) {
 			return true;
 		}
 

@@ -29,21 +29,21 @@ namespace Asteroid
 
 		const auto& lv_inputSystem = l_updateContext.m_engine->GetInputSystem();
 
-		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_W)) {
+		if (true == lv_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_W)) {
 			m_speed += glm::vec2(0.f, -lv_tempSpeed);
 			lv_keyIsPressed = true;
 		}
-		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_S)) {
+		if (true == lv_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_S)) {
 			m_speed += glm::vec2(0.f, lv_tempSpeed);
 			lv_keyIsPressed = true;
 
 
 		}
-		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_D)) {
+		if (true == lv_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_D)) {
 			m_speed += glm::vec2(lv_tempSpeed, 0.f);
 			lv_keyIsPressed = true;
 		}
-		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_A)) {
+		if (true == lv_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_A)) {
 			
 			m_speed += glm::vec2(-lv_tempSpeed, 0.f);
 			lv_keyIsPressed = true;
