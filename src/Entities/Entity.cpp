@@ -2,7 +2,6 @@
 
 
 #include "Entities/Entity.hpp"
-#include "Components/Component.hpp"
 #include "Systems/LogSystem.hpp"
 
 
@@ -44,10 +43,10 @@ namespace Asteroid
 	}
 
 
-	bool Entity::Update(const float l_lastFrameElapsedTime)
+	bool Entity::Update(UpdateComponents& l_updateComponents)
 	{
 		for (auto& l_component : m_components) {
-			if (false == l_component.second->Update(l_lastFrameElapsedTime)) {
+			if (false == l_component.second->Update(l_updateComponents)) {
 				return false;
 			}
 		}
