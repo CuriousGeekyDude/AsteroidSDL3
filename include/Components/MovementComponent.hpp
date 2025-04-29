@@ -5,31 +5,34 @@
 
 #include <glm.hpp>
 #include "Components/Component.hpp"
+#include <gtc/matrix_transform.hpp>
 
 namespace Asteroid
 {
-	class Entity;
-	class InputSystem;
 
 	class MovementComponent : public Component
 	{
 	public:
 		
-		MovementComponent(Entity* l_ownerEntity, const InputSystem* l_inputSystem);
+		MovementComponent(EntityHandle l_ownerEntityHandle);
 
 		virtual ~MovementComponent() = default;
 
 		const glm::mat3& GetTransform() const;
 
-		void SetSpeed(const float l_newSpeed);
+		void SetSpeed(const glm::vec2& l_newSpeed);
+
+		float GetCurrentAngleOfRotation() const;
+
+		const glm::vec2& GetSpeed() const;
+
+		void SetAngleOfRotation(const float l_theta);
 
 	protected:
-		glm::mat3 m_transform{};
-		const InputSystem* m_inputSystem;
-
-		/// <summary>
-		///Default speed for every component that moves.
-		/// </summary>
-		float m_speed{0.1f};
+		glm::mat3 m_transform{ glm::identity<glm::mat3>() };
+		float m_thetaDegrees{};
+		
+		//Speed along X and Y axis
+		glm::vec2 m_speed{0.f};
 	};
 }

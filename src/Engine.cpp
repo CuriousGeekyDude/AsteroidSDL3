@@ -3,16 +3,18 @@
 #include "Engine.hpp"
 #include "Components/PlayerComponents/PlayerGraphicsComponent.hpp"
 #include "Components/PlayerComponents/PlayerMovementComponent.hpp"
+#include "Components/BulletComponents/BulletGraphicsComponent.hpp"
+#include "Components/RayMovementComponent.hpp"
 #include "Entities/Entity.hpp"
 #include "Systems/Colors.hpp"
 
-#define LOGGING
 #include "Systems/LogSystem.hpp"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlrenderer3.h>
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_time.h>
 #include <memory>
 
 namespace Asteroid
@@ -22,6 +24,8 @@ namespace Asteroid
 		,m_window(nullptr)
 		,m_renderer(&m_gpuResourceManager)
 		,m_inputSystem()
+		,m_entityConnector(this)
+		,m_entitySpawnerFromPools(this)
 	{
 		
 	}
@@ -85,13 +89,11 @@ namespace Asteroid
 
 		Set_Verbosity(Severity::WARNING);
 
-		InitEntities();
+		InitEntitiesAndPools();
 
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Initializing entities was successful.");
 
-		
 
-		
 
 
 		return true;
@@ -119,9 +121,12 @@ namespace Asteroid
 		bool show_demo_window = true;
 		bool show_another_window = false;
 		ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.00f);
+		constexpr float lv_60fpsInMilliseconds{16.6666667f};
 		while (false == lv_quit) {
 
 			m_trackLastFrameElapsedTime.m_currentTime = SDL_GetTicks();
+
+			m_inputSystem.FlushKeysWithRepetition();
 
 			SDL_Event lv_event;
 			static uint64_t lv_HideOrShow{};
@@ -129,7 +134,7 @@ namespace Asteroid
 			while (true == SDL_PollEvent(&lv_event)) {
 
 				ImGui_ImplSDL3_ProcessEvent(&lv_event);
-				m_inputSystem.ProcessInput(lv_event);
+				m_inputSystem.ProcessInput(lv_event, m_window);
 
 				if (true == m_inputSystem.IsKeyUp(InputSystem::Keys::KEY_F1)) {
 					if (0 == lv_HideOrShow % 2) {
@@ -151,10 +156,14 @@ namespace Asteroid
 
 
 			assert(true == m_renderer.ClearWindow());
+
+			m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
 			for (auto& l_entity : m_entities) {
-				assert(l_entity.Update((float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime));
+				if (true == l_entity.IsActive()) {
+					assert(l_entity.Update((float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime));
+				}
 			}
-			
+			m_entitySpawnerFromPools.UpdatePools();
 
 
 			ImGui_ImplSDLRenderer3_NewFrame();
@@ -166,17 +175,19 @@ namespace Asteroid
 
 			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 			{
-				static float f = 0.1f;
+				//static float f = 0.1f;
 
 				auto& lv_player = m_entities[m_playerEntityHandle];
 
 				ImGui::Begin("Player Info");                          // Create a window called "Hello, world!" and append into it.
 
-
-				ImGui::SliderFloat("Speed", &f,0.1f, 5.f, "%.3f");
+				ImGui::Text("Angle of rotation: %f", -((PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))->GetCurrentAngleOfRotation());
+				//ImGui::SliderFloat("Speed", &f,0.1f, 5.f, "%.3f");
 				
-				auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
-				lv_movementComp->SetSpeed(f);
+				ImGui::Text("Speed: (%f, %f)", m_entityConnector.RequestSpeedFromPlayer().x, m_entityConnector.RequestSpeedFromPlayer().y);
+
+				/*auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
+				lv_movementComp->SetSpeed(f);*/
 				
 
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
@@ -191,8 +202,16 @@ namespace Asteroid
 			assert(true == m_renderer.PresentToWindow());
 
 			m_trackLastFrameElapsedTime.m_lastFrameElapsedTime = SDL_GetTicks() - m_trackLastFrameElapsedTime.m_currentTime;
+
+			if (lv_60fpsInMilliseconds > m_trackLastFrameElapsedTime.m_lastFrameElapsedTime) {
+
+				const uint64_t lv_delayTime = (uint64_t)(lv_60fpsInMilliseconds - m_trackLastFrameElapsedTime.m_lastFrameElapsedTime);
+				m_trackLastFrameElapsedTime.m_lastFrameElapsedTime += lv_delayTime;
+				SDL_Delay((uint32_t)lv_delayTime);
+
+			}
 		}
-		Set_Verbosity(LogSystem::Severity::INFO);
+
 		LOG(LogSystem::Severity::INFO, LogSystem::Channel::GRAPHICS, "End of game loop.");
 
 		return true;
@@ -200,23 +219,123 @@ namespace Asteroid
 	}
 
 
-
-	void Engine::InitEntities()
+	Entity& Engine::GetEntityFromHandle(const EntityHandle l_entityHandle)
 	{
+		using namespace LogSystem;
+
+		if ((uint32_t)m_entities.size() <= l_entityHandle.m_entityHandle) {
+			LOG(Severity::FAILURE, Channel::MEMORY, "An attempt was made to access out of bound memory in vector of entities. The index used: %u\n", l_entityHandle.m_entityHandle);
+			exit(EXIT_FAILURE);
+		}
+		else {
+			return m_entities[l_entityHandle.m_entityHandle];
+		}
+	}
+	const Entity& Engine::GetEntityFromHandle(const EntityHandle l_entityHandle) const
+	{
+		using namespace LogSystem;
+
+		if ((uint32_t)m_entities.size() <= l_entityHandle.m_entityHandle) {
+			LOG(Severity::FAILURE, Channel::MEMORY, "An attempt was made to access out of bound memory in vector of entities.\n");
+			exit(EXIT_FAILURE);
+		}
+		else {
+			return m_entities[l_entityHandle.m_entityHandle];
+		}
+	}
+
+	Entity& Engine::GetEntityFromType(const EntityType l_type)
+	{
+		using namespace LogSystem;
+
+		for (auto& l_entity : m_entities) {
+			if (l_type == l_entity.GetType()) {
+				return l_entity;
+			}
+		}
+
+		LOG(Severity::FAILURE, Channel::PROGRAM_LOGIC, "No entity with the requested type exist yet.\n");
+		exit(EXIT_FAILURE);
+	}
+	const Entity& Engine::GetEntityFromType(const EntityType l_type) const
+	{
+		using namespace LogSystem;
+
+		for (const auto& l_entity : m_entities) {
+			if (l_type == l_entity.GetType()) {
+				return l_entity;
+			}
+		}
+
+		LOG(Severity::FAILURE, Channel::PROGRAM_LOGIC, "No entity with the requested type exist yet.\n");
+		exit(EXIT_FAILURE);
+	}
+
+
+
+	const InputSystem& Engine::GetInputSystem() const
+	{
+		return m_inputSystem;
+	}
+
+
+	const std::vector<Entity>& Engine::GetEntities() const
+	{
+		return m_entities;
+	}
+
+	void Engine::InitEntitiesAndPools()
+	{
+		glm::ivec2 lv_windowRes{};
+		GetCurrentWindowSize(lv_windowRes);
+
 		//Main player initialization
 		{
 			uint32_t lv_spaceShipGpuTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("Spaceship");
 
 			assert(UINT32_MAX != lv_spaceShipGpuTextureHandle);
 
-			auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, 0)));
+			auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ (float)lv_windowRes.x/2.f, (float)lv_windowRes.y/2.f }, 0, true, EntityType::PLAYER)));
 
-			lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>(&lv_player, &m_inputSystem));
+			lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<PlayerMovementComponent>(0, this));
 			lv_player.AddComponent(ComponentTypes::GRAPHICS,
-				std::make_unique<PlayerGraphicsComponent>(lv_spaceShipGpuTextureHandle, &m_renderer, &lv_player));
+				std::make_unique<PlayerGraphicsComponent>(lv_spaceShipGpuTextureHandle, &m_renderer, 0, lv_windowRes, this, ((PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))));
 
-			m_playerEntityHandle = (uint32_t)(m_entities.size() - 1);
+			m_playerEntityHandle = 0U;
 		}
+
+		//Bullet entities and pool initialization
+		{
+			constexpr uint32_t lv_totalNumBullets{64U};
+			const uint32_t lv_bulletGpuTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("LaserBeam");
+			m_entitySpawnerFromPools.InitPool(Asteroid::EntityType::BULLET, (uint32_t)m_entities.size() ,lv_totalNumBullets);
+			
+			for (uint32_t i = 0U; i < lv_totalNumBullets; ++i) {
+
+				const uint32_t lv_bulletIdx = 1U + i;
+				auto& lv_bullet = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_bulletIdx, false, EntityType::BULLET)));
+			
+				lv_bullet.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<RayMovementComponent>(lv_bulletIdx, this));
+				lv_bullet.AddComponent(ComponentTypes::GRAPHICS,
+					std::make_unique<BulletGraphicsComponent>(lv_bulletGpuTextureHandle, &m_renderer, lv_bulletIdx, lv_windowRes, ((RayMovementComponent*)lv_bullet.GetComponent(ComponentTypes::MOVEMENT)), this));
+
+			}
+
+		}
+	}
+
+
+	void Engine::GetCurrentWindowSize(glm::ivec2& l_windowRes) const
+	{
+		using namespace LogSystem;
+
+		bool lv_result = SDL_GetWindowSize(m_window, &l_windowRes.x, &l_windowRes.y);
+
+		if (false == lv_result) {
+			LOG(Severity::FAILURE, Channel::GRAPHICS, "Failed to get current window size: %s", SDL_GetError());
+			exit(EXIT_FAILURE);
+		}
+
 	}
 
 	Engine::~Engine()

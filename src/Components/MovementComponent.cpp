@@ -9,10 +9,8 @@
 namespace Asteroid
 {
 
-	MovementComponent::MovementComponent(Entity* l_ownerEntity, const InputSystem* l_inputSystem)
-		:Component(l_ownerEntity)
-		, m_transform(glm::identity<glm::mat3>())
-		, m_inputSystem(l_inputSystem)
+	MovementComponent::MovementComponent(EntityHandle l_ownerEntityHandle)
+		:Component(l_ownerEntityHandle)
 	{
 
 	}
@@ -22,9 +20,25 @@ namespace Asteroid
 		return m_transform;
 	}
 
+	const glm::vec2& MovementComponent::GetSpeed() const
+	{
+		return m_speed;
+	}
 
-	void MovementComponent::SetSpeed(const float l_newSpeed)
+
+
+	void MovementComponent::SetSpeed(const glm::vec2& l_newSpeed)
 	{
 		m_speed = l_newSpeed;
+	}
+
+	float MovementComponent::GetCurrentAngleOfRotation() const
+	{
+		return m_thetaDegrees;
+	}
+
+	void MovementComponent::SetAngleOfRotation(const float l_theta)
+	{
+		m_thetaDegrees = l_theta;
 	}
 }

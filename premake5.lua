@@ -36,13 +36,13 @@ project "AsteroidSDL3"
 				"dependencies/imgui/",
 				"dependencies/glm/",
 				"dependencies/SDL3_image/include/"}
-	libdirs{"dependencies/SDL3/lib/x64/",
-			"dependencies/SDL3_image/lib/x64/"}
+	libdirs{"dependencies/SDL3/lib/64build/",
+			"dependencies/SDL3_image/lib/64build/"}
 	links{"SDL3", "SDL3_image"}
 	
 	postbuildcommands {
-        "{COPY} dependencies/SDL3/lib/x64/SDL3.dll x64/%{cfg.buildcfg}",
-		"{COPY} dependencies/SDL3_image/lib/x64/SDL3_image.dll x64/%{cfg.buildcfg}"
+        "{COPY} dependencies/SDL3/lib/64build/SDL3.dll x64/%{cfg.buildcfg}",
+		"{COPY} dependencies/SDL3_image/lib/64build/SDL3_image.dll x64/%{cfg.buildcfg}"
     }
 
 	filter "configurations:Debug"

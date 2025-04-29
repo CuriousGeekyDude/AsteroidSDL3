@@ -6,7 +6,6 @@
 #include "Components/Component.hpp"
 #include <glm.hpp>
 
-struct SDL_Texture;
 
 namespace Asteroid
 {
@@ -16,24 +15,29 @@ namespace Asteroid
 		class Renderer;
 	}
 
-	class Entity;
+
+	class MovementComponent;
 
 	class GraphicsComponent : public Component
 	{
 	public:
 
-		GraphicsComponent(uint32_t l_textureHandle
-		, RenderSystem::Renderer* l_renderer, Entity* l_entity);
+		GraphicsComponent(uint32_t l_textureHandle, EntityHandle l_entityHandle
+			, float l_widthToRender, float l_heightToRender
+			,const MovementComponent* l_movementComponent);
 
+		bool Update(UpdateComponents& l_updateContext);
+
+		bool GetVisibility() const;
 
 		virtual ~GraphicsComponent() = default;
 
 	protected:
-
-	protected:
-		bool m_isVisible;
-		uint32_t m_textureHandle;
-		RenderSystem::Renderer* m_renderer;
+		uint32_t m_textureHandle{};
+		float m_widthToRender{};
+		float m_heightToRender{};
+		bool m_isVisible{ true };
+		const MovementComponent* m_movementComponent;
 	};
 
 }

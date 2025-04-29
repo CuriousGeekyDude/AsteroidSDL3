@@ -7,7 +7,10 @@
 #include "Systems/GpuResouceManager.hpp"
 #include "Systems/Renderer.hpp"
 #include "Systems/InputSystem.hpp"
-
+#include "Systems/EntityConnector.hpp"
+#include "Entities/EntityType.hpp"
+#include "Entities/EntityHandle.hpp"
+#include "Entities/EntitySpawnerFromPools.hpp"
 #include <vector>
 #include <glm.hpp>
 
@@ -34,11 +37,31 @@ namespace Asteroid
 		bool GameLoop();
 
 
+		Entity& GetEntityFromHandle(const EntityHandle l_entityHandle);
+		const Entity& GetEntityFromHandle(const EntityHandle l_entityHandle) const;
+
+		//Iterates entities and returns the first one that has that type
+		Entity& GetEntityFromType(const EntityType l_type);
+		const Entity& GetEntityFromType(const EntityType l_type) const;
+
+
+		const std::vector<Entity>& GetEntities() const;
+
+
+		const InputSystem& GetInputSystem() const;
+
+		void GetCurrentWindowSize(glm::ivec2& l_windowRes) const;
+
 		~Engine();
+
+	public:
+
+		EntityConnector m_entityConnector;
+
 
 	private:
 
-		void InitEntities();
+		void InitEntitiesAndPools();
 
 	private:
 
@@ -53,6 +76,7 @@ namespace Asteroid
 
 		RenderSystem::Renderer m_renderer;
 		InputSystem m_inputSystem;
+		EntitySpawnerFromPools m_entitySpawnerFromPools;
 
 		GpuResourceManager m_gpuResourceManager;
 

@@ -12,7 +12,9 @@ namespace Asteroid
 	{
 		GRAPHICS,
 		INPUT,
-		MOVEMENT
+		MOVEMENT,
+		COLLISION,
+		STATE
 	};
 
 }
