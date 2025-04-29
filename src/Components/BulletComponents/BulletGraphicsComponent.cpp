@@ -8,31 +8,27 @@
 #include "Systems/RenderingData.hpp"
 #include "Systems/Renderer.hpp"
 #include "Engine.hpp"
+#include "Components/UpdateComponents.hpp"
 
 #include "Systems/LogSystem.hpp"
 
 namespace Asteroid
 {
-	BulletGraphicsComponent::BulletGraphicsComponent(uint32_t l_textureHandle
-		, RenderSystem::Renderer* l_renderer, EntityHandle l_entityHandle
-		, const glm::ivec2& l_windowResolution
-		, const RayMovementComponent* l_bulletMovementComponent
-		, Engine* l_engine)
-		:GraphicsComponent(l_textureHandle, l_renderer, l_entityHandle, l_windowResolution, l_engine)
+	BulletGraphicsComponent::BulletGraphicsComponent(uint32_t l_textureHandle, EntityHandle l_entityHandle
+		, const RayMovementComponent* l_bulletMovementComponent)
+		:GraphicsComponent(l_textureHandle,l_entityHandle)
 		,m_bulletMovementComponent(l_bulletMovementComponent)
 	{
 
 	}
 
 
-	bool BulletGraphicsComponent::Update(float l_deltaTime)
+	bool BulletGraphicsComponent::Update(UpdateComponents& l_updateContext)
 	{
-		using namespace LogSystem;
-		
-		LOG(Severity::INFO, Channel::MEMORY, "Bullet entity with index %u is being accessed", m_ownerEntityHandle);
-		auto& lv_ownerEntity = m_engine->GetEntityFromHandle(m_ownerEntityHandle);
+		glm::ivec2 lv_windowRes{};
+		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
-		m_engine->GetCurrentWindowSize(m_windowResolution);
+		l_updateContext.m_engine->GetCurrentWindowSize(lv_windowRes);
 
 		const auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();
 
@@ -44,14 +40,16 @@ namespace Asteroid
 		constexpr float lv_halfHeightToRender{ ((float)lv_heightToRender) / 2.f };
 
 
-		if (lv_currentPos.x <= -lv_halfWidthToRender || lv_currentPos.x >= ((float)m_windowResolution.x + lv_halfWidthToRender)
-			|| lv_currentPos.y >= ((float)m_windowResolution.y + lv_halfHeightToRender) || lv_currentPos.y <= -lv_halfHeightToRender) {
+		if (lv_currentPos.x <= -lv_halfWidthToRender || lv_currentPos.x >= ((float)lv_windowRes.x + lv_halfWidthToRender)
+			|| lv_currentPos.y >= ((float)lv_windowRes.y + lv_halfHeightToRender) || lv_currentPos.y <= -lv_halfHeightToRender) {
 
 			lv_ownerEntity.SetInactive();
 			return true;
 
 		}
 		else {
+
+			auto* lv_renderer = l_updateContext.m_engine->GetRenderer();
 
 			const float lv_theta = m_bulletMovementComponent->GetCurrentAngleOfRotation();
 			RenderSystem::RenderingData lv_renderData{};
@@ -62,7 +60,7 @@ namespace Asteroid
 			lv_renderData.m_entityTextureHandle = m_textureHandle;
 			lv_renderData.m_angleOfRotation = lv_theta;
 
-			if (false == m_renderer->RenderEntity(lv_renderData)) {
+			if (false == lv_renderer->RenderEntity(lv_renderData)) {
 				return false;
 			}
 

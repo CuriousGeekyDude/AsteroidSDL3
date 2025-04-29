@@ -6,17 +6,15 @@
 #include <glm.hpp>
 #include "Components/Component.hpp"
 #include <gtc/matrix_transform.hpp>
-#include "Entities/EntityHandle.hpp"
 
 namespace Asteroid
 {
-	class InputSystem;
 
 	class MovementComponent : public Component
 	{
 	public:
 		
-		MovementComponent(EntityHandle l_ownerEntityHandle, Engine* l_engine);
+		MovementComponent(EntityHandle l_ownerEntityHandle);
 
 		virtual ~MovementComponent() = default;
 

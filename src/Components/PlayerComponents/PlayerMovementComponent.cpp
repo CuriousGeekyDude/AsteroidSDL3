@@ -3,33 +3,31 @@
 
 
 #include "Components/PlayerComponents/PlayerMovementComponent.hpp"
-#include "Systems/InputSystem.hpp"
 #include "Engine.hpp"
-#include "Entities/Entity.hpp"
+#include "Components/UpdateComponents.hpp"
 #include <algorithm>
 
 namespace Asteroid
 {
-	PlayerMovementComponent::PlayerMovementComponent(
-	EntityHandle l_ownerEntityHandle, Engine* l_engine)
-		:MovementComponent(l_ownerEntityHandle, l_engine)
+	PlayerMovementComponent::PlayerMovementComponent(EntityHandle l_ownerEntityHandle)
+		:MovementComponent(l_ownerEntityHandle)
 		
 	{
 
 	}
 
 
-	bool PlayerMovementComponent::Update(float l_deltaTime)
+	bool PlayerMovementComponent::Update(UpdateComponents& l_updateContext)
 	{
 		glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
 		bool lv_keyIsPressed = false;
-		float lv_d = (1 - std::expf(-l_deltaTime * 0.16f));
+		float lv_d = (1 - std::expf(-l_updateContext.m_deltaTime * 0.16f));
 		float lv_damper{ 0.064f };
 		
-		float lv_tempSpeed{ lv_damper * lv_d * l_deltaTime };
+		float lv_tempSpeed{ lv_damper * lv_d * l_updateContext.m_deltaTime };
 
 
-		const auto& lv_inputSystem = m_engine->GetInputSystem();
+		const auto& lv_inputSystem = l_updateContext.m_engine->GetInputSystem();
 
 		if (true == lv_inputSystem.IsKeyPressedNoRepetition(InputSystem::Keys::KEY_W)) {
 			m_speed += glm::vec2(0.f, -lv_tempSpeed);
@@ -61,7 +59,7 @@ namespace Asteroid
 		lv_deltaTransform[2][0] = m_speed.x;
 		lv_deltaTransform[2][1] = m_speed.y;
 
-		auto& lv_ownerEntity = m_engine->GetEntityFromHandle(m_ownerEntityHandle);
+		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
 		m_transform = lv_deltaTransform * m_transform;
 		auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();

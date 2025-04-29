@@ -1,8 +1,7 @@
 #pragma once
 
 
-#include "../MovementComponent.hpp"
-#include "Entities/EntityHandle.hpp"
+#include "Components/MovementComponent.hpp"
 
 
 
@@ -13,9 +12,9 @@ namespace Asteroid
 	{
 	public:
 
-		PlayerMovementComponent(EntityHandle l_ownerEntityHandle, Engine* l_engine);
+		PlayerMovementComponent(EntityHandle l_ownerEntityHandle);
 
-		bool Update(float l_deltaTime) override;
+		bool Update(UpdateComponents& l_updateContext) override;
 
 	private:
 

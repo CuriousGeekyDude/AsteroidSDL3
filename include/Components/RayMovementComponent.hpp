@@ -14,13 +14,13 @@ namespace Asteroid
 	{
 	public:
 
-		RayMovementComponent(EntityHandle l_ownerEntityHandle, Engine* l_engine);
+		RayMovementComponent(EntityHandle l_ownerEntityHandle);
 
 		void SetInitialPos(const glm::vec2& l_initialPos);
 		void SetRayDirection(const glm::vec2& l_direction);
 		void SetInitialT(const float l_initialT);
 
-		virtual bool Update(float l_deltaTime) override;
+		virtual bool Update(UpdateComponents& l_updateContext) override;
 
 	private:
 		glm::vec2 m_initialPos{};

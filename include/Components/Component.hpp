@@ -4,25 +4,20 @@
 
 #include "Entities/EntityHandle.hpp"
 
-
 namespace Asteroid
 {
-	struct EntityHandle;
-	class EntityConnector;
-	class Engine;
+	struct UpdateComponents;
 
 	class Component
 	{
 	public:
 		virtual ~Component() = default;
 
-		virtual bool Update(float l_deltaTime) = 0;
+		virtual bool Update(UpdateComponents& l_updateContext) = 0;
 
-		Component(EntityHandle l_ownerEntityHandle, Engine* l_engine);
+		Component(EntityHandle l_ownerEntityHandle);
 
 	protected:
-
-		Engine* m_engine;
 		EntityHandle m_ownerEntityHandle;
 	};
 }

@@ -19,15 +19,11 @@ namespace Asteroid
 
 	public:
 
-		BulletGraphicsComponent(uint32_t l_textureHandle
-			, RenderSystem::Renderer* l_renderer, EntityHandle l_entityHandle
-		, const glm::ivec2& l_windowResolution, const RayMovementComponent* l_bulletMovementComponent
-		, Engine* l_engine);
+		BulletGraphicsComponent(uint32_t l_textureHandle, EntityHandle l_entityHandle
+		, const RayMovementComponent* l_bulletMovementComponent);
 
 
-		bool Update(float l_deltaTime) override;
-
-		
+		bool Update(UpdateComponents& l_updateContext) override;
 
 
 	private:
