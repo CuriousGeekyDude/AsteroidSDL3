@@ -12,7 +12,10 @@
 #include "Entities/Entity.hpp"
 #include "Systems/Collision.hpp"
 #include <glm.hpp>
+#include "Systems/CollisionReactionContext.hpp"
+#include "Components/CollisionComponent.hpp"
 
+#include "Systems/LogSystem.hpp"
 
 
 namespace Asteroid
@@ -26,58 +29,45 @@ namespace Asteroid
 	}
 
 
-	void Grid::Init(const Engine* l_engine)
+	void Grid::Init(const glm::ivec2& l_fullSizedWindowSize)
 	{
-		glm::ivec2 lv_currentWindowRes{};
-		l_engine->GetCurrentWindowSize(lv_currentWindowRes);
+		m_totalNumDivisionsX = (uint32_t)std::ceil((float)l_fullSizedWindowSize.x / (float)m_cellWidth);
+		m_totalNumDivisionsY = (uint32_t)std::ceil((float)l_fullSizedWindowSize.y / (float)m_cellHeight);
 
-		const uint32_t lv_totalNumDivisionsX = (uint32_t)std::ceil((float)lv_currentWindowRes.x / (float)m_cellWidth);
-		const uint32_t lv_totalNumDivisionsY = (uint32_t)std::ceil((float)lv_currentWindowRes.y / (float)m_cellHeight);
+		m_cells.resize(m_totalNumUint32PerCell * m_totalNumDivisionsX * m_totalNumDivisionsY);
 
-		m_cells.resize(m_totalNumUint32PerCell * lv_totalNumDivisionsX * lv_totalNumDivisionsY);
-
-		m_currentMaxNumCells = (uint32_t)(lv_totalNumDivisionsY * lv_totalNumDivisionsX);
+		m_currentMaxNumCells = (uint32_t)(m_totalNumDivisionsX * m_totalNumDivisionsY);
 
 		m_allIndicesInOneCell.resize(m_totalNumUint32PerCell * 32);
 	}
 
 
-	void Grid::Update(const Engine* l_engine)
+	void Grid::Update(const glm::ivec2& l_currentWindowSize, const std::vector<Circle>& l_circleBounds, const std::vector<Entity>& l_entities)
 	{
 		memset(m_cells.data(), 0, sizeof(uint32_t) * m_cells.size());
+		m_totalNumDivisionsX = (uint32_t)std::ceil((float)l_currentWindowSize.x / (float)m_cellWidth);
+		m_totalNumDivisionsY = (uint32_t)std::ceil((float)l_currentWindowSize.y / (float)m_cellHeight);
 
-		glm::ivec2 lv_currentWindowRes{};
-		l_engine->GetCurrentWindowSize(lv_currentWindowRes);
+		m_currentMaxNumCells = (uint32_t)(m_totalNumDivisionsY * m_totalNumDivisionsX);
+	
 
-
-		const uint32_t lv_totalNumDivisionsX = (uint32_t)std::ceil((float)lv_currentWindowRes.x / (float)m_cellWidth);
-		const uint32_t lv_totalNumDivisionsY = (uint32_t)std::ceil((float)lv_currentWindowRes.y / (float)m_cellHeight);
-
-		m_currentMaxNumCells = (uint32_t)(lv_totalNumDivisionsY * lv_totalNumDivisionsX);
-		
-
-
-		const auto& lv_circleBounds = l_engine->GetCircleBounds();
-		const auto& lv_entities = l_engine->GetEntities();
-
-
-		for (uint32_t j = 0; j < lv_totalNumDivisionsY; ++j) {
-			for (uint32_t i = 0; i < lv_totalNumDivisionsX; ++i) {
+		for (uint32_t j = 0; j < m_totalNumDivisionsY; ++j) {
+			for (uint32_t i = 0; i < m_totalNumDivisionsX; ++i) {
 
 				const Rectangle lv_currentCellRectangle
 				{ .m_min{m_cellWidth * (i), m_cellHeight * (j)}
 				, .m_max{m_cellWidth*(i+1), m_cellHeight*(j+1)}};
 
-				for (uint32_t z = 0; z < (uint32_t)lv_circleBounds.size(); ++z) {
+				for (uint32_t z = 0; z < (uint32_t)l_circleBounds.size(); ++z) {
 
 
-					if (true == lv_entities[z].IsActive()) {
-						if (true == CircleRectangleIntersection(lv_circleBounds[z], lv_currentCellRectangle)) {
+					if (true == l_entities[z].IsActive()) {
+						if (true == CircleRectangleIntersection(l_circleBounds[z], lv_currentCellRectangle)) {
 
 							const uint32_t lv_quotient = z / 32U;
 							const uint32_t lv_bitPlace = z % 32U;
 
-							const uint32_t lv_indexOfFirstUint32Cell = (j * lv_totalNumDivisionsX + i) * m_totalNumUint32PerCell;
+							const uint32_t lv_indexOfFirstUint32Cell = (j * m_totalNumDivisionsX + i) * m_totalNumUint32PerCell;
 
 							m_cells[lv_indexOfFirstUint32Cell + lv_quotient] |= (1 << lv_bitPlace);
 
@@ -93,20 +83,15 @@ namespace Asteroid
 
 
 
-	void Grid::DoCollisionDetection(Engine* l_engine)
+	void Grid::DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities, Animation* l_animationSystem)
 	{
-		glm::ivec2 lv_currentWindowRes{};
-		l_engine->GetCurrentWindowSize(lv_currentWindowRes);
 
-		const auto& lv_circleBounds = l_engine->GetCircleBounds();
+		using namespace LogSystem;
+	
+		for (uint32_t j = 0; j < m_totalNumDivisionsY; ++j) {
+			for (uint32_t i = 0; i < m_totalNumDivisionsX; ++i) {
 
-		const uint32_t lv_totalNumDivisionsX = (uint32_t)std::ceil((float)lv_currentWindowRes.x / (float)m_cellWidth);
-		const uint32_t lv_totalNumDivisionsY = (uint32_t)std::ceil((float)lv_currentWindowRes.y / (float)m_cellHeight);
-
-		for (uint32_t j = 0; j < lv_totalNumDivisionsY; ++j) {
-			for (uint32_t i = 0; i < lv_totalNumDivisionsX; ++i) {
-
-				uint32_t lv_firstUint32IndexOfCell = (j * lv_totalNumDivisionsX + i)*m_totalNumUint32PerCell;
+				uint32_t lv_firstUint32IndexOfCell = (j * m_totalNumDivisionsX + i)*m_totalNumUint32PerCell;
 				uint32_t lv_temp{};
 				for (uint32_t d = 0; d < m_totalNumUint32PerCell; ++d) {
 					for (uint32_t k = 0; k < 32; ++k) {
@@ -121,16 +106,24 @@ namespace Asteroid
 
 				for (uint32_t k = 0; k < lv_temp; ++k) {
 
-					const auto& lv_circle1 = lv_circleBounds[m_allIndicesInOneCell[k]];
+					const auto& lv_circle1 = l_circleBounds[m_allIndicesInOneCell[k]];
+					CollisionComponent* lv_collisionComponentEntityK = (CollisionComponent*)l_entities[m_allIndicesInOneCell[k]].GetComponent(ComponentTypes::COLLISION);
+					assert(nullptr != lv_collisionComponentEntityK);
+					CollisionReactionContext lv_collisionReactContextEntityK{.m_animationSystem = l_animationSystem, .m_ownerEntity = &l_entities[m_allIndicesInOneCell[k]]};
 					for (uint32_t d = k + 1; d < lv_temp; ++d) {
 
-						const auto& lv_circle2 = lv_circleBounds[m_allIndicesInOneCell[d]];
+						const auto& lv_circle2 = l_circleBounds[m_allIndicesInOneCell[d]];
 						const glm::vec2 lv_differenceVector = lv_circle1.m_center - lv_circle2.m_center;
 						const float lv_sumOfRadiuses = lv_circle1.m_radius + lv_circle2.m_radius;
 
 						if (glm::dot(lv_differenceVector, lv_differenceVector) <= (lv_sumOfRadiuses* lv_sumOfRadiuses)) {
-							Collision::CollisionReaction(l_engine->GetEntityFromHandle(EntityHandle{ m_allIndicesInOneCell[k] })
-								, l_engine->GetEntityFromHandle(EntityHandle{ m_allIndicesInOneCell[d] }));
+							
+							CollisionReactionContext lv_collisionReactContextEntityD{.m_animationSystem = l_animationSystem, .m_ownerEntity = &l_entities[m_allIndicesInOneCell[d]]};
+							CollisionComponent* lv_collisionComponentEntityD = (CollisionComponent*)l_entities[m_allIndicesInOneCell[d]].GetComponent(ComponentTypes::COLLISION);
+
+							lv_collisionComponentEntityK->CollisionReaction(l_entities[m_allIndicesInOneCell[d]], lv_collisionReactContextEntityK);
+							lv_collisionComponentEntityD->CollisionReaction(l_entities[m_allIndicesInOneCell[k]], lv_collisionReactContextEntityD);
+
 						}
 					}
 				}

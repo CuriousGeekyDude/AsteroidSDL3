@@ -2,15 +2,20 @@
 
 
 #include <vector>
-
+#include <glm.hpp>
+#include "GeometryPrimitives/Circle.hpp"
+#include "Entities/Entity.hpp"
 
 
 namespace Asteroid
 {
 
 	class Engine;
-	struct Circle;
 	struct Rectangle;
+	class Entity;
+	struct CollisionReactionContext;
+	class Animation;
+	
 
 	class Grid final
 	{
@@ -19,11 +24,11 @@ namespace Asteroid
 		Grid();
 
 
-		void Init(const Engine* l_engine);
+		void Init(const glm::ivec2& l_fullSizedWindowSize);
 
-		void Update(const Engine* l_engine);
+		void Update(const glm::ivec2& l_currentWindowSize, const std::vector<Circle>& l_circleBounds, const std::vector<Entity>& l_entities);
 
-		void DoCollisionDetection(Engine* l_engine);
+		void DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities, Animation* l_animationSystem);
 
 
 		uint32_t GetTotalNumNonEmptyCells() const;
@@ -36,6 +41,9 @@ namespace Asteroid
 		std::vector<uint32_t> m_cells{};
 		std::vector<uint32_t> m_allIndicesInOneCell;
 		uint32_t m_currentMaxNumCells{};
+		uint32_t m_totalNumDivisionsX{};
+		uint32_t m_totalNumDivisionsY{};
+
 		static constexpr uint32_t m_cellWidth{128U};
 		static constexpr uint32_t m_cellHeight{ 128U };
 
