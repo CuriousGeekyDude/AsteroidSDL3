@@ -6,7 +6,6 @@
 #include "Components/Component.hpp"
 #include <glm.hpp>
 
-
 namespace Asteroid
 {
 
@@ -16,28 +15,27 @@ namespace Asteroid
 	}
 
 
-	class MovementComponent;
+	struct AnimationMetaData;
 
+	//Used to render the entity. This could be a static texture being rendered or an animation.
+	//But either way this texture is our main entity. There could be other animations with regards
+	//to an event that was triggered in place of the position of our entity. But that requires 
+	//another component which we shall define elsewhere.
 	class GraphicsComponent : public Component
 	{
 	public:
 
-		GraphicsComponent(uint32_t l_textureHandle, EntityHandle l_entityHandle
-			, float l_widthToRender, float l_heightToRender
-			,const MovementComponent* l_movementComponent);
+		GraphicsComponent(const EntityHandle l_entityHandle
+			, const AnimationMetaData* l_animationMetaData);
 
-		bool Update(UpdateComponents& l_updateContext);
-
-		bool GetVisibility() const;
+		virtual bool Update(UpdateComponents& l_updateContext) override;
 
 		virtual ~GraphicsComponent() = default;
 
 	protected:
-		uint32_t m_textureHandle{};
-		float m_widthToRender{};
-		float m_heightToRender{};
-		bool m_isVisible{ true };
-		const MovementComponent* m_movementComponent;
+
+		const AnimationMetaData* m_animationMetaData{};
+		uint32_t m_currentOffset{};
 	};
 
 }
