@@ -47,6 +47,7 @@ namespace Asteroid
 	void Grid::Update(const glm::ivec2& l_currentWindowSize, const std::vector<Circle>& l_circleBounds, const std::vector<Entity>& l_entities)
 	{
 		memset(m_cells.data(), 0, sizeof(uint32_t) * m_cells.size());
+		memset(m_centerPosOfCells.data(), 0, sizeof(float)*m_centerPosOfCells.size());
 		m_totalNumDivisionsX = (uint32_t)std::ceil((float)l_currentWindowSize.x / (float)m_cellWidth);
 		m_totalNumDivisionsY = (uint32_t)std::ceil((float)l_currentWindowSize.y / (float)m_cellHeight);
 
