@@ -1,4 +1,3 @@
-Assets/ExplosionAnimationPng90PerFrame/explosion1_0001.png
 Assets/ExplosionAnimationPng90PerFrame/explosion1_0002.png
 Assets/ExplosionAnimationPng90PerFrame/explosion1_0003.png
 Assets/ExplosionAnimationPng90PerFrame/explosion1_0004.png
