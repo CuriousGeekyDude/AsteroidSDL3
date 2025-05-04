@@ -40,7 +40,10 @@ namespace Asteroid
 
 		std::vector<uint32_t> m_cells{};
 		std::vector<uint32_t> m_allIndicesInOneCell;
+
+		//Stores in the first element the number of current cells
 		std::vector<glm::vec2> m_centerPosOfCells;
+
 		uint32_t m_currentMaxNumCells{};
 		uint32_t m_totalNumDivisionsX{};
 		uint32_t m_totalNumDivisionsY{};
