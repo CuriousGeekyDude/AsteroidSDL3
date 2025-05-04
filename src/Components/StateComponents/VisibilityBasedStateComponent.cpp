@@ -50,7 +50,9 @@ namespace Asteroid
 			|| lv_currentPos.y >= ((float)lv_currentWindowSize.y + lv_halfHeightEntityDim) || lv_currentPos.y <= -lv_halfHeightEntityDim
 			|| true == lv_activeComponent->HasStartedFrameCount()) {
 			m_isVisible = false;
-			return true;
+		}
+		else {
+			m_isVisible = true;
 		}
 
 
