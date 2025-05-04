@@ -94,7 +94,9 @@ namespace Asteroid
 			using namespace LogSystem;
 			auto* lv_sdlTexture = m_gpuResourceManager->RetrieveGpuTexture(l_renderData.m_entityTextureHandle);
 
-			assert(lv_sdlTexture != nullptr);
+			if (nullptr == lv_sdlTexture) {
+				exit(EXIT_FAILURE);
+			}
 
 			SDL_FRect lv_dstRect;
 			lv_dstRect.x = l_renderData.m_entityPos.x;
@@ -105,6 +107,12 @@ namespace Asteroid
 			SDL_FPoint lv_centerOfRotation{};
 			lv_centerOfRotation.x = l_renderData.m_centerOfRotation.x;
 			lv_centerOfRotation.y = l_renderData.m_centerOfRotation.y;
+
+
+			if (false == SDL_SetTextureBlendMode(lv_sdlTexture, SDL_BLENDMODE_BLEND)) {
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "SDL_BLENDMODE_BLEND blend mode is not supported: % s", SDL_GetError());
+				return false;
+			}
 
 			if (false == SDL_RenderTextureRotated(m_renderer
 				, lv_sdlTexture, nullptr, &lv_dstRect, l_renderData.m_angleOfRotation, &lv_centerOfRotation, SDL_FLIP_NONE)) {
