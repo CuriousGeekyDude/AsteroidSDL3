@@ -13,6 +13,7 @@
 #include "Entities/Entity.hpp"
 #include "GeometryPrimitives/Circle.hpp"
 #include "Entities/EntitySpawnerFromPools.hpp"
+#include "Components/AnimationMetaData.hpp"
 #include "Systems/Grid.hpp"
 #include <vector>
 #include <glm.hpp>
@@ -49,6 +50,9 @@ namespace Asteroid
 		const std::vector<Entity>& GetEntities() const;
 
 
+
+		const AnimationMetaData* GetAnimationMeta(const AnimationType l_type) const;
+
 		RenderSystem::Renderer* GetRenderer();
 
 		const InputSystem& GetInputSystem() const;
@@ -64,7 +68,6 @@ namespace Asteroid
 
 		EntityConnector m_entityConnector;
 
-
 	private:
 
 		void InitEntitiesAndPools();
@@ -78,7 +81,10 @@ namespace Asteroid
 		uint32_t m_playerEntityHandle{};
 		std::vector<Entity> m_entities{};
 		std::vector<Circle> m_circleBoundsEntities{};
+		std::vector<AnimationMetaData> m_animationMetaData;
 		Time m_trackLastFrameElapsedTime;
+
+		uint32_t m_backgroundStarsTextureHandle{};
 
 		RenderSystem::Renderer m_renderer;
 		InputSystem m_inputSystem;
