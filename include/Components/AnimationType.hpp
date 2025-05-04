@@ -13,7 +13,7 @@ namespace Asteroid
 		ASTEROID,
 		MAIN_SPACESHIP,
 		LASER_BEAM,
-
+		WARP_ASTEROID,
 		INVALID
 	};
 }
