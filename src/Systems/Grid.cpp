@@ -10,10 +10,10 @@
 #include "GeometryPrimitives/Circle.hpp"
 #include "GeometryPrimitives/Rectangle.hpp"
 #include "Entities/Entity.hpp"
-#include "Systems/Collision.hpp"
 #include <glm.hpp>
-#include "Systems/CollisionReactionContext.hpp"
 #include "Components/CollisionComponent.hpp"
+#include "Components/StateComponents/CollisionBasedStateComponent.hpp"
+#include "Components/StateComponents/ActiveBasedStateComponent.hpp"
 
 #include "Systems/LogSystem.hpp"
 
@@ -60,8 +60,9 @@ namespace Asteroid
 
 				for (uint32_t z = 0; z < (uint32_t)l_circleBounds.size(); ++z) {
 
-
-					if (true == l_entities[z].IsActive()) {
+					CollisionBasedStateComponent* lv_collisionBasedComp = (CollisionBasedStateComponent*)l_entities[z].GetComponent(ComponentTypes::COLLISION_BASED_STATE);
+					ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)l_entities[z].GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+					if (true == lv_activeComp->IsActive() && true == lv_collisionBasedComp->GetCollisionState()) {
 						if (true == CircleRectangleIntersection(l_circleBounds[z], lv_currentCellRectangle)) {
 
 							const uint32_t lv_quotient = z / 32U;
@@ -83,7 +84,7 @@ namespace Asteroid
 
 
 
-	void Grid::DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities, Animation* l_animationSystem)
+	void Grid::DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities)
 	{
 
 		using namespace LogSystem;
@@ -109,7 +110,6 @@ namespace Asteroid
 					const auto& lv_circle1 = l_circleBounds[m_allIndicesInOneCell[k]];
 					CollisionComponent* lv_collisionComponentEntityK = (CollisionComponent*)l_entities[m_allIndicesInOneCell[k]].GetComponent(ComponentTypes::COLLISION);
 					assert(nullptr != lv_collisionComponentEntityK);
-					CollisionReactionContext lv_collisionReactContextEntityK{.m_animationSystem = l_animationSystem, .m_ownerEntity = &l_entities[m_allIndicesInOneCell[k]]};
 					for (uint32_t d = k + 1; d < lv_temp; ++d) {
 
 						const auto& lv_circle2 = l_circleBounds[m_allIndicesInOneCell[d]];
@@ -118,11 +118,10 @@ namespace Asteroid
 
 						if (glm::dot(lv_differenceVector, lv_differenceVector) <= (lv_sumOfRadiuses* lv_sumOfRadiuses)) {
 							
-							CollisionReactionContext lv_collisionReactContextEntityD{.m_animationSystem = l_animationSystem, .m_ownerEntity = &l_entities[m_allIndicesInOneCell[d]]};
 							CollisionComponent* lv_collisionComponentEntityD = (CollisionComponent*)l_entities[m_allIndicesInOneCell[d]].GetComponent(ComponentTypes::COLLISION);
 
-							lv_collisionComponentEntityK->CollisionReaction(l_entities[m_allIndicesInOneCell[d]], lv_collisionReactContextEntityK);
-							lv_collisionComponentEntityD->CollisionReaction(l_entities[m_allIndicesInOneCell[k]], lv_collisionReactContextEntityD);
+							lv_collisionComponentEntityK->CollisionReaction(l_entities[m_allIndicesInOneCell[d]], l_entities[m_allIndicesInOneCell[k]]);
+							lv_collisionComponentEntityD->CollisionReaction(l_entities[m_allIndicesInOneCell[k]], l_entities[m_allIndicesInOneCell[d]]);
 
 						}
 					}
