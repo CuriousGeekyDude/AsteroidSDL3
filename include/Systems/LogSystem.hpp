@@ -27,7 +27,8 @@ namespace Asteroid
 			INITIALIZATION,
 			INPUT,
 			MEMORY,
-			PROGRAM_LOGIC
+			PROGRAM_LOGIC,
+			ANIMATION
 		};
 
 
@@ -63,7 +64,7 @@ namespace Asteroid
 	}
 
 
-//#define LOGGING
+#define LOGGING
 #ifdef LOGGING
 
 #define LOG(l_level, l_category, l_userMsg, ...) LogSystem::Log(l_level, l_category, __LINE__, __FILE__, l_userMsg, __VA_ARGS__);
