@@ -28,10 +28,12 @@ namespace Asteroid
 	private:
 
 		bool BulletSpawnConditionMet();
+		bool AsteroidSpawnConditionMet();
 
 	private:
 
 		Engine* m_engine;
 		EntityPool m_bulletsPool;
+		EntityPool m_asteroidPool;
 	};
 }

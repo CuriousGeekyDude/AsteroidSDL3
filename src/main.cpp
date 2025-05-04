@@ -3,7 +3,6 @@
 #include "Engine.hpp"
 
 
-
 int main()
 {
 
@@ -17,6 +16,8 @@ int main()
 		.emplace(std::pair<std::string, std::string>("Spaceship", "Assets/DarkRaiderSpaceship.png"));
 	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
 		.emplace(std::pair<std::string, std::string>("LaserBeam", "Assets/LaserBeam.png"));
+	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
+		.emplace(std::pair<std::string, std::string>("Asteroid", "Assets/Asteroid.png"));
 
 
 	

@@ -4,6 +4,7 @@
 
 
 #include "Components/StateComponents/VisibilityBasedStateComponent.hpp"
+#include "Components/StateComponents/DelayDeactiveBasedStateComponent.hpp"
 #include "Components/GraphicsComponent.hpp"
 #include "Components/UpdateComponents.hpp"
 #include "Engine.hpp"
@@ -12,9 +13,11 @@ namespace Asteroid
 {
 
 	VisibilityBasedStateComponent::VisibilityBasedStateComponent(EntityHandle l_ownerEntityHandle
-		, const GraphicsComponent* l_graphicsComponent)
+		, const GraphicsComponent* l_graphicsComponent
+		, const DelayDeactiveBasedStateComponent* l_delayComponent)
 		:StateComponent(l_ownerEntityHandle)
 		,m_graphicsComponent(l_graphicsComponent)
+		, m_delayComponent(l_delayComponent)
 	{
 
 	}
@@ -23,9 +26,14 @@ namespace Asteroid
 	{
 		auto lv_isVisibile = m_graphicsComponent->GetVisibility();
 
-		if (false == lv_isVisibile) {
+		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
+		
+		DelayDeactiveBasedStateComponent* lv_delayComponent = (DelayDeactiveBasedStateComponent*)lv_ownerEntity.GetComponent(ComponentTypes::DELAY_BASED_STATE);
+		
+		auto lv_isDelayed = lv_delayComponent->HasStartedFrameCount();
 
-			auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
+		if (false == lv_isVisibile && false == lv_isDelayed) {
+
 			lv_ownerEntity.SetInactive();
 
 		}

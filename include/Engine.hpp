@@ -10,7 +10,10 @@
 #include "Systems/EntityConnector.hpp"
 #include "Entities/EntityType.hpp"
 #include "Entities/EntityHandle.hpp"
+#include "Entities/Entity.hpp"
+#include "GeometryPrimitives/Circle.hpp"
 #include "Entities/EntitySpawnerFromPools.hpp"
+#include "Systems/Grid.hpp"
 #include <vector>
 #include <glm.hpp>
 
@@ -21,8 +24,6 @@ struct SDL_Renderer;
 namespace Asteroid
 {
 
-	
-	class Entity;
 
 	class Engine
 	{
@@ -48,9 +49,14 @@ namespace Asteroid
 		const std::vector<Entity>& GetEntities() const;
 
 
+		RenderSystem::Renderer* GetRenderer();
+
 		const InputSystem& GetInputSystem() const;
 
 		void GetCurrentWindowSize(glm::ivec2& l_windowRes) const;
+
+		const std::vector<Circle>& GetCircleBounds() const;
+		void UpdateCircleBounds();
 
 		~Engine();
 
@@ -70,13 +76,14 @@ namespace Asteroid
 		//Wanted to have pointer here but vector of entities might grow
 		//and invalidate the ptr.
 		uint32_t m_playerEntityHandle{};
-		std::vector<Entity> m_entities;
-
+		std::vector<Entity> m_entities{};
+		std::vector<Circle> m_circleBoundsEntities{};
 		Time m_trackLastFrameElapsedTime;
 
 		RenderSystem::Renderer m_renderer;
 		InputSystem m_inputSystem;
 		EntitySpawnerFromPools m_entitySpawnerFromPools;
+		Grid m_grid;
 
 		GpuResourceManager m_gpuResourceManager;
 

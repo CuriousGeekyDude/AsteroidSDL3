@@ -21,7 +21,12 @@ namespace Asteroid
 
 	void EntitySpawnerFromPools::InitPool(const EntityType l_type, const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities)
 	{
-		m_bulletsPool.Init(l_type, l_firstEntityIndex, l_totalNumEntities);
+		if (EntityType::BULLET == l_type) {
+			m_bulletsPool.Init(l_type, l_firstEntityIndex, l_totalNumEntities);
+		}
+		if (EntityType::ASTEROID == l_type) {
+			m_asteroidPool.Init(l_type, l_firstEntityIndex, l_totalNumEntities);
+		}
 	}
 
 	void EntitySpawnerFromPools::SpawnNewEntitiesIfConditionsMet()
@@ -32,7 +37,6 @@ namespace Asteroid
 
 
 			auto lv_nextInactiveBulletIdx = m_bulletsPool.GetNextInactiveEntityHandle();
-			LOG(Severity::INFO, Channel::MEMORY, "The next inactive bullet has index %u", lv_nextInactiveBulletIdx.m_entityHandle);
 
 			auto& lv_bullet = m_engine->GetEntityFromHandle(lv_nextInactiveBulletIdx.m_entityHandle);
 			lv_bullet.SetActive();
@@ -62,12 +66,50 @@ namespace Asteroid
 			}
 
 		}
+
+		if (true == AsteroidSpawnConditionMet()) {
+
+
+			auto lv_nextInactiveBulletIdx = m_asteroidPool.GetNextInactiveEntityHandle();
+
+			glm::ivec2 lv_windowRes{};
+			m_engine->GetCurrentWindowSize(lv_windowRes);
+
+			auto& lv_asteroid = m_engine->GetEntityFromHandle(lv_nextInactiveBulletIdx.m_entityHandle);
+			lv_asteroid.SetActive();
+			glm::vec2 lv_direction{-1.f, 0.f};
+
+			RayMovementComponent* lv_asteroidMovComponent = (RayMovementComponent*)lv_asteroid.GetComponent(ComponentTypes::MOVEMENT);
+			constexpr float lv_initialT{ 20.f };
+
+			lv_asteroidMovComponent->SetSpeed(glm::vec2{ 0.1f });
+			lv_asteroidMovComponent->SetRayDirection(lv_direction);
+			lv_asteroidMovComponent->SetInitialT(lv_initialT);
+			lv_asteroidMovComponent->SetAngleOfRotation(0.f);
+			lv_asteroidMovComponent->SetInitialPos({lv_windowRes.x, lv_windowRes.y/2.f});
+			
+
+		}
 	}
 
 
 	void EntitySpawnerFromPools::UpdatePools()
 	{
 		m_bulletsPool.Update(m_engine->GetEntities());
+		m_asteroidPool.Update(m_engine->GetEntities());
+	}
+
+
+	bool EntitySpawnerFromPools::AsteroidSpawnConditionMet()
+	{
+		const auto& lv_inputSystem = m_engine->GetInputSystem();
+		if (true == lv_inputSystem.IsNoRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_T) && true == lv_inputSystem.IsMouseHidden()) {
+
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	bool EntitySpawnerFromPools::BulletSpawnConditionMet()
@@ -75,7 +117,7 @@ namespace Asteroid
 		using namespace LogSystem;
 
 		const auto& lv_inputSystem = m_engine->GetInputSystem();
-		if (true == lv_inputSystem.IsKeyPressedWithRepetition(InputSystem::Keys::KEY_F) && true == lv_inputSystem.IsMouseHidden()) {
+		if (true == lv_inputSystem.IsNoRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_F) && true == lv_inputSystem.IsMouseHidden()) {
 
 			return true;
 		}

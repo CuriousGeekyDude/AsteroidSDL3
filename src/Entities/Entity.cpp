@@ -2,9 +2,10 @@
 
 
 #include "Entities/Entity.hpp"
-#include "Components/Component.hpp"
 #include "Systems/LogSystem.hpp"
-
+#include "Components/ComponentTypes.hpp"
+#include "Components/StateComponents/DelayDeactiveBasedStateComponent.hpp"
+#include "Components/CollisionComponent.hpp"
 
 namespace Asteroid
 {
@@ -44,10 +45,10 @@ namespace Asteroid
 	}
 
 
-	bool Entity::Update(const float l_lastFrameElapsedTime)
+	bool Entity::Update(UpdateComponents& l_updateComponents)
 	{
 		for (auto& l_component : m_components) {
-			if (false == l_component.second->Update(l_lastFrameElapsedTime)) {
+			if (false == l_component.second->Update(l_updateComponents)) {
 				return false;
 			}
 		}
@@ -65,7 +66,32 @@ namespace Asteroid
 
 	void Entity::SetInactive()
 	{
-		m_isActive = false;
+		using namespace LogSystem;
+
+		auto* lv_delayComponent = (DelayDeactiveBasedStateComponent*)GetComponent(ComponentTypes::DELAY_BASED_STATE);
+		auto* lv_collisionComponent = (CollisionComponent*)GetComponent(ComponentTypes::COLLISION);
+
+
+		if (nullptr != lv_collisionComponent) {
+			LOG(Severity::INFO, Channel::PHYSICS, "Entity with index %u has reset its collision flag.", m_id);
+			lv_collisionComponent->ResetCollision();
+		}
+
+
+		if (nullptr == lv_delayComponent) {
+			m_isActive = false;
+		}
+		else {
+
+			if (true == lv_delayComponent->HasStartedFrameCount()) {
+				LOG(Severity::FAILURE, Channel::PROGRAM_LOGIC, "Entity with id %u is being deactivated when the delayed deactivation component is still active.", m_id);
+				exit(EXIT_FAILURE);
+			}
+			else {
+				m_isActive = false;
+			}
+
+		}
 	}
 
 	void Entity::SetActive()

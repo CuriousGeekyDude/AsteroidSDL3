@@ -8,16 +8,14 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "../Components/ComponentTypes.hpp"
+#include "Components/ComponentTypes.hpp"
 #include "EntityType.hpp"
+#include "Components/Component.hpp"
 
 
 
 namespace Asteroid
 {
-
-	class Component;
-	class EntityConnector;
 
 	class Entity
 	{
@@ -31,7 +29,7 @@ namespace Asteroid
 
 		Component* GetComponent(const ComponentTypes l_componentType) const;
 
-		bool Update(const float l_deltaTime);
+		bool Update(UpdateComponents& l_updateComponents);
 
 		const glm::vec2& GetCurrentPos() const;
 
