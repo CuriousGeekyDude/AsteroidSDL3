@@ -95,7 +95,7 @@ namespace Asteroid
 		if (false == m_gpuTextures.empty()) {
 			if (l_textureHandle >= (uint32_t)m_gpuTextures.size()) {
 
-				LOG(Severity::WARNING, Channel::GRAPHICS,"Texture handle is bigger than the size of the gpu textures vector.");
+				LOG(Severity::WARNING, Channel::GRAPHICS,"Texture handle %u is bigger than the size of the gpu textures vector.", l_textureHandle);
 				return nullptr;
 			}
 			return m_gpuTextures[l_textureHandle];
