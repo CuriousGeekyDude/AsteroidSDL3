@@ -8,6 +8,8 @@
 namespace Asteroid
 {
 
+	class ActiveBasedStateComponent;
+
 	class UserInputBasedMovementComponent : public MovementComponent
 	{
 	public:

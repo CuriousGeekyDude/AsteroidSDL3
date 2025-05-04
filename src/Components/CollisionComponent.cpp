@@ -10,9 +10,8 @@
 namespace Asteroid
 {
 
-	CollisionComponent::CollisionComponent(EntityHandle l_ownerEntityHandle, DelayDeactiveBasedStateComponent* l_delayedDeactiveComponent)
+	CollisionComponent::CollisionComponent(EntityHandle l_ownerEntityHandle)
 		:Component(l_ownerEntityHandle)
-		,m_delayedDeactiveComponent(l_delayedDeactiveComponent)
 	{
 
 	}

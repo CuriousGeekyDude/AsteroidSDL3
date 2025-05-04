@@ -10,8 +10,8 @@ namespace Asteroid
 {
 
 
-	PlayerCollisionComponent::PlayerCollisionComponent(EntityHandle l_ownerEntityHandle, DelayDeactiveBasedStateComponent* l_delayedDeactiveComponent)
-		:CollisionComponent(l_ownerEntityHandle, l_delayedDeactiveComponent)
+	PlayerCollisionComponent::PlayerCollisionComponent(EntityHandle l_ownerEntityHandle)
+		:CollisionComponent(l_ownerEntityHandle)
 	{
 
 	}
@@ -21,7 +21,7 @@ namespace Asteroid
 		return true;
 	}
 
-	void PlayerCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, CollisionReactionContext& l_collisionReactContext)
+	void PlayerCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_collisionReactContext)
 	{
 
 	}

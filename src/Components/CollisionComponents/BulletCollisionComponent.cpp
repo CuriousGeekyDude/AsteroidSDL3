@@ -6,17 +6,15 @@
 
 #include "Components/CollisionComponents/BulletCollisionComponent.hpp"
 #include "Entities/Entity.hpp"
-#include "Systems/CollisionReactionContext.hpp"
-#include "Components/RayMovementComponent.hpp"
+#include "Components/StateComponents/ActiveBasedStateComponent.hpp"
 
 
 namespace Asteroid
 {
 
 	
-	BulletCollisionComponent::BulletCollisionComponent(EntityHandle l_ownerEntityHandle, const RayMovementComponent* l_ownerMovComponent, DelayDeactiveBasedStateComponent* l_delayedDeactiveComponent)
-		:CollisionComponent(l_ownerEntityHandle, l_delayedDeactiveComponent)
-		,m_ownerMovComponent(l_ownerMovComponent)
+	BulletCollisionComponent::BulletCollisionComponent(EntityHandle l_ownerEntityHandle)
+		:CollisionComponent(l_ownerEntityHandle)
 	{
 
 	}
@@ -27,7 +25,7 @@ namespace Asteroid
 	}
 
 
-	void BulletCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, CollisionReactionContext& l_collisionReactContext)
+	void BulletCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity)
 	{
 		if (EntityType::BULLET == l_entityItCollidedWith.GetType() || EntityType::PLAYER == l_entityItCollidedWith.GetType()) {
 			return;
@@ -41,8 +39,11 @@ namespace Asteroid
 
 		if (false == m_resetCollision && true == m_firstCollision) {
 
-			auto* lv_ownerEntity = l_collisionReactContext.m_ownerEntity;
-			l_collisionReactContext.m_ownerEntity->SetInactive();
+
+			ActiveBasedStateComponent* lv_activeComponent = (ActiveBasedStateComponent*)l_ownerEntity.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+
+			lv_activeComponent->SetActiveState(false);
+
 			m_firstCollision = false;
 
 		}

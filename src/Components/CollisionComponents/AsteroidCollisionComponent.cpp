@@ -5,19 +5,18 @@
 
 
 #include "Components/CollisionComponents/AsteroidCollisionComponent.hpp"
-#include "Systems/Animation.hpp"
-#include "Systems/CollisionReactionContext.hpp"
+#include "Components/AnimationComponent.hpp"
 #include "Entities/Entity.hpp"
-#include "Components/RayMovementComponent.hpp"
-#include "Components/StateComponents/DelayDeactiveBasedStateComponent.hpp"
+#include "Components/StateComponents/ActiveBasedStateComponent.hpp"
+#include "Components/StateComponents/VisibilityBasedStateComponent.hpp"
+#include "Components/StateComponents/CollisionBasedStateComponent.hpp"
 
 
 namespace Asteroid
 {
 
-	AsteroidCollisionComponent::AsteroidCollisionComponent(EntityHandle l_ownerEntityHandle, const RayMovementComponent* l_ownerMovComponent, DelayDeactiveBasedStateComponent* l_delayedDeactiveComponent)
-		:CollisionComponent(l_ownerEntityHandle, l_delayedDeactiveComponent)
-		,m_ownerMovComponent(l_ownerMovComponent)
+	AsteroidCollisionComponent::AsteroidCollisionComponent(EntityHandle l_ownerEntityHandle)
+		:CollisionComponent(l_ownerEntityHandle)
 	{
 
 	}
@@ -31,7 +30,7 @@ namespace Asteroid
 
 
 
-	void AsteroidCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, CollisionReactionContext& l_collisionReactContext)
+	void AsteroidCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity)
 	{
 		
 		if (true == m_resetCollision) {
@@ -43,13 +42,18 @@ namespace Asteroid
 
 		if (false == m_resetCollision && true == m_firstCollision) {
 
-			auto* lv_ownerEntity = l_collisionReactContext.m_ownerEntity;
 
-			l_collisionReactContext.m_animationSystem
-				->InitNewAnimation(AnimationType::EXPLOSION_FIRE_ASTEROID
-				, lv_ownerEntity->GetCurrentPos(), m_ownerMovComponent->GetCurrentAngleOfRotation());
-			m_delayedDeactiveComponent->StartCount();
-			m_firstCollision = false;
+			CollisionBasedStateComponent* lv_collisionStateComp = (CollisionBasedStateComponent*)l_ownerEntity.GetComponent(ComponentTypes::COLLISION_BASED_STATE);
+
+
+			if (true == lv_collisionStateComp->GetCollisionState()) {
+				AnimationComponent* lv_fireExplosionAnimation = (AnimationComponent*)l_ownerEntity.GetComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION);
+				ActiveBasedStateComponent* lv_activeComponent = (ActiveBasedStateComponent*)l_ownerEntity.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+				lv_fireExplosionAnimation->StartAnimation();
+				lv_activeComponent->StartCount();
+				lv_collisionStateComp->StartCollisionDeactivation();
+				m_firstCollision = false;
+			}
 
 		}
 

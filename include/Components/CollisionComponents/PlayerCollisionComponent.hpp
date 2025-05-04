@@ -15,11 +15,11 @@ namespace Asteroid
 	{
 	public:
 
-		PlayerCollisionComponent(EntityHandle l_ownerEntityHandle, DelayDeactiveBasedStateComponent* l_delayedDeactiveComponent);
+		PlayerCollisionComponent(EntityHandle l_ownerEntityHandle);
 
 		bool Update(UpdateComponents& l_updateContext) override;
 
-		void CollisionReaction(Entity& l_entityItCollidedWith, CollisionReactionContext& l_collisionReactContext) override;
+		void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity) override;
 
 	};
 

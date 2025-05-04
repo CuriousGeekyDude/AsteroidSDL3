@@ -6,6 +6,7 @@
 #include "Engine.hpp"
 #include "Components/UpdateComponents.hpp"
 
+
 namespace Asteroid
 {
 
@@ -32,13 +33,16 @@ namespace Asteroid
 	{
 		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
+
+
 		m_initialT += m_speed.x * l_updateContext.m_deltaTime;
 
-		const glm::vec2 lv_newPos = m_initialPos + (m_initialT) * m_rayDirection;
+		const glm::vec2 lv_newPos = m_initialPos + (m_initialT)*m_rayDirection;
 		m_transform[2][0] = lv_newPos.x;
 		m_transform[2][1] = lv_newPos.y;
 
 		lv_ownerEntity.SetCurrentPos(lv_newPos);
+
 
 
 		return true;

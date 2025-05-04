@@ -17,16 +17,13 @@ namespace Asteroid
 	{
 	public:
 
-		BulletCollisionComponent(EntityHandle l_ownerEntityHandle, const RayMovementComponent* l_ownerMovComponent, DelayDeactiveBasedStateComponent* l_delayedDeactiveComponent);
+		BulletCollisionComponent(EntityHandle l_ownerEntityHandle);
 
 		bool Update(UpdateComponents& l_updateContext) override;
 
-		void CollisionReaction(Entity& l_entityItCollidedWith, CollisionReactionContext& l_collisionReactContext) override;
+		void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity) override;
 
 	private:
-
-		const RayMovementComponent* m_ownerMovComponent{};
-
 
 	};
 
