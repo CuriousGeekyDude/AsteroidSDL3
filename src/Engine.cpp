@@ -399,7 +399,7 @@ namespace Asteroid
 
 		//Asteroid Entities and pool initialization
 		{
-			constexpr uint32_t lv_totalNumAsteroids{ 64U };
+			constexpr uint32_t lv_totalNumAsteroids{ 128U };
 			const auto* lv_asteroidAnimMeta = GetAnimationMeta(AnimationType::ASTEROID);
 			const auto* lv_explosionAsteroidAnimMeta = GetAnimationMeta(AnimationType::EXPLOSION_FIRE_ASTEROID);
 			assert(nullptr != lv_asteroidAnimMeta);
@@ -472,6 +472,13 @@ namespace Asteroid
 	{
 		return m_circleBoundsEntities;
 	}
+
+
+	const Grid& Engine::GetGrid() const
+	{
+		return m_grid;
+	}
+
 
 	Engine::~Engine()
 	{
