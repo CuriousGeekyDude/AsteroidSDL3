@@ -7,6 +7,9 @@
 #include "Components/Component.hpp"
 #include <gtc/matrix_transform.hpp>
 
+
+
+
 namespace Asteroid
 {
 
@@ -32,6 +35,7 @@ namespace Asteroid
 		glm::mat3 m_transform{ glm::identity<glm::mat3>() };
 		float m_thetaDegrees{};
 		
+
 		//Speed along X and Y axis
 		glm::vec2 m_speed{0.f};
 	};

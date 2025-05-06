@@ -6,6 +6,8 @@
 #include "Systems/InputSystem.hpp"
 #include "Engine.hpp"
 #include "Components/RayMovementComponent.hpp"
+#include "Components/StateComponents/ActiveBasedStateComponent.hpp"
+#include "Components/StateComponents/VisibilityBasedStateComponent.hpp"
 #include "Entities/Entity.hpp"
 
 
@@ -35,11 +37,16 @@ namespace Asteroid
 
 		if (true == BulletSpawnConditionMet()) {
 
-
+			
 			auto lv_nextInactiveBulletIdx = m_bulletsPool.GetNextInactiveEntityHandle();
 
+			LOG(Severity::INFO, Channel::GRAPHICS, "Bullet with index %u is being fetched", lv_nextInactiveBulletIdx);
+
 			auto& lv_bullet = m_engine->GetEntityFromHandle(lv_nextInactiveBulletIdx.m_entityHandle);
-			lv_bullet.SetActive();
+
+			ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)lv_bullet.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+
+			lv_activeComp->SetActiveState(true);
 			const auto& lv_currentPlayerPos = m_engine->m_entityConnector.RequestPositionFromPlayer();
 			float lv_playerAngleOfRotation = m_engine->m_entityConnector.RequestAngleRotationFromPlayer();
 			const auto& lv_mousePos = m_engine->GetInputSystem().GetMousePosRelativeToWindow();
@@ -70,13 +77,21 @@ namespace Asteroid
 		if (true == AsteroidSpawnConditionMet()) {
 
 
-			auto lv_nextInactiveBulletIdx = m_asteroidPool.GetNextInactiveEntityHandle();
+			auto lv_nextInactiveAsteroidIdx = m_asteroidPool.GetNextInactiveEntityHandle();
+
+			LOG(Severity::INFO, Channel::GRAPHICS, "Asteroid with index %u is being fetched", lv_nextInactiveAsteroidIdx);
 
 			glm::ivec2 lv_windowRes{};
 			m_engine->GetCurrentWindowSize(lv_windowRes);
 
-			auto& lv_asteroid = m_engine->GetEntityFromHandle(lv_nextInactiveBulletIdx.m_entityHandle);
-			lv_asteroid.SetActive();
+			auto& lv_asteroid = m_engine->GetEntityFromHandle(lv_nextInactiveAsteroidIdx.m_entityHandle);
+
+			ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+			VisibilityBasedStateComponent* lv_visibilityComp = (VisibilityBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::VISIBILITY_BASED_STATE);
+
+			lv_activeComp->SetActiveState(true);
+			lv_visibilityComp->SetVisibility(true);
+
 			glm::vec2 lv_direction{-1.f, 0.f};
 
 			RayMovementComponent* lv_asteroidMovComponent = (RayMovementComponent*)lv_asteroid.GetComponent(ComponentTypes::MOVEMENT);

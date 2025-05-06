@@ -4,6 +4,7 @@
 
 #include "Entities/EntityPool.hpp"
 #include "Entities/Entity.hpp"
+#include "Components/StateComponents/ActiveBasedStateComponent.hpp"
 #include <utility>
 #include <limits>
 
@@ -70,7 +71,10 @@ namespace Asteroid
 
 			for (uint32_t i = 0; i < (uint32_t)m_inactiveEntityIndices.size(); ++i) {
 
-				if (true == l_entities[i + m_firstEntityIndex].IsActive()) {
+
+				ActiveBasedStateComponent* lv_activeComponent = (ActiveBasedStateComponent*)l_entities[i + m_firstEntityIndex].GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+
+				if (true == lv_activeComponent->IsActive()) {
 					m_inactiveEntityIndices[i] = std::numeric_limits<uint32_t>::max();
 				}
 				else {

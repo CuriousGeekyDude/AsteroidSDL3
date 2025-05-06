@@ -113,6 +113,10 @@ namespace Asteroid
 				char lv_tempChannel[] = "PROGRAM_LOGIC";
 				memcpy(lv_channel.data(), &lv_tempChannel, sizeof(lv_tempChannel));
 			}
+			if (Channel::ANIMATION == l_category) {
+				char lv_tempChannel[] = "ANIMATION";
+				memcpy(lv_channel.data(), &lv_tempChannel, sizeof(lv_tempChannel));
+			}
 
 
 			int lv_totalNumCharWritten = snprintf(lv_finalMsg, lv_finalMsgSize

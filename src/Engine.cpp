@@ -2,10 +2,17 @@
 
 #include "Engine.hpp"
 #include "Components/MovementComponents/UserInputBasedMovementComponent.hpp"
+#include "Components/AnimationComponent.hpp"
 #include "Components/GraphicsComponent.hpp"
 #include "Components/RayMovementComponent.hpp"
 #include "Components/StateComponents/VisibilityBasedStateComponent.hpp"
+#include "Components/StateComponents/ActiveBasedStateComponent.hpp"
+#include "Components/CollisionComponents/PlayerCollisionComponent.hpp"
+#include "Components/CollisionComponents/AsteroidCollisionComponent.hpp"
+#include "Components/CollisionComponents/BulletCollisionComponent.hpp"
+#include "Components/StateComponents/CollisionBasedStateComponent.hpp"
 #include "Systems/Colors.hpp"
+#include "Systems/RenderingData.hpp"
 #include "Components/UpdateComponents.hpp"
 #include "Systems/LogSystem.hpp"
 #include <imgui.h>
@@ -26,6 +33,7 @@ namespace Asteroid
 		,m_entityConnector(this)
 		,m_entitySpawnerFromPools(this)
 		,m_grid()
+		,m_animationMetaData(std::move(m_initialData.m_animationMetaData))
 	{
 		
 	}
@@ -82,6 +90,8 @@ namespace Asteroid
 				, l_mapPairNameToPath.second, l_mapPairNameToPath.first);
 		}
 
+		m_backgroundStarsTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("BackgroundStarClusters");
+
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Creation of all textures on gpu was successful.");
 
 
@@ -91,7 +101,9 @@ namespace Asteroid
 
 		InitEntitiesAndPools();
 
-		m_grid.Init(this);
+		glm::ivec2 lv_fullWindowSize{};
+		GetCurrentWindowSize(lv_fullWindowSize);
+		m_grid.Init(lv_fullWindowSize);
 
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Initializing entities was successful.");
 
@@ -126,6 +138,14 @@ namespace Asteroid
 		constexpr float lv_60fpsInMilliseconds{16.6666667f};
 		UpdateComponents lv_updateComponent{};
 		lv_updateComponent.m_engine = this;
+
+		glm::ivec2 lv_currentWindowSize{};
+		RenderSystem::RenderingData lv_backgroundStarsRenderData{};
+		lv_backgroundStarsRenderData.m_angleOfRotation = 0.f;
+		lv_backgroundStarsRenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
+		lv_backgroundStarsRenderData.m_entityTextureHandle = m_backgroundStarsTextureHandle;
+		
+
 		while (false == lv_quit) {
 
 			m_trackLastFrameElapsedTime.m_currentTime = SDL_GetTicks();
@@ -160,18 +180,28 @@ namespace Asteroid
 
 
 			assert(true == m_renderer.ClearWindow());
+			GetCurrentWindowSize(lv_currentWindowSize);
+
+			lv_backgroundStarsRenderData.m_heightToRender = lv_currentWindowSize.y;
+			lv_backgroundStarsRenderData.m_widthToRender = lv_currentWindowSize.x;
+			lv_backgroundStarsRenderData.m_centerOfRotation.x = (float)lv_currentWindowSize.x / 2.f;
+			lv_backgroundStarsRenderData.m_centerOfRotation.y = (float)lv_currentWindowSize.y / 2.f;
+
+			m_renderer.RenderEntity(lv_backgroundStarsRenderData);
 
 			m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
 			lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
 			for (auto& l_entity : m_entities) {
-				if (true == l_entity.IsActive()) {
+				ActiveBasedStateComponent* lv_activeComponent = (ActiveBasedStateComponent*)l_entity.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+				if (true == lv_activeComponent->IsActive()) {
 					assert(l_entity.Update(lv_updateComponent));
 				}
 			}
 			m_entitySpawnerFromPools.UpdatePools();
 			UpdateCircleBounds();
-			m_grid.Update(this);
-			m_grid.DoCollisionDetection(this);
+
+			m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
+			m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities);
 			
 
 
@@ -305,47 +335,62 @@ namespace Asteroid
 		glm::ivec2 lv_windowRes{};
 		GetCurrentWindowSize(lv_windowRes);
 
-		m_circleBoundsEntities.reserve(65U);
+		m_circleBoundsEntities.reserve(150U);
 		m_entities.reserve(150U);
 
 		//Main player initialization
 		{
-			uint32_t lv_spaceShipGpuTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("Spaceship");
+			const auto* lv_spaceshipAnimMeta = GetAnimationMeta(AnimationType::MAIN_SPACESHIP);
 
-			assert(UINT32_MAX != lv_spaceShipGpuTextureHandle);
+			assert(nullptr != lv_spaceshipAnimMeta);
 
-			auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ (float)lv_windowRes.x/2.f, (float)lv_windowRes.y/2.f }, 0, true, EntityType::PLAYER)));
+			auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ (float)lv_windowRes.x/2.f, (float)lv_windowRes.y/2.f }, 0, EntityType::PLAYER)));
 
+
+			lv_player.AddComponent(ComponentTypes::COLLISION,
+				std::make_unique<PlayerCollisionComponent>(0));
+			lv_player.AddComponent(ComponentTypes::ACTIVE_BASED_STATE,
+				std::make_unique<ActiveBasedStateComponent>(0, 1U, true, (CollisionComponent*)lv_player.GetComponent(ComponentTypes::COLLISION), nullptr));
+			lv_player.AddComponent(ComponentTypes::COLLISION_BASED_STATE,
+				std::make_unique<CollisionBasedStateComponent>(0, 1));
 			lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<UserInputBasedMovementComponent>(0));
 			lv_player.AddComponent(ComponentTypes::GRAPHICS,
-				std::make_unique<GraphicsComponent>(lv_spaceShipGpuTextureHandle, 0, 90.f, 90.f
-					, ((UserInputBasedMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))));
-
+				std::make_unique<GraphicsComponent>(0, lv_spaceshipAnimMeta));
+			lv_player.AddComponent(ComponentTypes::VISIBILITY_BASED_STATE,
+				std::make_unique<VisibilityBasedStateComponent>(0, lv_spaceshipAnimMeta));
+			
 			m_playerEntityHandle = 0U;
 			
-			m_circleBoundsEntities.push_back(Circle{ .m_center{lv_player.GetCurrentPos()}, .m_radius{45.f} });
+			m_circleBoundsEntities.push_back(Circle{ .m_center{lv_player.GetCurrentPos()}, .m_radius{lv_spaceshipAnimMeta->m_widthToRenderTextures/2.f} });
 		}
 
 		//Bullet entities and pool initialization
 		{
 			constexpr uint32_t lv_totalNumBullets{64U};
-			const uint32_t lv_bulletGpuTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("LaserBeam");
+			const auto* lv_bulletAnimMetaData = GetAnimationMeta(AnimationType::LASER_BEAM);
+			assert(nullptr != lv_bulletAnimMetaData);
 			m_entitySpawnerFromPools.InitPool(Asteroid::EntityType::BULLET, (uint32_t)m_entities.size() ,lv_totalNumBullets);
 			
 			for (uint32_t i = 0U; i < lv_totalNumBullets; ++i) {
 
 				const uint32_t lv_bulletIdx = 1U + i;
-				auto& lv_bullet = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_bulletIdx, false, EntityType::BULLET)));
+				auto& lv_bullet = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_bulletIdx, EntityType::BULLET)));
 			
+
+				lv_bullet.AddComponent(ComponentTypes::COLLISION,
+					std::make_unique<BulletCollisionComponent>(lv_bulletIdx));
+				lv_bullet.AddComponent(ComponentTypes::ACTIVE_BASED_STATE,
+					std::make_unique<ActiveBasedStateComponent>(lv_bulletIdx, 1U, false, (CollisionComponent*)lv_bullet.GetComponent(ComponentTypes::COLLISION), nullptr));
+				lv_bullet.AddComponent(ComponentTypes::COLLISION_BASED_STATE,
+					std::make_unique<CollisionBasedStateComponent>(lv_bulletIdx, 1));
 				lv_bullet.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<RayMovementComponent>(lv_bulletIdx));
 				lv_bullet.AddComponent(ComponentTypes::GRAPHICS,
-					std::make_unique<GraphicsComponent>(lv_bulletGpuTextureHandle
-						,lv_bulletIdx, 40.f, 40.f,
-						((RayMovementComponent*)lv_bullet.GetComponent(ComponentTypes::MOVEMENT))));
-				lv_bullet.AddComponent(ComponentTypes::STATE,
-					std::make_unique<VisibilityBasedStateComponent>(lv_bulletIdx, (GraphicsComponent*)lv_bullet.GetComponent(ComponentTypes::GRAPHICS)));
+					std::make_unique<GraphicsComponent>(lv_bulletIdx, lv_bulletAnimMetaData));
+				lv_bullet.AddComponent(ComponentTypes::VISIBILITY_BASED_STATE,
+					std::make_unique<VisibilityBasedStateComponent>(lv_bulletIdx, lv_bulletAnimMetaData));
 
-				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_bullet.GetCurrentPos()}, .m_radius{20.f} });
+				
+				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_bullet.GetCurrentPos()}, .m_radius{lv_bulletAnimMetaData->m_widthToRenderTextures/2.f} });
 				
 
 			}
@@ -355,23 +400,34 @@ namespace Asteroid
 		//Asteroid Entities and pool initialization
 		{
 			constexpr uint32_t lv_totalNumAsteroids{ 64U };
-			const uint32_t lv_asteroidGpuTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("Asteroid");
+			const auto* lv_asteroidAnimMeta = GetAnimationMeta(AnimationType::ASTEROID);
+			const auto* lv_explosionAsteroidAnimMeta = GetAnimationMeta(AnimationType::EXPLOSION_FIRE_ASTEROID);
+			assert(nullptr != lv_asteroidAnimMeta);
 			const uint32_t lv_entitiesLastIndex = (uint32_t)m_entities.size();
 			m_entitySpawnerFromPools.InitPool(Asteroid::EntityType::ASTEROID, lv_entitiesLastIndex, lv_totalNumAsteroids);
 
 			for (uint32_t i = 0U; i < lv_totalNumAsteroids; ++i) {
 
 				const uint32_t lv_asteroidIdx = lv_entitiesLastIndex + i;
-				auto& lv_asteroid = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_asteroidIdx, false, EntityType::ASTEROID)));
+				auto& lv_asteroid = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_asteroidIdx,  EntityType::ASTEROID)));
 
+				lv_asteroid.AddComponent(ComponentTypes::COLLISION_BASED_STATE,
+					std::make_unique<CollisionBasedStateComponent>(lv_asteroidIdx, lv_explosionAsteroidAnimMeta->m_totalNumFrames / 3));
+				lv_asteroid.AddComponent(ComponentTypes::COLLISION,
+					std::make_unique<AsteroidCollisionComponent>(lv_asteroidIdx));
+				lv_asteroid.AddComponent(ComponentTypes::ACTIVE_BASED_STATE,
+					std::make_unique<ActiveBasedStateComponent>(lv_asteroidIdx, lv_explosionAsteroidAnimMeta->m_totalNumFrames, false
+					,(CollisionComponent*)lv_asteroid.GetComponent(ComponentTypes::COLLISION), (CollisionBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::COLLISION_BASED_STATE)));
 				lv_asteroid.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<RayMovementComponent>(lv_asteroidIdx));
 				lv_asteroid.AddComponent(ComponentTypes::GRAPHICS,
-					std::make_unique<GraphicsComponent>(lv_asteroidGpuTextureHandle, lv_asteroidIdx, 80.f, 80.f
-						, ((RayMovementComponent*)lv_asteroid.GetComponent(ComponentTypes::MOVEMENT))));
-				lv_asteroid.AddComponent(ComponentTypes::STATE,
-					std::make_unique<VisibilityBasedStateComponent>(lv_asteroidIdx, (GraphicsComponent*)lv_asteroid.GetComponent(ComponentTypes::GRAPHICS)));
-
-				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_asteroid.GetCurrentPos()}, .m_radius{40.f} });
+					std::make_unique<GraphicsComponent>(lv_asteroidIdx, lv_asteroidAnimMeta));
+				lv_asteroid.AddComponent(ComponentTypes::VISIBILITY_BASED_STATE,
+					std::make_unique<VisibilityBasedStateComponent>(lv_asteroidIdx, lv_asteroidAnimMeta));
+				lv_asteroid.AddComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION,
+					std::make_unique<AnimationComponent>(lv_asteroidIdx, lv_explosionAsteroidAnimMeta));
+				
+				
+				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_asteroid.GetCurrentPos()}, .m_radius{lv_asteroidAnimMeta->m_widthToRenderTextures/2.f} });
 
 
 			}
@@ -381,7 +437,8 @@ namespace Asteroid
 	void Engine::UpdateCircleBounds()
 	{
 		for (size_t i = 0; i < m_entities.size(); ++i) {
-			if (true == m_entities[i].IsActive()) {
+			ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)m_entities[i].GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+			if (true == lv_activeComp->IsActive()) {
 				m_circleBoundsEntities[i].m_center = m_entities[i].GetCurrentPos();
 			}
 		}
@@ -400,6 +457,16 @@ namespace Asteroid
 
 	}
 
+	const AnimationMetaData* Engine::GetAnimationMeta(const AnimationType l_type) const
+	{
+		for (const auto& l_metaData : m_animationMetaData) {
+			if (l_type == l_metaData.m_type) {
+				return &l_metaData;
+			}
+		}
+
+		return nullptr;
+	}
 
 	const std::vector<Circle>& Engine::GetCircleBounds() const
 	{

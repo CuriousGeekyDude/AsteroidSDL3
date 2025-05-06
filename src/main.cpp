@@ -1,6 +1,19 @@
 
 
 #include "Engine.hpp"
+#include "Utilities/UtilityFunctions.hpp"
+
+
+
+void FillMeta(Asteroid::AnimationMetaData& l_meta, uint32_t l_firstIndex
+	, uint32_t l_totalNumFrames, int l_width, int l_height, Asteroid::AnimationType l_type)
+{
+	l_meta.m_firstTextureIndex = l_firstIndex;
+	l_meta.m_heightToRenderTextures = l_height;
+	l_meta.m_widthToRenderTextures = l_width;
+	l_meta.m_type = l_type;
+	l_meta.m_totalNumFrames = l_totalNumFrames;
+}
 
 
 int main()
@@ -8,17 +21,38 @@ int main()
 
 	using namespace Asteroid;
 
+
+	AnimationMetaData lv_meta{};
+
 	EngineInitData lv_engineInitialData;
+	lv_engineInitialData.m_animationMetaData.reserve(256U);
 	lv_engineInitialData.m_appName = "AsteroidSDL3";
 	lv_engineInitialData.m_windowTitle = "Asteroid Game";
 	lv_engineInitialData.m_appVersion = "Version 1.0";
 	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
-		.emplace(std::pair<std::string, std::string>("Spaceship", "Assets/DarkRaiderSpaceship.png"));
-	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
-		.emplace(std::pair<std::string, std::string>("LaserBeam", "Assets/LaserBeam.png"));
-	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
-		.emplace(std::pair<std::string, std::string>("Asteroid", "Assets/Asteroid.png"));
+		.emplace_back(std::pair<std::string, std::string>("Spaceship", "Assets/DarkRaiderSpaceship.png"));
 
+	FillMeta(lv_meta, 0, 1, 90, 90, AnimationType::MAIN_SPACESHIP);
+	lv_engineInitialData.m_animationMetaData.push_back(lv_meta);
+
+
+	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
+		.emplace_back(std::pair<std::string, std::string>("LaserBeam", "Assets/LaserBeam.png"));
+	FillMeta(lv_meta, 1, 1, 40, 40, AnimationType::LASER_BEAM);
+	lv_engineInitialData.m_animationMetaData.push_back(lv_meta);
+
+
+	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
+		.emplace_back(std::pair<std::string, std::string>("BackgroundStarClusters", "Assets/Background.jpg"));
+
+	lv_engineInitialData.m_animationMetaData.push_back
+	(Utilities::ProcessFileOfRelativePathsOfTextures("InitFiles/Animation/ExplosionBombFireAsteroid/RelativePathTextures.txt"
+		, lv_engineInitialData.m_mappedTextureNamesToTheirPaths, AnimationType::EXPLOSION_FIRE_ASTEROID
+		, 160, 120));
+	lv_engineInitialData.m_animationMetaData.push_back
+	(Utilities::ProcessFileOfRelativePathsOfTextures("InitFiles/Animation/Asteroid/RelativePathTextures.txt"
+		, lv_engineInitialData.m_mappedTextureNamesToTheirPaths, AnimationType::ASTEROID
+		, 80, 80));
 
 	
 	Engine lv_asteroidEngine(std::move(lv_engineInitialData));

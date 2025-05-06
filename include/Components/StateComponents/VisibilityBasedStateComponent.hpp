@@ -11,22 +11,25 @@
 namespace Asteroid
 {
 	class GraphicsComponent;
-	class DelayDeactiveBasedStateComponent;
+	class ActiveBasedStateComponent;
+	struct AnimationMetaData;
 
 	class VisibilityBasedStateComponent : public StateComponent
 	{
 	public:
 
 		VisibilityBasedStateComponent(EntityHandle l_ownerEntityHandle
-			, const GraphicsComponent* l_graphicsComponent
-			, const DelayDeactiveBasedStateComponent* l_delayComponent);
+			, const AnimationMetaData* l_animationMetaData);
 
 		bool Update(UpdateComponents& l_updateContext) override;
 
+		bool GetVisibility() const;
+
+		void SetVisibility(const bool l_visibility);
 
 	private:
-		const GraphicsComponent* m_graphicsComponent{};
-		const DelayDeactiveBasedStateComponent* m_delayComponent{};
+		const AnimationMetaData* m_animationMetaData{};
+		bool m_isVisible{ true };
 	};
 
 }

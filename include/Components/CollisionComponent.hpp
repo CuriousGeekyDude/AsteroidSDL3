@@ -10,19 +10,16 @@ namespace Asteroid
 {
 
 	class Entity;
-	struct CollisionReactionContext;
-	class DelayDeactiveBasedStateComponent;
-
+	
 	class CollisionComponent : public Component
 	{
 
 	public:
 
-		CollisionComponent(EntityHandle l_ownerEntityHandle
-		, DelayDeactiveBasedStateComponent* l_delayedDeactiveComponent);
+		CollisionComponent(EntityHandle l_ownerEntityHandle);
 
 
-		virtual void CollisionReaction(Entity& l_entityItCollidedWith, CollisionReactionContext& l_collisionReactContext) = 0;
+		virtual void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity) = 0;
 
 
 		void ResetCollision();
@@ -32,7 +29,6 @@ namespace Asteroid
 		bool m_firstCollision{false};
 		bool m_resetCollision{ true };
 
-		DelayDeactiveBasedStateComponent* m_delayedDeactiveComponent{};
 	};
 
 

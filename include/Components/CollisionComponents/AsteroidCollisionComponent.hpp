@@ -9,25 +9,22 @@
 
 namespace Asteroid
 {
-	class DelayDeactiveBasedStateComponent;
-	class RayMovementComponent;
+	
+	class Entity;
 
 	class AsteroidCollisionComponent : public CollisionComponent
 	{
 	public:
 
-		AsteroidCollisionComponent(EntityHandle l_ownerEntityHandle, const RayMovementComponent* l_ownerMovComponent, DelayDeactiveBasedStateComponent* l_delayedDeactiveComponent);
+		AsteroidCollisionComponent(EntityHandle l_ownerEntityHandle);
 
 
 		bool Update(UpdateComponents& l_updateContext) override;
 
 
-		void CollisionReaction(Entity& l_entityItCollidedWith, CollisionReactionContext& l_collisionReactContext) override;
+		void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity) override;
 
 	private:
-
-		const RayMovementComponent* m_ownerMovComponent{};
-
 
 
 	};
