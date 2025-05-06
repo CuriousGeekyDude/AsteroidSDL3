@@ -38,7 +38,7 @@ namespace Asteroid
 
 		m_currentMaxNumCells = (uint32_t)(m_totalNumDivisionsX * m_totalNumDivisionsY);
 
-		m_centerPosOfCells.resize(m_currentMaxNumCells+1);
+		m_centerPosOfCells.resize(m_currentMaxNumCells);
 
 		m_allIndicesInOneCell.resize(m_totalNumUint32PerCell * 32);
 	}
@@ -57,12 +57,10 @@ namespace Asteroid
 		constexpr float lv_halfCellWidth{(float)m_cellWidth/2.f};
 		constexpr float lv_halfCellHeight{ (float)m_cellHeight / 2.f };
 
-		m_centerPosOfCells[0] = glm::vec2{(float)m_currentMaxNumCells, (float)m_currentMaxNumCells};
-
 		for (uint32_t j = 0U; j < m_totalNumDivisionsY; ++j) {
 			for (uint32_t i = 0U; i < m_totalNumDivisionsX; ++i) {
 
-				m_centerPosOfCells[j * m_totalNumDivisionsX + i + 1] = glm::vec2{(float)i*m_cellWidth + lv_halfCellWidth, (float)j*m_cellHeight + lv_halfCellHeight};
+				m_centerPosOfCells[j * m_totalNumDivisionsX + i] = glm::vec2{(float)i*m_cellWidth + lv_halfCellWidth, (float)j*m_cellHeight + lv_halfCellHeight};
 
 			}
 		}
