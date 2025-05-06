@@ -17,7 +17,15 @@ namespace Asteroid
 {
 	EntitySpawnerFromPools::EntitySpawnerFromPools(Engine* l_engine)
 		:m_engine(l_engine)
+		,m_mt(std::random_device()())
 	{
+
+		constexpr float lv_deltaAngleDegrees{glm::two_pi<float>()/(float)m_asteroidMinNumInScene};
+		for (uint32_t i = 0; i < (uint32_t)m_randomDirectionsForAsteroids.size(); ++i) {
+
+			m_randomDirectionsForAsteroids[i] = (float)i*lv_deltaAngleDegrees;
+
+		}
 
 	}
 
@@ -34,6 +42,7 @@ namespace Asteroid
 	void EntitySpawnerFromPools::SpawnNewEntitiesIfConditionsMet()
 	{
 		using namespace LogSystem;
+		constexpr float lv_piOver180 = glm::pi<float>() / 180.f;
 
 		if (true == BulletSpawnConditionMet()) {
 
@@ -76,33 +85,45 @@ namespace Asteroid
 
 		if (true == AsteroidSpawnConditionMet()) {
 
+			const Grid& lv_grid = m_engine->GetGrid();
+			const auto& lv_centerPosCells = lv_grid.GetCurrentCenterPosCells();
 
-			auto lv_nextInactiveAsteroidIdx = m_asteroidPool.GetNextInactiveEntityHandle();
+			const uint32_t lv_totalNumCurrentCells = lv_grid.GetTotalNumCurrentCells();
 
-			LOG(Severity::INFO, Channel::GRAPHICS, "Asteroid with index %u is being fetched", lv_nextInactiveAsteroidIdx);
-
-			glm::ivec2 lv_windowRes{};
-			m_engine->GetCurrentWindowSize(lv_windowRes);
-
-			auto& lv_asteroid = m_engine->GetEntityFromHandle(lv_nextInactiveAsteroidIdx.m_entityHandle);
-
-			ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
-			VisibilityBasedStateComponent* lv_visibilityComp = (VisibilityBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::VISIBILITY_BASED_STATE);
-
-			lv_activeComp->SetActiveState(true);
-			lv_visibilityComp->SetVisibility(true);
-
-			glm::vec2 lv_direction{-1.f, 0.f};
-
-			RayMovementComponent* lv_asteroidMovComponent = (RayMovementComponent*)lv_asteroid.GetComponent(ComponentTypes::MOVEMENT);
-			constexpr float lv_initialT{ 20.f };
-
-			lv_asteroidMovComponent->SetSpeed(glm::vec2{ 0.1f });
-			lv_asteroidMovComponent->SetRayDirection(lv_direction);
-			lv_asteroidMovComponent->SetInitialT(lv_initialT);
-			lv_asteroidMovComponent->SetAngleOfRotation(0.f);
-			lv_asteroidMovComponent->SetInitialPos({lv_windowRes.x, lv_windowRes.y/2.f});
+			GenerateRandomIndexCellNumbers(lv_totalNumCurrentCells);
 			
+			for (uint32_t i = 0; i < m_asteroidMinNumInScene; ++i) {
+
+				auto lv_nextInactiveAsteroidIdx = m_asteroidPool.GetNextInactiveEntityHandle();
+
+
+
+				LOG(Severity::INFO, Channel::GRAPHICS, "Asteroid with index %u is being fetched", lv_nextInactiveAsteroidIdx);
+
+				
+
+				glm::vec2 lv_asteroidPos = lv_centerPosCells[m_randomIndexCellNumbers[i]];
+
+				auto& lv_asteroid = m_engine->GetEntityFromHandle(lv_nextInactiveAsteroidIdx.m_entityHandle);
+
+				ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+				VisibilityBasedStateComponent* lv_visibilityComp = (VisibilityBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::VISIBILITY_BASED_STATE);
+
+				lv_activeComp->SetActiveState(true);
+				lv_visibilityComp->SetVisibility(true);
+
+				glm::vec2 lv_direction{ std::cos(m_randomDirectionsForAsteroids[i] + lv_piOver180*m_randomIndexCellNumbers[i]), std::sin(m_randomDirectionsForAsteroids[i] + lv_piOver180*m_randomIndexCellNumbers[i])};
+
+				RayMovementComponent* lv_asteroidMovComponent = (RayMovementComponent*)lv_asteroid.GetComponent(ComponentTypes::MOVEMENT);
+				constexpr float lv_initialT{ 20.f };
+
+				lv_asteroidMovComponent->SetSpeed(glm::vec2{ 0.05f });
+				lv_asteroidMovComponent->SetRayDirection(lv_direction);
+				lv_asteroidMovComponent->SetInitialT(lv_initialT);
+				lv_asteroidMovComponent->SetAngleOfRotation(0.f);
+				lv_asteroidMovComponent->SetInitialPos(lv_asteroidPos);
+
+			}
 
 		}
 	}
@@ -115,16 +136,50 @@ namespace Asteroid
 	}
 
 
+
+	void EntitySpawnerFromPools::GenerateRandomIndexCellNumbers(const uint32_t l_maxNumCurrentCells)
+	{
+		if (0U == l_maxNumCurrentCells) {
+			return;
+		}
+		std::uniform_int_distribution<uint32_t> lv_randGenerator{ 0U, l_maxNumCurrentCells - 1 };
+		m_randomIndexCellNumbers[0] = lv_randGenerator(m_mt);
+
+		for (uint32_t i = 1; i < (uint32_t)m_randomIndexCellNumbers.size(); ++i) {
+			m_randomIndexCellNumbers[i] = lv_randGenerator(m_mt);
+
+			for (uint32_t j = 0; j < i; ++j) {
+				if (m_randomIndexCellNumbers[j] == m_randomIndexCellNumbers[i]) {
+					m_randomIndexCellNumbers[i] = lv_randGenerator(m_mt);
+					j = 0U;
+				}
+			}
+
+		}
+	}
+
+
 	bool EntitySpawnerFromPools::AsteroidSpawnConditionMet()
 	{
-		const auto& lv_inputSystem = m_engine->GetInputSystem();
+		
+
+		const uint32_t lv_totalNumActiveAsteroids = m_asteroidPool.GetTotalNumActiveEntities();
+
+		if (m_asteroidMinNumInScene > lv_totalNumActiveAsteroids) {
+			return true;
+		}
+		else {
+			return false;
+		}
+
+		/*const auto& lv_inputSystem = m_engine->GetInputSystem();
 		if (true == lv_inputSystem.IsNoRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_T) && true == lv_inputSystem.IsMouseHidden()) {
 
 			return true;
 		}
 		else {
 			return false;
-		}
+		}*/
 	}
 
 	bool EntitySpawnerFromPools::BulletSpawnConditionMet()
