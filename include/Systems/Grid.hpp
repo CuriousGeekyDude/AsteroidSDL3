@@ -32,6 +32,7 @@ namespace Asteroid
 
 		uint32_t GetTotalNumNonEmptyCells() const;
 		uint32_t GetTotalNumCurrentCells() const;
+		const std::vector<glm::vec2>& GetCurrentCenterPosCells() const;
 	private:
 		bool CircleRectangleIntersection(const Circle& l_circle, const Rectangle& l_rectangle);
 
@@ -39,6 +40,8 @@ namespace Asteroid
 
 		std::vector<uint32_t> m_cells{};
 		std::vector<uint32_t> m_allIndicesInOneCell;
+		std::vector<glm::vec2> m_centerPosOfCells;
+
 		uint32_t m_currentMaxNumCells{};
 		uint32_t m_totalNumDivisionsX{};
 		uint32_t m_totalNumDivisionsY{};

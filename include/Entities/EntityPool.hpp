@@ -26,6 +26,10 @@ namespace Asteroid
 
 		void Update(const std::vector<Entity>& l_entities);
 
+
+		uint32_t GetTotalNumInactiveEntities() const;
+		uint32_t GetTotalNumActiveEntities() const;
+
 	private:
 		//This vector will either have a valid entity index or UINT32_MAX
 		std::vector<uint32_t> m_inactiveEntityIndices{};

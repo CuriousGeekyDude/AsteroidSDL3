@@ -59,6 +59,8 @@ namespace Asteroid
 
 		void GetCurrentWindowSize(glm::ivec2& l_windowRes) const;
 
+		const Grid& GetGrid() const;
+
 		const std::vector<Circle>& GetCircleBounds() const;
 		void UpdateCircleBounds();
 

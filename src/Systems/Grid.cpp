@@ -38,6 +38,8 @@ namespace Asteroid
 
 		m_currentMaxNumCells = (uint32_t)(m_totalNumDivisionsX * m_totalNumDivisionsY);
 
+		m_centerPosOfCells.resize(m_currentMaxNumCells);
+
 		m_allIndicesInOneCell.resize(m_totalNumUint32PerCell * 32);
 	}
 
@@ -45,11 +47,24 @@ namespace Asteroid
 	void Grid::Update(const glm::ivec2& l_currentWindowSize, const std::vector<Circle>& l_circleBounds, const std::vector<Entity>& l_entities)
 	{
 		memset(m_cells.data(), 0, sizeof(uint32_t) * m_cells.size());
+		memset(m_centerPosOfCells.data(), 0, sizeof(float)*m_centerPosOfCells.size());
 		m_totalNumDivisionsX = (uint32_t)std::ceil((float)l_currentWindowSize.x / (float)m_cellWidth);
 		m_totalNumDivisionsY = (uint32_t)std::ceil((float)l_currentWindowSize.y / (float)m_cellHeight);
 
 		m_currentMaxNumCells = (uint32_t)(m_totalNumDivisionsY * m_totalNumDivisionsX);
-	
+		
+
+		constexpr float lv_halfCellWidth{(float)m_cellWidth/2.f};
+		constexpr float lv_halfCellHeight{ (float)m_cellHeight / 2.f };
+
+		for (uint32_t j = 0U; j < m_totalNumDivisionsY; ++j) {
+			for (uint32_t i = 0U; i < m_totalNumDivisionsX; ++i) {
+
+				m_centerPosOfCells[j * m_totalNumDivisionsX + i] = glm::vec2{(float)i*m_cellWidth + lv_halfCellWidth, (float)j*m_cellHeight + lv_halfCellHeight};
+
+			}
+		}
+
 
 		for (uint32_t j = 0; j < m_totalNumDivisionsY; ++j) {
 			for (uint32_t i = 0; i < m_totalNumDivisionsX; ++i) {
@@ -163,6 +178,14 @@ namespace Asteroid
 		}
 
 		return lv_totalNumNonEmptyCells;
+	}
+
+
+
+
+	const std::vector<glm::vec2>& Grid::GetCurrentCenterPosCells() const
+	{
+		return m_centerPosOfCells;
 	}
 
 

@@ -54,6 +54,10 @@ int main()
 		, lv_engineInitialData.m_mappedTextureNamesToTheirPaths, AnimationType::ASTEROID
 		, 80, 80));
 
+	lv_engineInitialData.m_animationMetaData.push_back
+	(Utilities::ProcessFileOfRelativePathsOfTextures("InitFiles/Animation/WarpEffect/RelativePathTextures.txt"
+		, lv_engineInitialData.m_mappedTextureNamesToTheirPaths, AnimationType::WARP_ASTEROID
+		, 250, 150));
 	
 	Engine lv_asteroidEngine(std::move(lv_engineInitialData));
 

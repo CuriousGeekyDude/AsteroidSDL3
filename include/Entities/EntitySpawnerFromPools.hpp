@@ -5,6 +5,8 @@
 
 #include "EntityPool.hpp"
 #include <vector>
+#include <array>
+#include <random>
 
 
 namespace Asteroid
@@ -30,10 +32,20 @@ namespace Asteroid
 		bool BulletSpawnConditionMet();
 		bool AsteroidSpawnConditionMet();
 
+
+		void GenerateRandomIndexCellNumbers(const uint32_t l_maxNumCurrentCells);
+
 	private:
 
 		Engine* m_engine;
 		EntityPool m_bulletsPool;
+
+		static constexpr uint32_t m_asteroidMinNumInScene{15U};
+		std::array<uint32_t, m_asteroidMinNumInScene> m_randomIndexCellNumbers{};
+		std::array<float, m_asteroidMinNumInScene> m_randomDirectionsForAsteroids{};
 		EntityPool m_asteroidPool;
+
+
+		std::mt19937 m_mt;
 	};
 }
