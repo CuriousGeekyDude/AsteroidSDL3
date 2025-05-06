@@ -57,9 +57,45 @@ namespace Asteroid
 				}
 			}
 
+			EntityHandle lv_returnInactiveIndex{m_nextInactiveIndex};
+			m_inactiveEntityIndices[m_nextInactiveIndex - m_firstEntityIndex] = std::numeric_limits<uint32_t>::max();
+			m_nextInactiveIndex = std::numeric_limits<uint32_t>::max();
+			for (size_t i = 0; i < m_inactiveEntityIndices.size(); ++i) {
+
+				if (std::numeric_limits<uint32_t>::max() != m_inactiveEntityIndices[i]) {
+					m_nextInactiveIndex = m_inactiveEntityIndices[i];
+					break;
+				}
+
+			}
+
 			return EntityHandle(m_nextInactiveIndex);
 		}
 
+	}
+
+
+	uint32_t EntityPool::GetTotalNumInactiveEntities() const
+	{
+		uint32_t lv_totalNumInactiveEntities{};
+		for (const auto l_inactiveIndex : m_inactiveEntityIndices) {
+			if (std::numeric_limits<uint32_t>::max() != l_inactiveIndex) {
+				++lv_totalNumInactiveEntities;
+			}
+		}
+
+		return lv_totalNumInactiveEntities;
+	}
+	uint32_t EntityPool::GetTotalNumActiveEntities() const
+	{
+		uint32_t lv_totalNumActiveEntities{};
+		for (const auto l_inactiveIndex : m_inactiveEntityIndices) {
+			if (std::numeric_limits<uint32_t>::max() == l_inactiveIndex) {
+				++lv_totalNumActiveEntities;
+			}
+		}
+
+		return lv_totalNumActiveEntities;
 	}
 
 	void EntityPool::Update(const std::vector<Entity>& l_entities)
