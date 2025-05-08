@@ -15,6 +15,7 @@
 #include "Entities/EntitySpawnerFromPools.hpp"
 #include "Components/AnimationMetaData.hpp"
 #include "Systems/Grid.hpp"
+#include "Systems/CallbacksTimer.hpp"
 #include <vector>
 #include <glm.hpp>
 
@@ -64,6 +65,8 @@ namespace Asteroid
 		const std::vector<Circle>& GetCircleBounds() const;
 		void UpdateCircleBounds();
 
+		CallbacksTimer& GetCallbacksTimer();
+
 		~Engine();
 
 	public:
@@ -92,6 +95,7 @@ namespace Asteroid
 		InputSystem m_inputSystem;
 		EntitySpawnerFromPools m_entitySpawnerFromPools;
 		Grid m_grid;
+		CallbacksTimer m_callbacksTimer{};
 
 		GpuResourceManager m_gpuResourceManager;
 

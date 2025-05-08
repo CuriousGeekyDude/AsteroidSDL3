@@ -4,15 +4,12 @@
 
 
 
-#include "Components/AnimationComponent.hpp"
+#include "Components/OnceRepeatableAnimationComponent.hpp"
 #include "Components/UpdateComponents.hpp"
 #include "Components/MovementComponent.hpp"
-#include "Components/StateComponents/ActiveBasedStateComponent.hpp"
 #include "Components/AnimationMetaData.hpp"
-#include "Components/StateComponents/VisibilityBasedStateComponent.hpp"
 #include "Systems/RenderingData.hpp"
 #include "Engine.hpp"
-#include "Systems/LogSystem.hpp"
 
 
 
@@ -20,23 +17,29 @@ namespace Asteroid
 {
 
 
-	AnimationComponent::AnimationComponent(const EntityHandle l_entityHandle
-		, const AnimationMetaData* l_animationMetaData)
-		: GraphicsComponent(l_entityHandle, l_animationMetaData)
+	OnceRepeatableAnimationComponent::OnceRepeatableAnimationComponent()
 	{
 
 	}
 
 
-	bool AnimationComponent::Update(UpdateComponents& l_updateContext)
+
+	void OnceRepeatableAnimationComponent::Init(const EntityHandle l_entityHandle
+		, const AnimationMetaData* l_animationMetaData
+		, const MovementComponent* l_movementComponent)
 	{
-		using namespace LogSystem;
+		Component::Init(l_entityHandle);
+
+		m_animationMetaData = l_animationMetaData;
+		m_movementComponent = l_movementComponent;
+	}
+
+
+
+	bool OnceRepeatableAnimationComponent::Update(UpdateComponents& l_updateContext)
+	{
 
 		const auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
-		ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)lv_ownerEntity.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
-		VisibilityBasedStateComponent* lv_visibilityComp = (VisibilityBasedStateComponent*)lv_ownerEntity.GetComponent(ComponentTypes::VISIBILITY_BASED_STATE);
-		MovementComponent* lv_movementComp = (MovementComponent*)lv_ownerEntity.GetComponent(ComponentTypes::MOVEMENT);
-
 
 		if (false == m_startAnimation) {
 
@@ -53,7 +56,7 @@ namespace Asteroid
 		}
 
 		auto* lv_renderer = l_updateContext.m_engine->GetRenderer();
-		const float lv_rotationAngleDegrees = lv_movementComp->GetCurrentAngleOfRotation();
+		const float lv_rotationAngleDegrees = m_movementComponent->GetCurrentAngleOfRotation();
 		const auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();
 
 		RenderSystem::RenderingData lv_renderData{};
@@ -70,18 +73,14 @@ namespace Asteroid
 		}
 
 
-		LOG(Severity::INFO, Channel::ANIMATION, "current offset is %u", m_currentOffset);
 
 		m_currentOffset += 1U;
 
-
-
 		return true;
-
 
 	}
 
-	void AnimationComponent::StartAnimation()
+	void OnceRepeatableAnimationComponent::StartAnimation()
 	{
 		m_startAnimation = true;
 	}

@@ -17,7 +17,7 @@ namespace Asteroid
 	{
 	public:
 		
-		MovementComponent(EntityHandle l_ownerEntityHandle);
+		MovementComponent();
 
 		virtual ~MovementComponent() = default;
 
@@ -30,6 +30,8 @@ namespace Asteroid
 		const glm::vec2& GetSpeed() const;
 
 		void SetAngleOfRotation(const float l_theta);
+
+		void Init(EntityHandle l_ownerEntityHandle);
 
 	protected:
 		glm::mat3 m_transform{ glm::identity<glm::mat3>() };

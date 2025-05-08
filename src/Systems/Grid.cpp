@@ -12,7 +12,6 @@
 #include "Entities/Entity.hpp"
 #include <glm.hpp>
 #include "Components/CollisionComponent.hpp"
-#include "Components/StateComponents/CollisionBasedStateComponent.hpp"
 #include "Components/StateComponents/ActiveBasedStateComponent.hpp"
 
 #include "Systems/LogSystem.hpp"
@@ -75,9 +74,8 @@ namespace Asteroid
 
 				for (uint32_t z = 0; z < (uint32_t)l_circleBounds.size(); ++z) {
 
-					CollisionBasedStateComponent* lv_collisionBasedComp = (CollisionBasedStateComponent*)l_entities[z].GetComponent(ComponentTypes::COLLISION_BASED_STATE);
-					ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)l_entities[z].GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
-					if (true == lv_activeComp->IsActive() && true == lv_collisionBasedComp->GetCollisionState()) {
+					CollisionComponent* lv_collisionComp = (CollisionComponent*)l_entities[z].GetComponent(ComponentTypes::COLLISION);
+					if (true == l_entities[z].GetActiveState() && true == lv_collisionComp->GetCollisionState()) {
 						if (true == CircleRectangleIntersection(l_circleBounds[z], lv_currentCellRectangle)) {
 
 							const uint32_t lv_quotient = z / 32U;
@@ -99,7 +97,7 @@ namespace Asteroid
 
 
 
-	void Grid::DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities)
+	void Grid::DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities, CallbacksTimer& l_timer)
 	{
 
 		using namespace LogSystem;
@@ -135,8 +133,8 @@ namespace Asteroid
 							
 							CollisionComponent* lv_collisionComponentEntityD = (CollisionComponent*)l_entities[m_allIndicesInOneCell[d]].GetComponent(ComponentTypes::COLLISION);
 
-							lv_collisionComponentEntityK->CollisionReaction(l_entities[m_allIndicesInOneCell[d]], l_entities[m_allIndicesInOneCell[k]]);
-							lv_collisionComponentEntityD->CollisionReaction(l_entities[m_allIndicesInOneCell[k]], l_entities[m_allIndicesInOneCell[d]]);
+							lv_collisionComponentEntityK->CollisionReaction(l_entities[m_allIndicesInOneCell[d]], l_entities[m_allIndicesInOneCell[k]], l_timer);
+							lv_collisionComponentEntityD->CollisionReaction(l_entities[m_allIndicesInOneCell[k]], l_entities[m_allIndicesInOneCell[d]], l_timer);
 
 						}
 					}

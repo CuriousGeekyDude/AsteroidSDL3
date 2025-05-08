@@ -10,9 +10,21 @@ namespace Asteroid
 {
 
 
-	PlayerCollisionComponent::PlayerCollisionComponent(EntityHandle l_ownerEntityHandle)
-		:CollisionComponent(l_ownerEntityHandle)
+	PlayerCollisionComponent::PlayerCollisionComponent()
 	{
+
+	}
+
+
+
+
+	void PlayerCollisionComponent::Init(EntityHandle l_ownerEntityHandle
+		, const uint32_t l_frameCountToActivateCollision
+		, const uint32_t l_frameCountToDeactivateCollision
+		, const bool l_isCollisionActive
+		, IndefiniteRepeatableAnimationComponent* l_repeatableAnimComponent)
+	{
+		CollisionComponent::Init(l_ownerEntityHandle, l_frameCountToActivateCollision, l_frameCountToDeactivateCollision, l_isCollisionActive, l_repeatableAnimComponent);
 
 	}
 
@@ -21,7 +33,7 @@ namespace Asteroid
 		return true;
 	}
 
-	void PlayerCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_collisionReactContext)
+	void PlayerCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_collisionReactContext, CallbacksTimer& l_timer)
 	{
 
 	}

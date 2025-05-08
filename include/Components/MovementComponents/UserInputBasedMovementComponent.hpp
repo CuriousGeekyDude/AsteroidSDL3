@@ -14,9 +14,11 @@ namespace Asteroid
 	{
 	public:
 
-		UserInputBasedMovementComponent(EntityHandle l_ownerEntityHandle);
+		UserInputBasedMovementComponent();
 
 		bool Update(UpdateComponents& l_updateContext) override;
+
+		void Init(EntityHandle l_ownerEntityHandle);
 
 	private:
 

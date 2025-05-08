@@ -10,7 +10,7 @@ namespace Asteroid
 
 	enum class ComponentTypes : uint32_t
 	{
-		GRAPHICS,
+		INDEFINITE_ENTITY_ANIMATION,
 		EXPLOSION_FIRE_ASTEROID_ANIMATION,
 
 		INPUT,
@@ -22,10 +22,6 @@ namespace Asteroid
 		
 		STATE,
 		ACTIVE_BASED_STATE,
-		VISIBILITY_BASED_STATE,
-		COLLISION_BASED_STATE
-
-
 
 	};
 

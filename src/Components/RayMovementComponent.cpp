@@ -10,10 +10,14 @@
 namespace Asteroid
 {
 
-	RayMovementComponent::RayMovementComponent(EntityHandle l_ownerEntityHandle)
-		:MovementComponent(l_ownerEntityHandle)
+	RayMovementComponent::RayMovementComponent()
 	{
 
+	}
+
+	void RayMovementComponent::Init(EntityHandle l_ownerEntityHandle)
+	{
+		m_ownerEntityHandle = l_ownerEntityHandle;
 	}
 
 	void RayMovementComponent::SetInitialPos(const glm::vec2& l_initialPos)

@@ -9,13 +9,18 @@
 
 namespace Asteroid
 {
-	UserInputBasedMovementComponent::UserInputBasedMovementComponent(EntityHandle l_ownerEntityHandle)
-		:MovementComponent(l_ownerEntityHandle)
+	UserInputBasedMovementComponent::UserInputBasedMovementComponent()
 		
 	{
 
 	}
 
+
+
+	void UserInputBasedMovementComponent::Init(EntityHandle l_ownerEntityHandle)
+	{
+		Component::Init(l_ownerEntityHandle);
+	}
 
 	bool UserInputBasedMovementComponent::Update(UpdateComponents& l_updateContext)
 	{

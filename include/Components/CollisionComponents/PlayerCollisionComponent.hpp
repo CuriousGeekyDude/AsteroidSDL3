@@ -15,11 +15,20 @@ namespace Asteroid
 	{
 	public:
 
-		PlayerCollisionComponent(EntityHandle l_ownerEntityHandle);
+		PlayerCollisionComponent();
 
 		bool Update(UpdateComponents& l_updateContext) override;
 
-		void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity) override;
+
+
+		void Init(EntityHandle l_ownerEntityHandle
+			, const uint32_t l_frameCountToActivateCollision
+			, const uint32_t l_frameCountToDeactivateCollision
+			, const bool l_isCollisionActive
+			, IndefiniteRepeatableAnimationComponent* l_repeatableAnimComponent);
+
+
+		void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity, CallbacksTimer& l_timer) override;
 
 	};
 

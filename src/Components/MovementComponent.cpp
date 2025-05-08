@@ -9,8 +9,7 @@
 namespace Asteroid
 {
 
-	MovementComponent::MovementComponent(EntityHandle l_ownerEntityHandle)
-		:Component(l_ownerEntityHandle)
+	MovementComponent::MovementComponent()
 	{
 
 	}
@@ -25,6 +24,12 @@ namespace Asteroid
 		return m_speed;
 	}
 
+
+
+	void MovementComponent::Init(EntityHandle l_ownerEntityHandle)
+	{
+		Component::Init(l_ownerEntityHandle);
+	}
 
 
 	void MovementComponent::SetSpeed(const glm::vec2& l_newSpeed)

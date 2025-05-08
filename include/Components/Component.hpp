@@ -15,7 +15,10 @@ namespace Asteroid
 
 		virtual bool Update(UpdateComponents& l_updateContext) = 0;
 
-		Component(EntityHandle l_ownerEntityHandle);
+		Component();
+
+
+		void Init(EntityHandle l_ownerEntityHandle);
 
 	protected:
 		EntityHandle m_ownerEntityHandle;
