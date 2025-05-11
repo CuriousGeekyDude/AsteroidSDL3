@@ -50,6 +50,9 @@ namespace Asteroid
 		}
 
 
+
+		Set_Verbosity(Severity::FAILURE);
+
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Metadata creation was successfull.");
 
 		if (false == SDL_InitSubSystem(SDL_INIT_VIDEO)) {
@@ -187,6 +190,8 @@ namespace Asteroid
 
 			m_renderer.RenderEntity(lv_backgroundStarsRenderData);
 
+			m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
+			m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
 			m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
 			m_callbacksTimer.Update();
 			lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
@@ -198,8 +203,6 @@ namespace Asteroid
 			m_entitySpawnerFromPools.UpdatePools();
 			UpdateCircleBounds();
 
-			m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
-			m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
 			
 
 
@@ -207,8 +210,8 @@ namespace Asteroid
 			ImGui_ImplSDL3_NewFrame();
 			ImGui::NewFrame();
 
-			if (show_demo_window)
-				ImGui::ShowDemoWindow(&show_demo_window);
+			/*if (show_demo_window)
+				ImGui::ShowDemoWindow(&show_demo_window);*/
 
 			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 			{
@@ -410,7 +413,9 @@ namespace Asteroid
 			constexpr uint32_t lv_totalNumAsteroids{ 128U };
 			const auto* lv_asteroidAnimMeta = GetAnimationMeta(AnimationType::ASTEROID);
 			const auto* lv_explosionAsteroidAnimMeta = GetAnimationMeta(AnimationType::EXPLOSION_FIRE_ASTEROID);
+			const auto* lv_warpAsteroidAnimMeta = GetAnimationMeta(AnimationType::WARP_ASTEROID);
 			assert(nullptr != lv_asteroidAnimMeta);
+			assert(nullptr != lv_warpAsteroidAnimMeta);
 			const uint32_t lv_entitiesLastIndex = (uint32_t)m_entities.size();
 			m_entitySpawnerFromPools.InitPool(Asteroid::EntityType::ASTEROID, lv_entitiesLastIndex, lv_totalNumAsteroids);
 
@@ -423,17 +428,18 @@ namespace Asteroid
 				auto lv_movementComponent = std::make_unique<RayMovementComponent>();
 				auto lv_entityMainAnimation = std::make_unique<IndefiniteRepeatableAnimationComponent>();
 				auto lv_fireExplosionAnimationComponent = std::make_unique<OnceRepeatableAnimationComponent>();
+				auto lv_warpAsteroidAnimComponent = std::make_unique<OnceRepeatableAnimationComponent>();
 
-
-				lv_collisionComponent->Init(lv_asteroidIdx, 1, lv_explosionAsteroidAnimMeta->m_totalNumFrames / 3
+				lv_collisionComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta->m_totalNumFrames + 20U, lv_explosionAsteroidAnimMeta->m_totalNumFrames / 3
 					, true, lv_entityMainAnimation.get(), lv_fireExplosionAnimationComponent.get()
 					, lv_activeComponent.get());
 				lv_activeComponent->Init(lv_asteroidIdx, lv_collisionComponent.get(), lv_entityMainAnimation.get()
 										, 1, lv_explosionAsteroidAnimMeta->m_totalNumFrames);
 				lv_movementComponent->Init(lv_asteroidIdx);
 				lv_entityMainAnimation->Init(lv_asteroidIdx, lv_asteroidAnimMeta, lv_movementComponent.get()
-											, lv_activeComponent.get(), 0, 0, true);
+											, lv_activeComponent.get(), lv_warpAsteroidAnimMeta->m_totalNumFrames - 20U, 0, true);
 				lv_fireExplosionAnimationComponent->Init(lv_asteroidIdx, lv_explosionAsteroidAnimMeta , lv_movementComponent.get());
+				lv_warpAsteroidAnimComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta, lv_movementComponent.get(), false);
 
 				auto& lv_asteroid = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_asteroidIdx,  EntityType::ASTEROID, false)));
 
@@ -442,7 +448,7 @@ namespace Asteroid
 				lv_asteroid.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
 				lv_asteroid.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityMainAnimation));
 				lv_asteroid.AddComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION, std::move(lv_fireExplosionAnimationComponent));
-				
+				lv_asteroid.AddComponent(ComponentTypes::WARP_ASTEROID_ANIMATION, std::move(lv_warpAsteroidAnimComponent));
 				
 				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_asteroid.GetCurrentPos()}, .m_radius{lv_asteroidAnimMeta->m_widthToRenderTextures/2.f} });
 
