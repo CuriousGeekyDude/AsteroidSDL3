@@ -5,7 +5,7 @@
 
 
 #include "Systems/CallbacksTimer.hpp"
-
+#include "Systems/LogSystem.hpp"
 
 
 namespace Asteroid
@@ -24,6 +24,9 @@ namespace Asteroid
 	void CallbacksTimer::Update()
 	{
 
+		using namespace LogSystem;
+
+		LOG(Severity::FAILURE, Channel::MEMORY, "Callback timer vector size is %u", (uint32_t)m_delayedSetStateCallbacks.size());
 
 		for (size_t i = 0U; i < m_delayedSetStateCallbacks.size(); ++i) {
 
