@@ -80,6 +80,9 @@ namespace Asteroid
 
 	void Entity::SetActiveState(const bool l_activeState)
 	{
+		using namespace LogSystem;
+
+		LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "Active state is changed");
 		m_isActive = l_activeState;
 	}
 
