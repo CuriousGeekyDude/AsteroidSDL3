@@ -35,7 +35,6 @@ namespace Asteroid
 	private:
 
 		const ActiveBasedStateComponent* m_activeComponent{};
-
 	};
 
 }

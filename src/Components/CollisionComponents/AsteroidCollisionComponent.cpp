@@ -10,6 +10,7 @@
 #include "Components/StateComponents/ActiveBasedStateComponent.hpp"
 #include "Systems/CallbacksTimer.hpp"
 #include "Systems/LogSystem.hpp"
+#include "Components/UpdateComponents.hpp"
 
 
 namespace Asteroid
@@ -40,6 +41,8 @@ namespace Asteroid
 
 	bool AsteroidCollisionComponent::Update(UpdateComponents& l_updateContext)
 	{
+		l_updateContext.m_totalNumAsteroidsHitByBullets += m_hitBullet;
+		m_hitBullet = 0U;
 		return true;
 	}
 
@@ -61,7 +64,10 @@ namespace Asteroid
 
 		if (false == m_resetCollision && true == m_firstCollision && true == m_isCollisionActive) {
 
-			
+			if (EntityType::BULLET == l_entityItCollidedWith.GetType()) {
+				++m_hitBullet;
+			}
+		
 			m_fireExplosionAnimation->StartAnimation();
 			bool lv_stateValue{ false };
 

@@ -40,7 +40,7 @@ namespace Asteroid
 
 		OnceRepeatableAnimationComponent* m_fireExplosionAnimation{};
 		ActiveBasedStateComponent* m_activeComponent{};
-
+		uint32_t m_hitBullet{};
 	};
 
 }

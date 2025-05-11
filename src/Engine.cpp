@@ -231,6 +231,7 @@ namespace Asteroid
 				/*auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
 				lv_movementComp->SetSpeed(f);*/
 				
+				ImGui::Text("Total number of asteroids hit by bullets since the start: %u", lv_updateComponent.m_totalNumAsteroidsHitByBullets);
 
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 				ImGui::End();
