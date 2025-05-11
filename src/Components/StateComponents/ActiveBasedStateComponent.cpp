@@ -50,12 +50,13 @@ namespace Asteroid
 
 	bool ActiveBasedStateComponent::Update(UpdateComponents& l_updateContext)
 	{
+		using namespace LogSystem;
 		
 		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
-		if (false == m_repeatableAnimationComponent->IsInWindowBounds() && false == m_delayedActivateCallbackAlreadySet) {
+		if (false == m_repeatableAnimationComponent->IsInWindowBounds() && false == m_delayedActivateCallbackAlreadySet && true == lv_ownerEntity.GetActiveState()) {
 			if (EntityType::PLAYER != lv_ownerEntity.GetType()) {
-
+				LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "Active component is setting active state to false due to pos: (%f, %f)", lv_ownerEntity.GetCurrentPos().x, lv_ownerEntity.GetCurrentPos().y);
 				lv_ownerEntity.SetActiveState(false);
 			}
 		}
