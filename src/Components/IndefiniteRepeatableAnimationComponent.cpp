@@ -82,9 +82,9 @@ namespace Asteroid
 			return true;
 		}
 		else {
-			
+
 			if (false == m_isInWindowBound) {
-				
+
 				m_isVisible = false;
 				return true;
 			}
@@ -115,6 +115,7 @@ namespace Asteroid
 			m_currentOffset = m_currentOffset % m_animationMetaData->m_totalNumFrames;
 
 		}
+		
 
 		return true;
 
@@ -123,6 +124,16 @@ namespace Asteroid
 	void IndefiniteRepeatableAnimationComponent::Reset()
 	{
 		m_isInWindowBound = true;
+	}
+
+
+	uint32_t IndefiniteRepeatableAnimationComponent::GetFrameCountToActivateVisbility() const
+	{
+		return m_frameCountToActivateVisibility;
+	}
+	uint32_t IndefiniteRepeatableAnimationComponent::GetFrameCountToDeactivateVisbility() const
+	{
+		return m_frameCountToDeactivateVisibility;
 	}
 
 }

@@ -46,6 +46,9 @@ namespace Asteroid
 
 		void Reset();
 
+		uint32_t GetFrameCountToActivateVisbility() const;
+		uint32_t GetFrameCountToDeactivateVisbility() const;
+
 	private:
 
 		const AnimationMetaData* m_animationMetaData;
@@ -53,7 +56,7 @@ namespace Asteroid
 		ActiveBasedStateComponent* m_activeStateComponent;
 
 		uint32_t m_currentOffset{};
-		bool m_isInWindowBound;
+		bool m_isInWindowBound{true};
 		bool m_isVisible;
 
 		uint32_t m_frameCountToActivateVisibility;
