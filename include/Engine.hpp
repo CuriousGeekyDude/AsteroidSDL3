@@ -88,6 +88,7 @@ namespace Asteroid
 		std::vector<Circle> m_circleBoundsEntities{};
 		std::vector<AnimationMetaData> m_animationMetaData;
 		Time m_trackLastFrameElapsedTime;
+		float m_timeSinceStartInSeconds{};
 
 		uint32_t m_backgroundStarsTextureHandle{};
 

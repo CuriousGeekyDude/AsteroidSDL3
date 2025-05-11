@@ -145,7 +145,9 @@ namespace Asteroid
 		lv_backgroundStarsRenderData.m_angleOfRotation = 0.f;
 		lv_backgroundStarsRenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
 		lv_backgroundStarsRenderData.m_entityTextureHandle = m_backgroundStarsTextureHandle;
-		
+
+		float lv_totalSecondsFirstLevel = 90.f;
+		uint32_t lv_minAsteroidsToHitToGoToNextLevel = 35U;
 
 		while (false == lv_quit) {
 
@@ -190,58 +192,120 @@ namespace Asteroid
 
 			m_renderer.RenderEntity(lv_backgroundStarsRenderData);
 
-			m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
-			m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
-			m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
 			m_callbacksTimer.Update();
-			lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
-			for (auto& l_entity : m_entities) {
-				if (true == l_entity.GetActiveState()) {
-					assert(l_entity.Update(lv_updateComponent));
+
+			if (m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel) {
+				m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
+				m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
+				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
+				lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
+				for (auto& l_entity : m_entities) {
+					if (true == l_entity.GetActiveState()) {
+						assert(l_entity.Update(lv_updateComponent));
+					}
 				}
+				m_entitySpawnerFromPools.UpdatePools();
+				UpdateCircleBounds();
+
+
+
+
+				ImGui_ImplSDLRenderer3_NewFrame();
+				ImGui_ImplSDL3_NewFrame();
+				ImGui::NewFrame();
+
+				/*if (show_demo_window)
+					ImGui::ShowDemoWindow(&show_demo_window);*/
+
+					// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+				{
+					//static float f = 0.1f;
+
+					auto& lv_player = m_entities[m_playerEntityHandle];
+
+					ImGui::Begin("Player Info");                          // Create a window called "Hello, world!" and append into it.
+
+					ImGui::Text("Angle of rotation: %f", -((UserInputBasedMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))->GetCurrentAngleOfRotation());
+					//ImGui::SliderFloat("Speed", &f,0.1f, 5.f, "%.3f");
+
+					ImGui::Text("Speed: (%f, %f)", m_entityConnector.RequestSpeedFromPlayer().x, m_entityConnector.RequestSpeedFromPlayer().y);
+					ImGui::Text("Total number of non-empty cells: %u", m_grid.GetTotalNumNonEmptyCells());
+					ImGui::Text("Total number of cells: %u", m_grid.GetTotalNumCurrentCells());
+
+					/*auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
+					lv_movementComp->SetSpeed(f);*/
+
+					ImGui::Text("Total num of asteroids hit by bullets since the start: %u", lv_updateComponent.m_totalNumAsteroidsHitByBullets);
+					ImGui::Text("Seconds: %f", m_timeSinceStartInSeconds);
+					ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+					ImGui::End();
+				}
+
+
+
+				
+
 			}
-			m_entitySpawnerFromPools.UpdatePools();
-			UpdateCircleBounds();
-
-			
-
-
-			ImGui_ImplSDLRenderer3_NewFrame();
-			ImGui_ImplSDL3_NewFrame();
-			ImGui::NewFrame();
-
-			/*if (show_demo_window)
-				ImGui::ShowDemoWindow(&show_demo_window);*/
-
-			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-			{
-				//static float f = 0.1f;
-
-				auto& lv_player = m_entities[m_playerEntityHandle];
-
-				ImGui::Begin("Player Info");                          // Create a window called "Hello, world!" and append into it.
-
-				ImGui::Text("Angle of rotation: %f", -((UserInputBasedMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))->GetCurrentAngleOfRotation());
-				//ImGui::SliderFloat("Speed", &f,0.1f, 5.f, "%.3f");
+			else {
 				
-				ImGui::Text("Speed: (%f, %f)", m_entityConnector.RequestSpeedFromPlayer().x, m_entityConnector.RequestSpeedFromPlayer().y);
-				ImGui::Text("Total number of non-empty cells: %u", m_grid.GetTotalNumNonEmptyCells());
-				ImGui::Text("Total number of cells: %u", m_grid.GetTotalNumCurrentCells());
+				ImGui_ImplSDLRenderer3_NewFrame();
+				ImGui_ImplSDL3_NewFrame();
+				ImGui::NewFrame();
 
-				/*auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
-				lv_movementComp->SetSpeed(f);*/
-				
-				ImGui::Text("Total number of asteroids hit by bullets since the start: %u", lv_updateComponent.m_totalNumAsteroidsHitByBullets);
+				ImGui::Begin("Game status");
 
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+				if (lv_minAsteroidsToHitToGoToNextLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets) {
+
+					static bool lv_enteredThisLoop{ false };
+
+
+					ImGui::Text("Congrats! You have successfully completed this level!");
+					
+					if (false == lv_enteredThisLoop) {
+						DelayedSetStateCallback lv_exitCallback
+						{
+							.m_callback{[&lv_quit]() {lv_quit = true; }},
+							.m_maxNumFrames = 60U
+						};
+
+						m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));
+					}
+
+					lv_enteredThisLoop = true;
+
+
+				}
+				else {
+
+					static bool lv_repeat{ false };
+					static bool lv_exit{ false };
+
+					ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
+					if (true == ImGui::Button("Repeat")) {
+						lv_repeat = true;
+					}
+					if (true == ImGui::Button("Exit")) {
+						lv_exit = true;
+					}
+
+					if (true == lv_repeat) {
+						m_timeSinceStartInSeconds = 0.f;
+
+						lv_repeat = false;
+						lv_exit = false;
+					}
+
+					if (true == lv_exit) {
+						lv_quit = true;
+					}
+				}
+
 				ImGui::End();
 			}
 
-			
 
 			ImGui::Render();
 			ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), m_renderer.GetSDLRenderer());
-
 			assert(true == m_renderer.PresentToWindow());
 
 			m_trackLastFrameElapsedTime.m_lastFrameElapsedTime = SDL_GetTicks() - m_trackLastFrameElapsedTime.m_currentTime;
@@ -253,6 +317,8 @@ namespace Asteroid
 				SDL_Delay((uint32_t)lv_delayTime);
 
 			}
+
+			m_timeSinceStartInSeconds += ((float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime/1000.f);
 		}
 
 		LOG(LogSystem::Severity::INFO, LogSystem::Channel::GRAPHICS, "End of game loop.");
