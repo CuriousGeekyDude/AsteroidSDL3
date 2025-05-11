@@ -33,10 +33,15 @@ namespace Asteroid
 
 		void Init(EntityHandle l_ownerEntityHandle);
 
+		void SetPauseState(const bool l_pauseState);
+
+		bool GetPauseState() const;
+
 	protected:
 		glm::mat3 m_transform{ glm::identity<glm::mat3>() };
 		float m_thetaDegrees{};
 		
+		bool m_pauseMovement{ false };
 
 		//Speed along X and Y axis
 		glm::vec2 m_speed{0.f};

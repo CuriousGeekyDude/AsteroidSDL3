@@ -46,4 +46,15 @@ namespace Asteroid
 	{
 		m_thetaDegrees = l_theta;
 	}
+
+
+	bool MovementComponent::GetPauseState() const
+	{
+		return m_pauseMovement;
+	}
+
+	void MovementComponent::SetPauseState(const bool l_pauseState)
+	{
+		m_pauseMovement = l_pauseState;
+	}
 }
