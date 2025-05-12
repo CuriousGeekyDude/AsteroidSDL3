@@ -47,4 +47,9 @@ namespace Asteroid
 
 	}
 
+	void CallbacksTimer::FlushAllCallbacks()
+	{
+		m_delayedSetStateCallbacks.resize(0);
+	}
+
 }

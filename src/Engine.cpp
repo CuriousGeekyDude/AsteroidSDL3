@@ -271,10 +271,16 @@ namespace Asteroid
 						ImGui::Text("Starting the next level...");
 
 						if (false == lv_enteredThisLoop) {
+
+							m_callbacksTimer.FlushAllCallbacks();
+							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
+								m_entities[i].SetActiveState(false);
+							}
+
 							DelayedSetStateCallback lv_exitCallback
 							{
-								.m_callback{[&]() {m_currentLevel += 1U; m_timeSinceStartInSeconds = 0U; }},
-								.m_maxNumFrames = 120U
+								.m_callback{[&]() {m_currentLevel += 1U; m_timeSinceStartInSeconds = 0U;}},
+								.m_maxNumFrames = 512U
 							};
 
 							m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));

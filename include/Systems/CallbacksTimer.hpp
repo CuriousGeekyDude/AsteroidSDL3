@@ -21,6 +21,8 @@ namespace Asteroid
 
 		void Update();
 
+		void FlushAllCallbacks();
+
 
 	private:
 
