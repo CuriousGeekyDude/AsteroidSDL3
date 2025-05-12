@@ -69,7 +69,18 @@ namespace Asteroid
 
 			}
 
-			return EntityHandle(m_nextInactiveIndex);
+			return lv_returnInactiveIndex;
+		}
+
+	}
+
+
+	void EntityPool::Reset()
+	{
+		m_nextInactiveIndex = m_firstEntityIndex;
+		for (uint32_t i = 0; i < (uint32_t)m_inactiveEntityIndices.size(); ++i) {
+			m_inactiveEntityIndices[i] = i + m_firstEntityIndex;
+			m_activeEntityIndicesFromOldestToNewest[i] = std::numeric_limits<uint32_t>::max();
 		}
 
 	}

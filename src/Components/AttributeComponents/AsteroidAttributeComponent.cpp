@@ -39,13 +39,15 @@ namespace Asteroid
 
 			m_rayMovement->SetRayDirection(lv_normalizedDir);
 		}
+
+		return true;
 	}
 
 
 	void AsteroidAttributeComponent::Init(EntityHandle l_ownerEntityHandle, uint32_t l_hp
 		, const AsteroidStates l_state, RayMovementComponent* l_rayMovement)
 	{
-		AttributeComponent::Init(m_ownerEntityHandle, l_hp);
+		AttributeComponent::Init(l_ownerEntityHandle, l_hp);
 
 		m_state = l_state;
 		m_rayMovement = l_rayMovement;

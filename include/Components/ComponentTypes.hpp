@@ -20,6 +20,7 @@ namespace Asteroid
 
 		COLLISION,
 
+		ATTRIBUTE,
 		
 		STATE,
 		ACTIVE_BASED_STATE,

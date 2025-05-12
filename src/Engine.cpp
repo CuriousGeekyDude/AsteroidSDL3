@@ -9,6 +9,7 @@
 #include "Components/CollisionComponents/PlayerCollisionComponent.hpp"
 #include "Components/CollisionComponents/AsteroidCollisionComponent.hpp"
 #include "Components/CollisionComponents/BulletCollisionComponent.hpp"
+#include "Components/AttributeComponents/AsteroidAttributeComponent.hpp"
 #include "Systems/Colors.hpp"
 #include "Systems/RenderingData.hpp"
 #include "Components/UpdateComponents.hpp"
@@ -146,10 +147,10 @@ namespace Asteroid
 		lv_backgroundStarsRenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
 		lv_backgroundStarsRenderData.m_entityTextureHandle = m_backgroundStarsTextureHandle;
 
-		constexpr float lv_totalSecondsFirstLevel = 90.f;
-		constexpr float lv_totalSecondsSecondLevel = 120.f;
-		constexpr uint32_t lv_minAsteroidsToHitToGoToSecondLevel = 35U;
-		constexpr uint32_t lv_minAsteroidsToHitToWinInSecondLevel = 45U;
+		constexpr float lv_totalSecondsFirstLevel = 20.f; //90
+		constexpr float lv_totalSecondsSecondLevel = 10.f; //120
+		constexpr uint32_t lv_minAsteroidsToHitToGoToSecondLevel = 1U; //35
+		constexpr uint32_t lv_minAsteroidsToHitToWinInSecondLevel = 1U;
 
 		while (false == lv_quit) {
 
@@ -201,7 +202,7 @@ namespace Asteroid
 
 				m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
 				m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
-				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
+				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet(m_currentLevel);
 				lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
 				for (auto& l_entity : m_entities) {
 					if (true == l_entity.GetActiveState()) {
@@ -276,10 +277,18 @@ namespace Asteroid
 							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
 								m_entities[i].SetActiveState(false);
 							}
+							
+							m_entitySpawnerFromPools.ResetPools();
 
 							DelayedSetStateCallback lv_exitCallback
 							{
-								.m_callback{[&]() {m_currentLevel += 1U; m_timeSinceStartInSeconds = 0U;}},
+								.m_callback{[&]() 
+								{
+									m_currentLevel += 1U; 
+									m_timeSinceStartInSeconds = 0U;
+									lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+									lv_enteredThisLoop = false;
+								}},
 								.m_maxNumFrames = 512U
 							};
 
@@ -304,7 +313,18 @@ namespace Asteroid
 						}
 
 						if (true == lv_repeat) {
+
+
+							m_callbacksTimer.FlushAllCallbacks();
+							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
+								m_entities[i].SetActiveState(false);
+							}
+
+							m_entitySpawnerFromPools.ResetPools();
 							m_timeSinceStartInSeconds = 0.f;
+							lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+
+
 
 							lv_repeat = false;
 							lv_exit = false;
@@ -315,15 +335,109 @@ namespace Asteroid
 						}
 					}
 
+
+
 					ImGui::End();
 				}
 				else if (2U == m_currentLevel) {
-
-					m_timeSinceStartInSeconds = 0.f;
-
+					
 					ImGui::Begin("Game status");
 
-					ImGui::Text("Second level has begun...");
+					if (lv_minAsteroidsToHitToWinInSecondLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets) {
+
+						ImGui::Text("You won the game congrats!");
+						
+
+						static bool lv_repeat3{ false };
+						static bool lv_exit3{ false };
+
+						ImGui::Text("Would you like to play again or exit?");
+
+						if (true == ImGui::Button("Play again")) {
+
+							lv_repeat3 = true;
+						}
+
+						if (true == ImGui::Button("Exit")) {
+
+							lv_quit = true;
+
+						}
+
+
+						if (true == lv_repeat3) {
+
+							m_callbacksTimer.FlushAllCallbacks();
+							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
+								m_entities[i].SetActiveState(false);
+							}
+
+							m_entitySpawnerFromPools.ResetPools();
+							m_timeSinceStartInSeconds = 0.f;
+							lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+
+							m_currentLevel = 1U;
+
+							lv_repeat3 = false;
+
+						}
+
+						/*static bool lv_enteredThisLoop{ false };
+
+
+						if (false == lv_enteredThisLoop) {
+
+							m_callbacksTimer.FlushAllCallbacks();
+
+							DelayedSetStateCallback lv_exitCallback
+							{
+								.m_callback{[&lv_quit]() {lv_quit = true; }},
+								.m_maxNumFrames = 512U
+							};
+
+							m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));
+						}
+
+						lv_enteredThisLoop = true;*/
+
+
+					}
+					else {
+
+						static bool lv_repeat2{ false };
+						static bool lv_exit2{ false };
+
+						ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
+						if (true == ImGui::Button("Repeat")) {
+							lv_repeat2 = true;
+							m_currentLevel = 2U;
+						}
+						if (true == ImGui::Button("Exit")) {
+							lv_exit2 = true;
+						}
+
+						if (true == lv_repeat2) {
+
+							m_callbacksTimer.FlushAllCallbacks();
+							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
+								m_entities[i].SetActiveState(false);
+							}
+
+							m_entitySpawnerFromPools.ResetPools();
+							m_timeSinceStartInSeconds = 0.f;
+							lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+
+
+							lv_repeat2 = false;
+							lv_exit2 = false;
+						}
+
+						if (true == lv_exit2) {
+							lv_quit = true;
+						}
+
+					}
+
 
 					ImGui::End();
 
@@ -522,6 +636,7 @@ namespace Asteroid
 				auto lv_entityMainAnimation = std::make_unique<IndefiniteRepeatableAnimationComponent>();
 				auto lv_fireExplosionAnimationComponent = std::make_unique<OnceRepeatableAnimationComponent>();
 				auto lv_warpAsteroidAnimComponent = std::make_unique<OnceRepeatableAnimationComponent>();
+				auto lv_asteroidAttribComponent = std::make_unique<AsteroidAttributeComponent>();
 
 				lv_collisionComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta->m_totalNumFrames + 20U, lv_explosionAsteroidAnimMeta->m_totalNumFrames / 3
 					, true, lv_entityMainAnimation.get(), lv_fireExplosionAnimationComponent.get()
@@ -534,6 +649,8 @@ namespace Asteroid
 				lv_fireExplosionAnimationComponent->Init(lv_asteroidIdx, lv_explosionAsteroidAnimMeta , lv_movementComponent.get());
 				lv_warpAsteroidAnimComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta, lv_movementComponent.get(), false);
 
+				lv_asteroidAttribComponent->Init(lv_asteroidIdx, 3, AsteroidStates::PASSIVE, lv_movementComponent.get());
+
 				auto& lv_asteroid = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_asteroidIdx,  EntityType::ASTEROID, false)));
 
 				lv_asteroid.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
@@ -542,7 +659,9 @@ namespace Asteroid
 				lv_asteroid.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityMainAnimation));
 				lv_asteroid.AddComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION, std::move(lv_fireExplosionAnimationComponent));
 				lv_asteroid.AddComponent(ComponentTypes::WARP_ASTEROID_ANIMATION, std::move(lv_warpAsteroidAnimComponent));
-				
+				lv_asteroid.AddComponent(ComponentTypes::ATTRIBUTE, std::move(lv_asteroidAttribComponent));
+
+
 				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_asteroid.GetCurrentPos()}, .m_radius{lv_asteroidAnimMeta->m_widthToRenderTextures/2.f} });
 
 

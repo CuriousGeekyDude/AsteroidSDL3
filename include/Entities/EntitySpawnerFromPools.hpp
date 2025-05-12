@@ -22,10 +22,11 @@ namespace Asteroid
 		EntitySpawnerFromPools(Engine* l_engine);
 
 		void InitPool(const EntityType l_type, const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities);
-		void SpawnNewEntitiesIfConditionsMet();
+		void SpawnNewEntitiesIfConditionsMet(const uint32_t l_level);
 
 		void UpdatePools();
 
+		void ResetPools();
 
 	private:
 
