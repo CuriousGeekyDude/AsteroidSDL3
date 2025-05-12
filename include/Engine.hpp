@@ -89,6 +89,7 @@ namespace Asteroid
 		std::vector<AnimationMetaData> m_animationMetaData;
 		Time m_trackLastFrameElapsedTime;
 		float m_timeSinceStartInSeconds{};
+		uint32_t m_currentLevel{1U};
 
 		uint32_t m_backgroundStarsTextureHandle{};
 

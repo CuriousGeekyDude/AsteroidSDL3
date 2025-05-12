@@ -146,8 +146,10 @@ namespace Asteroid
 		lv_backgroundStarsRenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
 		lv_backgroundStarsRenderData.m_entityTextureHandle = m_backgroundStarsTextureHandle;
 
-		float lv_totalSecondsFirstLevel = 90.f;
-		uint32_t lv_minAsteroidsToHitToGoToNextLevel = 35U;
+		constexpr float lv_totalSecondsFirstLevel = 90.f;
+		constexpr float lv_totalSecondsSecondLevel = 120.f;
+		constexpr uint32_t lv_minAsteroidsToHitToGoToSecondLevel = 35U;
+		constexpr uint32_t lv_minAsteroidsToHitToWinInSecondLevel = 45U;
 
 		while (false == lv_quit) {
 
@@ -194,7 +196,9 @@ namespace Asteroid
 
 			m_callbacksTimer.Update();
 
-			if (m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel) {
+			if ((m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel && 1U == m_currentLevel) 
+				|| (m_timeSinceStartInSeconds <= lv_totalSecondsSecondLevel && 2U == m_currentLevel)) {
+
 				m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
 				m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
 				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
@@ -248,59 +252,77 @@ namespace Asteroid
 			}
 			else {
 				
+
 				ImGui_ImplSDLRenderer3_NewFrame();
 				ImGui_ImplSDL3_NewFrame();
 				ImGui::NewFrame();
 
-				ImGui::Begin("Game status");
 
-				if (lv_minAsteroidsToHitToGoToNextLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets) {
+				if (1U == m_currentLevel) {
 
-					static bool lv_enteredThisLoop{ false };
+					ImGui::Begin("Game status");
+
+					if (lv_minAsteroidsToHitToGoToSecondLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets) {
+
+						static bool lv_enteredThisLoop{ false };
 
 
-					ImGui::Text("Congrats! You have successfully completed this level!");
-					
-					if (false == lv_enteredThisLoop) {
-						DelayedSetStateCallback lv_exitCallback
-						{
-							.m_callback{[&lv_quit]() {lv_quit = true; }},
-							.m_maxNumFrames = 60U
-						};
+						ImGui::Text("Congrats! You have successfully completed this level!");
+						ImGui::Text("Starting the next level...");
 
-						m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));
+						if (false == lv_enteredThisLoop) {
+							DelayedSetStateCallback lv_exitCallback
+							{
+								.m_callback{[&]() {m_currentLevel += 1U; m_timeSinceStartInSeconds = 0U; }},
+								.m_maxNumFrames = 120U
+							};
+
+							m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));
+						}
+
+						lv_enteredThisLoop = true;
+
+
+					}
+					else {
+
+						static bool lv_repeat{ false };
+						static bool lv_exit{ false };
+
+						ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
+						if (true == ImGui::Button("Repeat")) {
+							lv_repeat = true;
+						}
+						if (true == ImGui::Button("Exit")) {
+							lv_exit = true;
+						}
+
+						if (true == lv_repeat) {
+							m_timeSinceStartInSeconds = 0.f;
+
+							lv_repeat = false;
+							lv_exit = false;
+						}
+
+						if (true == lv_exit) {
+							lv_quit = true;
+						}
 					}
 
-					lv_enteredThisLoop = true;
+					ImGui::End();
+				}
+				else if (2U == m_currentLevel) {
 
+					m_timeSinceStartInSeconds = 0.f;
+
+					ImGui::Begin("Game status");
+
+					ImGui::Text("Second level has begun...");
+
+					ImGui::End();
 
 				}
-				else {
 
-					static bool lv_repeat{ false };
-					static bool lv_exit{ false };
-
-					ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
-					if (true == ImGui::Button("Repeat")) {
-						lv_repeat = true;
-					}
-					if (true == ImGui::Button("Exit")) {
-						lv_exit = true;
-					}
-
-					if (true == lv_repeat) {
-						m_timeSinceStartInSeconds = 0.f;
-
-						lv_repeat = false;
-						lv_exit = false;
-					}
-
-					if (true == lv_exit) {
-						lv_quit = true;
-					}
-				}
-
-				ImGui::End();
 			}
 
 
@@ -320,8 +342,6 @@ namespace Asteroid
 
 			m_timeSinceStartInSeconds += ((float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime/1000.f);
 		}
-
-		LOG(LogSystem::Severity::INFO, LogSystem::Channel::GRAPHICS, "End of game loop.");
 
 		return true;
 
