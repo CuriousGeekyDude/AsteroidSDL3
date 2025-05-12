@@ -10,11 +10,15 @@ namespace Asteroid
 {
 
 
-	StateComponent::StateComponent(EntityHandle l_ownerEntityHandle)
-		:Component(l_ownerEntityHandle)
+	StateComponent::StateComponent()
 	{
 
 	}
 
+
+	void StateComponent::Init(EntityHandle l_ownerEntityHandle)
+	{
+		Component::Init(l_ownerEntityHandle);
+	}
 
 }

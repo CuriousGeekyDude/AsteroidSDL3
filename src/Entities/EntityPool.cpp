@@ -107,10 +107,7 @@ namespace Asteroid
 
 			for (uint32_t i = 0; i < (uint32_t)m_inactiveEntityIndices.size(); ++i) {
 
-
-				ActiveBasedStateComponent* lv_activeComponent = (ActiveBasedStateComponent*)l_entities[i + m_firstEntityIndex].GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
-
-				if (true == lv_activeComponent->IsActive()) {
+				if (true == l_entities[i + m_firstEntityIndex].GetActiveState()) {
 					m_inactiveEntityIndices[i] = std::numeric_limits<uint32_t>::max();
 				}
 				else {

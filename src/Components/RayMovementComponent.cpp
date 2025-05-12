@@ -10,10 +10,14 @@
 namespace Asteroid
 {
 
-	RayMovementComponent::RayMovementComponent(EntityHandle l_ownerEntityHandle)
-		:MovementComponent(l_ownerEntityHandle)
+	RayMovementComponent::RayMovementComponent()
 	{
 
+	}
+
+	void RayMovementComponent::Init(EntityHandle l_ownerEntityHandle)
+	{
+		m_ownerEntityHandle = l_ownerEntityHandle;
 	}
 
 	void RayMovementComponent::SetInitialPos(const glm::vec2& l_initialPos)
@@ -31,19 +35,21 @@ namespace Asteroid
 
 	bool RayMovementComponent::Update(UpdateComponents& l_updateContext)
 	{
-		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
+
+		if (false == m_pauseMovement) {
+			auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
 
 
-		m_initialT += m_speed.x * l_updateContext.m_deltaTime;
+			m_initialT += m_speed.x * l_updateContext.m_deltaTime;
 
-		const glm::vec2 lv_newPos = m_initialPos + (m_initialT)*m_rayDirection;
-		m_transform[2][0] = lv_newPos.x;
-		m_transform[2][1] = lv_newPos.y;
+			const glm::vec2 lv_newPos = m_initialPos + (m_initialT)*m_rayDirection;
+			m_transform[2][0] = lv_newPos.x;
+			m_transform[2][1] = lv_newPos.y;
 
-		lv_ownerEntity.SetCurrentPos(lv_newPos);
+			lv_ownerEntity.SetCurrentPos(lv_newPos);
 
-
+		}
 
 		return true;
 	}

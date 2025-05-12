@@ -9,8 +9,7 @@
 namespace Asteroid
 {
 
-	MovementComponent::MovementComponent(EntityHandle l_ownerEntityHandle)
-		:Component(l_ownerEntityHandle)
+	MovementComponent::MovementComponent()
 	{
 
 	}
@@ -27,6 +26,12 @@ namespace Asteroid
 
 
 
+	void MovementComponent::Init(EntityHandle l_ownerEntityHandle)
+	{
+		Component::Init(l_ownerEntityHandle);
+	}
+
+
 	void MovementComponent::SetSpeed(const glm::vec2& l_newSpeed)
 	{
 		m_speed = l_newSpeed;
@@ -40,5 +45,16 @@ namespace Asteroid
 	void MovementComponent::SetAngleOfRotation(const float l_theta)
 	{
 		m_thetaDegrees = l_theta;
+	}
+
+
+	bool MovementComponent::GetPauseState() const
+	{
+		return m_pauseMovement;
+	}
+
+	void MovementComponent::SetPauseState(const bool l_pauseState)
+	{
+		m_pauseMovement = l_pauseState;
 	}
 }

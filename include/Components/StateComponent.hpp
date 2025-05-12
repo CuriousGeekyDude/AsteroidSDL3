@@ -14,7 +14,9 @@ namespace Asteroid
 	{
 	public:
 
-		StateComponent(EntityHandle l_ownerEntityHandle);
+		StateComponent();
+
+		void Init(EntityHandle l_ownerEntityHandle);
 
 	};
 

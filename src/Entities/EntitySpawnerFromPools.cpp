@@ -7,7 +7,9 @@
 #include "Engine.hpp"
 #include "Components/RayMovementComponent.hpp"
 #include "Components/StateComponents/ActiveBasedStateComponent.hpp"
-#include "Components/StateComponents/VisibilityBasedStateComponent.hpp"
+#include "Components/IndefiniteRepeatableAnimationComponent.hpp"
+#include "Components/CollisionComponent.hpp"
+#include "Components/OnceRepeatableAnimationComponent.hpp"
 #include "Entities/Entity.hpp"
 
 
@@ -46,16 +48,23 @@ namespace Asteroid
 
 		if (true == BulletSpawnConditionMet()) {
 
-			
+
 			auto lv_nextInactiveBulletIdx = m_bulletsPool.GetNextInactiveEntityHandle();
 
 			LOG(Severity::INFO, Channel::GRAPHICS, "Bullet with index %u is being fetched", lv_nextInactiveBulletIdx);
 
 			auto& lv_bullet = m_engine->GetEntityFromHandle(lv_nextInactiveBulletIdx.m_entityHandle);
 
-			ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)lv_bullet.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+			auto* lv_collisionComponent = (CollisionComponent*)lv_bullet.GetComponent(ComponentTypes::COLLISION);
+			auto* lv_entityMainAnimationComponent = (IndefiniteRepeatableAnimationComponent*)lv_bullet.GetComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION);
+			auto* lv_activeComponent = (ActiveBasedStateComponent*)lv_bullet.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+			lv_bullet.SetActiveState(true);
+			lv_collisionComponent->SetCollisionState(true);
+			lv_collisionComponent->Reset();
+			lv_entityMainAnimationComponent->Reset();
+			lv_entityMainAnimationComponent->SetVisibleState(true);
+			lv_activeComponent->Reset();
 
-			lv_activeComp->SetActiveState(true);
 			const auto& lv_currentPlayerPos = m_engine->m_entityConnector.RequestPositionFromPlayer();
 			float lv_playerAngleOfRotation = m_engine->m_entityConnector.RequestAngleRotationFromPlayer();
 			const auto& lv_mousePos = m_engine->GetInputSystem().GetMousePosRelativeToWindow();
@@ -79,6 +88,7 @@ namespace Asteroid
 				lv_bulletMovComponent->SetInitialT(lv_initialT);
 				lv_bulletMovComponent->SetAngleOfRotation(lv_playerAngleOfRotation);
 				lv_bulletMovComponent->SetInitialPos(lv_currentPlayerPos);
+				lv_bullet.SetCurrentPos(lv_currentPlayerPos);
 			}
 
 		}
@@ -92,6 +102,9 @@ namespace Asteroid
 
 			GenerateRandomIndexCellNumbers(lv_totalNumCurrentCells);
 			
+
+			auto& lv_callBacksTimer = m_engine->GetCallbacksTimer();
+
 			for (uint32_t i = 0; i < m_asteroidMinNumInScene; ++i) {
 
 				auto lv_nextInactiveAsteroidIdx = m_asteroidPool.GetNextInactiveEntityHandle();
@@ -105,23 +118,55 @@ namespace Asteroid
 				glm::vec2 lv_asteroidPos = lv_centerPosCells[m_randomIndexCellNumbers[i]];
 
 				auto& lv_asteroid = m_engine->GetEntityFromHandle(lv_nextInactiveAsteroidIdx.m_entityHandle);
+				lv_asteroid.SetCurrentPos(lv_asteroidPos);
+				auto* lv_collisionComponent = (CollisionComponent*)lv_asteroid.GetComponent(ComponentTypes::COLLISION);
+				auto* lv_entityMainAnimationComponent = (IndefiniteRepeatableAnimationComponent*)lv_asteroid.GetComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION);
+				auto* lv_activeComponent = (ActiveBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
+				auto* lv_warpEffect = (OnceRepeatableAnimationComponent*)lv_asteroid.GetComponent(ComponentTypes::WARP_ASTEROID_ANIMATION);
 
-				ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
-				VisibilityBasedStateComponent* lv_visibilityComp = (VisibilityBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::VISIBILITY_BASED_STATE);
+				lv_asteroid.SetActiveState(true);
+				lv_activeComponent->Reset();
+				lv_collisionComponent->SetCollisionState(false);
+				lv_collisionComponent->Reset();
+				lv_entityMainAnimationComponent->SetVisibleState(false);
+				lv_entityMainAnimationComponent->Reset();
+				lv_warpEffect->StartAnimation();
 
-				lv_activeComp->SetActiveState(true);
-				lv_visibilityComp->SetVisibility(true);
+				DelayedSetStateCallback lv_delayedCollisionActivation
+				{
+					.m_callback{[lv_collisionComponent]() {lv_collisionComponent->SetCollisionState(true); }},
+					.m_maxNumFrames = lv_collisionComponent->GetFrameCountToActivateCollision()
+				};
+
+				DelayedSetStateCallback lv_delayedVisibilityActivation
+				{
+					.m_callback{[lv_entityMainAnimationComponent]() {lv_entityMainAnimationComponent->SetVisibleState(true); }},
+					.m_maxNumFrames = lv_entityMainAnimationComponent->GetFrameCountToActivateVisbility()
+				};
+				
+				lv_callBacksTimer.AddSetStateCallback(std::move(lv_delayedCollisionActivation));
+				lv_callBacksTimer.AddSetStateCallback(std::move(lv_delayedVisibilityActivation));
+
 
 				glm::vec2 lv_direction{ std::cos(m_randomDirectionsForAsteroids[i] + lv_piOver180*m_randomIndexCellNumbers[i]), std::sin(m_randomDirectionsForAsteroids[i] + lv_piOver180*m_randomIndexCellNumbers[i])};
 
 				RayMovementComponent* lv_asteroidMovComponent = (RayMovementComponent*)lv_asteroid.GetComponent(ComponentTypes::MOVEMENT);
 				constexpr float lv_initialT{ 20.f };
 
-				lv_asteroidMovComponent->SetSpeed(glm::vec2{ 0.05f });
+				lv_asteroidMovComponent->SetSpeed(glm::vec2{ 0.1f });
 				lv_asteroidMovComponent->SetRayDirection(lv_direction);
 				lv_asteroidMovComponent->SetInitialT(lv_initialT);
 				lv_asteroidMovComponent->SetAngleOfRotation(0.f);
 				lv_asteroidMovComponent->SetInitialPos(lv_asteroidPos);
+
+				lv_asteroidMovComponent->SetPauseState(true);
+
+				DelayedSetStateCallback lv_delayedMovementActivation
+				{
+					.m_callback{[lv_asteroidMovComponent]() {lv_asteroidMovComponent->SetPauseState(false); }},
+					.m_maxNumFrames = lv_warpEffect->GetAnimationMetaData()->m_totalNumFrames
+				};
+				lv_callBacksTimer.AddSetStateCallback(std::move(lv_delayedMovementActivation));
 
 			}
 
@@ -165,7 +210,7 @@ namespace Asteroid
 
 		const uint32_t lv_totalNumActiveAsteroids = m_asteroidPool.GetTotalNumActiveEntities();
 
-		if (m_asteroidMinNumInScene > lv_totalNumActiveAsteroids) {
+		if  (lv_totalNumActiveAsteroids < 5U) {
 			return true;
 		}
 		else {

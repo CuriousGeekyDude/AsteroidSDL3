@@ -7,9 +7,10 @@
 
 namespace Asteroid
 {
-	Entity::Entity(const glm::vec2& l_initialPos, uint32_t l_id, const EntityType l_type)
+	Entity::Entity(const glm::vec2& l_initialPos, uint32_t l_id, const EntityType l_type, const bool l_isActive)
 		:m_currentPos(l_initialPos), m_id(l_id)
 		,m_type(l_type)
+		,m_isActive(l_isActive)
 	{
 
 	}
@@ -74,6 +75,20 @@ namespace Asteroid
 		}
 
 		return nullptr;
+	}
+
+
+	void Entity::SetActiveState(const bool l_activeState)
+	{
+		using namespace LogSystem;
+
+		LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "Active state is changed");
+		m_isActive = l_activeState;
+	}
+
+	bool Entity::GetActiveState() const
+	{
+		return m_isActive;
 	}
 
 	uint32_t Entity::GetID() const

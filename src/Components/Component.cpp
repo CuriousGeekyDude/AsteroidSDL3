@@ -9,9 +9,13 @@
 
 namespace Asteroid
 {
-	Component::Component(EntityHandle l_ownerEntityHandle)
-		:m_ownerEntityHandle(l_ownerEntityHandle)
+	Component::Component()
 	{
 
+	}
+
+	void Component::Init(EntityHandle l_ownerEntityHandle)
+	{
+		m_ownerEntityHandle = l_ownerEntityHandle;
 	}
 }

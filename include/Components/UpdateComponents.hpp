@@ -12,6 +12,7 @@ namespace Asteroid
 	{
 		float m_deltaTime{};
 		Engine* m_engine{};
+		uint32_t m_totalNumAsteroidsHitByBullets{};
 	};
 
 }

@@ -13,8 +13,7 @@ namespace Asteroid
 	class Engine;
 	struct Rectangle;
 	class Entity;
-	class Animation;
-	
+	class CallbacksTimer;
 
 	class Grid final
 	{
@@ -27,7 +26,7 @@ namespace Asteroid
 
 		void Update(const glm::ivec2& l_currentWindowSize, const std::vector<Circle>& l_circleBounds, const std::vector<Entity>& l_entities);
 
-		void DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities);
+		void DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities, CallbacksTimer& l_timer);
 
 
 		uint32_t GetTotalNumNonEmptyCells() const;

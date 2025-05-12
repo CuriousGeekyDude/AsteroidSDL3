@@ -2,15 +2,13 @@
 
 #include "Engine.hpp"
 #include "Components/MovementComponents/UserInputBasedMovementComponent.hpp"
-#include "Components/AnimationComponent.hpp"
-#include "Components/GraphicsComponent.hpp"
+#include "Components/OnceRepeatableAnimationComponent.hpp"
+#include "Components/IndefiniteRepeatableAnimationComponent.hpp"
 #include "Components/RayMovementComponent.hpp"
-#include "Components/StateComponents/VisibilityBasedStateComponent.hpp"
 #include "Components/StateComponents/ActiveBasedStateComponent.hpp"
 #include "Components/CollisionComponents/PlayerCollisionComponent.hpp"
 #include "Components/CollisionComponents/AsteroidCollisionComponent.hpp"
 #include "Components/CollisionComponents/BulletCollisionComponent.hpp"
-#include "Components/StateComponents/CollisionBasedStateComponent.hpp"
 #include "Systems/Colors.hpp"
 #include "Systems/RenderingData.hpp"
 #include "Components/UpdateComponents.hpp"
@@ -51,6 +49,9 @@ namespace Asteroid
 
 		}
 
+
+
+		Set_Verbosity(Severity::FAILURE);
 
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Metadata creation was successfull.");
 
@@ -144,7 +145,9 @@ namespace Asteroid
 		lv_backgroundStarsRenderData.m_angleOfRotation = 0.f;
 		lv_backgroundStarsRenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
 		lv_backgroundStarsRenderData.m_entityTextureHandle = m_backgroundStarsTextureHandle;
-		
+
+		float lv_totalSecondsFirstLevel = 90.f;
+		uint32_t lv_minAsteroidsToHitToGoToNextLevel = 35U;
 
 		while (false == lv_quit) {
 
@@ -189,57 +192,120 @@ namespace Asteroid
 
 			m_renderer.RenderEntity(lv_backgroundStarsRenderData);
 
-			m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
-			lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
-			for (auto& l_entity : m_entities) {
-				ActiveBasedStateComponent* lv_activeComponent = (ActiveBasedStateComponent*)l_entity.GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
-				if (true == lv_activeComponent->IsActive()) {
-					assert(l_entity.Update(lv_updateComponent));
+			m_callbacksTimer.Update();
+
+			if (m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel) {
+				m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
+				m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
+				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
+				lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
+				for (auto& l_entity : m_entities) {
+					if (true == l_entity.GetActiveState()) {
+						assert(l_entity.Update(lv_updateComponent));
+					}
 				}
+				m_entitySpawnerFromPools.UpdatePools();
+				UpdateCircleBounds();
+
+
+
+
+				ImGui_ImplSDLRenderer3_NewFrame();
+				ImGui_ImplSDL3_NewFrame();
+				ImGui::NewFrame();
+
+				/*if (show_demo_window)
+					ImGui::ShowDemoWindow(&show_demo_window);*/
+
+					// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+				{
+					//static float f = 0.1f;
+
+					auto& lv_player = m_entities[m_playerEntityHandle];
+
+					ImGui::Begin("Player Info");                          // Create a window called "Hello, world!" and append into it.
+
+					ImGui::Text("Angle of rotation: %f", -((UserInputBasedMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))->GetCurrentAngleOfRotation());
+					//ImGui::SliderFloat("Speed", &f,0.1f, 5.f, "%.3f");
+
+					ImGui::Text("Speed: (%f, %f)", m_entityConnector.RequestSpeedFromPlayer().x, m_entityConnector.RequestSpeedFromPlayer().y);
+					ImGui::Text("Total number of non-empty cells: %u", m_grid.GetTotalNumNonEmptyCells());
+					ImGui::Text("Total number of cells: %u", m_grid.GetTotalNumCurrentCells());
+
+					/*auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
+					lv_movementComp->SetSpeed(f);*/
+
+					ImGui::Text("Total num of asteroids hit by bullets since the start: %u", lv_updateComponent.m_totalNumAsteroidsHitByBullets);
+					ImGui::Text("Seconds: %f", m_timeSinceStartInSeconds);
+					ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+					ImGui::End();
+				}
+
+
+
+				
+
 			}
-			m_entitySpawnerFromPools.UpdatePools();
-			UpdateCircleBounds();
-
-			m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
-			m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities);
-			
-
-
-			ImGui_ImplSDLRenderer3_NewFrame();
-			ImGui_ImplSDL3_NewFrame();
-			ImGui::NewFrame();
-
-			if (show_demo_window)
-				ImGui::ShowDemoWindow(&show_demo_window);
-
-			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-			{
-				//static float f = 0.1f;
-
-				auto& lv_player = m_entities[m_playerEntityHandle];
-
-				ImGui::Begin("Player Info");                          // Create a window called "Hello, world!" and append into it.
-
-				ImGui::Text("Angle of rotation: %f", -((UserInputBasedMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))->GetCurrentAngleOfRotation());
-				//ImGui::SliderFloat("Speed", &f,0.1f, 5.f, "%.3f");
+			else {
 				
-				ImGui::Text("Speed: (%f, %f)", m_entityConnector.RequestSpeedFromPlayer().x, m_entityConnector.RequestSpeedFromPlayer().y);
-				ImGui::Text("Total number of non-empty cells: %u", m_grid.GetTotalNumNonEmptyCells());
-				ImGui::Text("Total number of cells: %u", m_grid.GetTotalNumCurrentCells());
+				ImGui_ImplSDLRenderer3_NewFrame();
+				ImGui_ImplSDL3_NewFrame();
+				ImGui::NewFrame();
 
-				/*auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
-				lv_movementComp->SetSpeed(f);*/
-				
+				ImGui::Begin("Game status");
 
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+				if (lv_minAsteroidsToHitToGoToNextLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets) {
+
+					static bool lv_enteredThisLoop{ false };
+
+
+					ImGui::Text("Congrats! You have successfully completed this level!");
+					
+					if (false == lv_enteredThisLoop) {
+						DelayedSetStateCallback lv_exitCallback
+						{
+							.m_callback{[&lv_quit]() {lv_quit = true; }},
+							.m_maxNumFrames = 60U
+						};
+
+						m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));
+					}
+
+					lv_enteredThisLoop = true;
+
+
+				}
+				else {
+
+					static bool lv_repeat{ false };
+					static bool lv_exit{ false };
+
+					ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
+					if (true == ImGui::Button("Repeat")) {
+						lv_repeat = true;
+					}
+					if (true == ImGui::Button("Exit")) {
+						lv_exit = true;
+					}
+
+					if (true == lv_repeat) {
+						m_timeSinceStartInSeconds = 0.f;
+
+						lv_repeat = false;
+						lv_exit = false;
+					}
+
+					if (true == lv_exit) {
+						lv_quit = true;
+					}
+				}
+
 				ImGui::End();
 			}
 
-			
 
 			ImGui::Render();
 			ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), m_renderer.GetSDLRenderer());
-
 			assert(true == m_renderer.PresentToWindow());
 
 			m_trackLastFrameElapsedTime.m_lastFrameElapsedTime = SDL_GetTicks() - m_trackLastFrameElapsedTime.m_currentTime;
@@ -251,6 +317,8 @@ namespace Asteroid
 				SDL_Delay((uint32_t)lv_delayTime);
 
 			}
+
+			m_timeSinceStartInSeconds += ((float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime/1000.f);
 		}
 
 		LOG(LogSystem::Severity::INFO, LogSystem::Channel::GRAPHICS, "End of game loop.");
@@ -344,20 +412,24 @@ namespace Asteroid
 
 			assert(nullptr != lv_spaceshipAnimMeta);
 
-			auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ (float)lv_windowRes.x/2.f, (float)lv_windowRes.y/2.f }, 0, EntityType::PLAYER)));
 
+			auto lv_movementComponent = std::make_unique<UserInputBasedMovementComponent>();
+			auto lv_collisionComponent = std::make_unique<PlayerCollisionComponent>();
+			auto lv_entityAnimationComp = std::make_unique<IndefiniteRepeatableAnimationComponent>();
+			auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
 
-			lv_player.AddComponent(ComponentTypes::COLLISION,
-				std::make_unique<PlayerCollisionComponent>(0));
-			lv_player.AddComponent(ComponentTypes::ACTIVE_BASED_STATE,
-				std::make_unique<ActiveBasedStateComponent>(0, 1U, true, (CollisionComponent*)lv_player.GetComponent(ComponentTypes::COLLISION), nullptr));
-			lv_player.AddComponent(ComponentTypes::COLLISION_BASED_STATE,
-				std::make_unique<CollisionBasedStateComponent>(0, 1));
-			lv_player.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<UserInputBasedMovementComponent>(0));
-			lv_player.AddComponent(ComponentTypes::GRAPHICS,
-				std::make_unique<GraphicsComponent>(0, lv_spaceshipAnimMeta));
-			lv_player.AddComponent(ComponentTypes::VISIBILITY_BASED_STATE,
-				std::make_unique<VisibilityBasedStateComponent>(0, lv_spaceshipAnimMeta));
+			lv_movementComponent->Init(0);
+			lv_collisionComponent->Init(0, 0, 0, true, lv_entityAnimationComp.get());
+			lv_entityAnimationComp->Init(0, lv_spaceshipAnimMeta, lv_movementComponent.get()
+										,lv_activeComponent.get(), 0, 0, true);
+			lv_activeComponent->Init(0, lv_collisionComponent.get(), lv_entityAnimationComp.get(),
+				1, 1);
+			auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ (float)lv_windowRes.x/2.f, (float)lv_windowRes.y/2.f }, 0, EntityType::PLAYER, true)));
+
+			lv_player.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
+			lv_player.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
+			lv_player.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityAnimationComp));
+			lv_player.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
 			
 			m_playerEntityHandle = 0U;
 			
@@ -374,20 +446,26 @@ namespace Asteroid
 			for (uint32_t i = 0U; i < lv_totalNumBullets; ++i) {
 
 				const uint32_t lv_bulletIdx = 1U + i;
-				auto& lv_bullet = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_bulletIdx, EntityType::BULLET)));
+
+				auto lv_collisionComponent = std::make_unique<BulletCollisionComponent>();
+				auto lv_movementComponent = std::make_unique<RayMovementComponent>();
+				auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
+				auto lv_entityMainAnimation = std::make_unique<IndefiniteRepeatableAnimationComponent>();
+
+				lv_collisionComponent->Init(lv_bulletIdx,0, 0, true
+											, lv_entityMainAnimation.get(), lv_activeComponent.get());
+				lv_movementComponent->Init(lv_bulletIdx);
+				lv_activeComponent->Init(lv_bulletIdx, lv_collisionComponent.get(), lv_entityMainAnimation.get(), 0, 0);
+				lv_entityMainAnimation->Init(lv_bulletIdx, lv_bulletAnimMetaData, lv_movementComponent.get(), lv_activeComponent.get(), 0, 0, true);
+
+				auto& lv_bullet = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_bulletIdx, EntityType::BULLET, false)));
 			
 
-				lv_bullet.AddComponent(ComponentTypes::COLLISION,
-					std::make_unique<BulletCollisionComponent>(lv_bulletIdx));
-				lv_bullet.AddComponent(ComponentTypes::ACTIVE_BASED_STATE,
-					std::make_unique<ActiveBasedStateComponent>(lv_bulletIdx, 1U, false, (CollisionComponent*)lv_bullet.GetComponent(ComponentTypes::COLLISION), nullptr));
-				lv_bullet.AddComponent(ComponentTypes::COLLISION_BASED_STATE,
-					std::make_unique<CollisionBasedStateComponent>(lv_bulletIdx, 1));
-				lv_bullet.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<RayMovementComponent>(lv_bulletIdx));
-				lv_bullet.AddComponent(ComponentTypes::GRAPHICS,
-					std::make_unique<GraphicsComponent>(lv_bulletIdx, lv_bulletAnimMetaData));
-				lv_bullet.AddComponent(ComponentTypes::VISIBILITY_BASED_STATE,
-					std::make_unique<VisibilityBasedStateComponent>(lv_bulletIdx, lv_bulletAnimMetaData));
+				lv_bullet.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
+				lv_bullet.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
+				lv_bullet.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
+				lv_bullet.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityMainAnimation));
+				
 
 				
 				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_bullet.GetCurrentPos()}, .m_radius{lv_bulletAnimMetaData->m_widthToRenderTextures/2.f} });
@@ -402,30 +480,42 @@ namespace Asteroid
 			constexpr uint32_t lv_totalNumAsteroids{ 128U };
 			const auto* lv_asteroidAnimMeta = GetAnimationMeta(AnimationType::ASTEROID);
 			const auto* lv_explosionAsteroidAnimMeta = GetAnimationMeta(AnimationType::EXPLOSION_FIRE_ASTEROID);
+			const auto* lv_warpAsteroidAnimMeta = GetAnimationMeta(AnimationType::WARP_ASTEROID);
 			assert(nullptr != lv_asteroidAnimMeta);
+			assert(nullptr != lv_warpAsteroidAnimMeta);
 			const uint32_t lv_entitiesLastIndex = (uint32_t)m_entities.size();
 			m_entitySpawnerFromPools.InitPool(Asteroid::EntityType::ASTEROID, lv_entitiesLastIndex, lv_totalNumAsteroids);
 
 			for (uint32_t i = 0U; i < lv_totalNumAsteroids; ++i) {
 
 				const uint32_t lv_asteroidIdx = lv_entitiesLastIndex + i;
-				auto& lv_asteroid = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_asteroidIdx,  EntityType::ASTEROID)));
 
-				lv_asteroid.AddComponent(ComponentTypes::COLLISION_BASED_STATE,
-					std::make_unique<CollisionBasedStateComponent>(lv_asteroidIdx, lv_explosionAsteroidAnimMeta->m_totalNumFrames / 3));
-				lv_asteroid.AddComponent(ComponentTypes::COLLISION,
-					std::make_unique<AsteroidCollisionComponent>(lv_asteroidIdx));
-				lv_asteroid.AddComponent(ComponentTypes::ACTIVE_BASED_STATE,
-					std::make_unique<ActiveBasedStateComponent>(lv_asteroidIdx, lv_explosionAsteroidAnimMeta->m_totalNumFrames, false
-					,(CollisionComponent*)lv_asteroid.GetComponent(ComponentTypes::COLLISION), (CollisionBasedStateComponent*)lv_asteroid.GetComponent(ComponentTypes::COLLISION_BASED_STATE)));
-				lv_asteroid.AddComponent(ComponentTypes::MOVEMENT, std::make_unique<RayMovementComponent>(lv_asteroidIdx));
-				lv_asteroid.AddComponent(ComponentTypes::GRAPHICS,
-					std::make_unique<GraphicsComponent>(lv_asteroidIdx, lv_asteroidAnimMeta));
-				lv_asteroid.AddComponent(ComponentTypes::VISIBILITY_BASED_STATE,
-					std::make_unique<VisibilityBasedStateComponent>(lv_asteroidIdx, lv_asteroidAnimMeta));
-				lv_asteroid.AddComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION,
-					std::make_unique<AnimationComponent>(lv_asteroidIdx, lv_explosionAsteroidAnimMeta));
-				
+				auto lv_collisionComponent = std::make_unique<AsteroidCollisionComponent>();
+				auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
+				auto lv_movementComponent = std::make_unique<RayMovementComponent>();
+				auto lv_entityMainAnimation = std::make_unique<IndefiniteRepeatableAnimationComponent>();
+				auto lv_fireExplosionAnimationComponent = std::make_unique<OnceRepeatableAnimationComponent>();
+				auto lv_warpAsteroidAnimComponent = std::make_unique<OnceRepeatableAnimationComponent>();
+
+				lv_collisionComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta->m_totalNumFrames + 20U, lv_explosionAsteroidAnimMeta->m_totalNumFrames / 3
+					, true, lv_entityMainAnimation.get(), lv_fireExplosionAnimationComponent.get()
+					, lv_activeComponent.get());
+				lv_activeComponent->Init(lv_asteroidIdx, lv_collisionComponent.get(), lv_entityMainAnimation.get()
+										, 1, lv_explosionAsteroidAnimMeta->m_totalNumFrames);
+				lv_movementComponent->Init(lv_asteroidIdx);
+				lv_entityMainAnimation->Init(lv_asteroidIdx, lv_asteroidAnimMeta, lv_movementComponent.get()
+											, lv_activeComponent.get(), lv_warpAsteroidAnimMeta->m_totalNumFrames - 20U, 0, true);
+				lv_fireExplosionAnimationComponent->Init(lv_asteroidIdx, lv_explosionAsteroidAnimMeta , lv_movementComponent.get());
+				lv_warpAsteroidAnimComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta, lv_movementComponent.get(), false);
+
+				auto& lv_asteroid = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_asteroidIdx,  EntityType::ASTEROID, false)));
+
+				lv_asteroid.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
+				lv_asteroid.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
+				lv_asteroid.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
+				lv_asteroid.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityMainAnimation));
+				lv_asteroid.AddComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION, std::move(lv_fireExplosionAnimationComponent));
+				lv_asteroid.AddComponent(ComponentTypes::WARP_ASTEROID_ANIMATION, std::move(lv_warpAsteroidAnimComponent));
 				
 				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_asteroid.GetCurrentPos()}, .m_radius{lv_asteroidAnimMeta->m_widthToRenderTextures/2.f} });
 
@@ -437,8 +527,7 @@ namespace Asteroid
 	void Engine::UpdateCircleBounds()
 	{
 		for (size_t i = 0; i < m_entities.size(); ++i) {
-			ActiveBasedStateComponent* lv_activeComp = (ActiveBasedStateComponent*)m_entities[i].GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
-			if (true == lv_activeComp->IsActive()) {
+			if (true == m_entities[i].GetActiveState()) {
 				m_circleBoundsEntities[i].m_center = m_entities[i].GetCurrentPos();
 			}
 		}
@@ -456,6 +545,13 @@ namespace Asteroid
 		}
 
 	}
+
+
+	CallbacksTimer& Engine::GetCallbacksTimer()
+	{
+		return m_callbacksTimer;
+	}
+
 
 	const AnimationMetaData* Engine::GetAnimationMeta(const AnimationType l_type) const
 	{

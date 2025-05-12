@@ -5,7 +5,7 @@
 
 
 #include "Components/StateComponents/ActiveBasedStateComponent.hpp"
-#include "Components/StateComponents/CollisionBasedStateComponent.hpp"
+#include "Components/IndefiniteRepeatableAnimationComponent.hpp"
 #include "Components/CollisionComponent.hpp"
 #include "Components/UpdateComponents.hpp"
 #include "Engine.hpp"
@@ -15,74 +15,64 @@
 namespace Asteroid
 {
 
-	ActiveBasedStateComponent::ActiveBasedStateComponent(EntityHandle l_ownerEntityHandle, const uint32_t l_maxNumFrames, const bool l_isActive
-		,CollisionComponent* l_collisionComponent
-		,CollisionBasedStateComponent* l_collisionStateComp)
-		:StateComponent(l_ownerEntityHandle), m_maxNumFrames(l_maxNumFrames)
-		,m_isActive(l_isActive)
-		,m_collisionComponent(l_collisionComponent)
-		,m_collisionStateComponent(l_collisionStateComp)
+	ActiveBasedStateComponent::ActiveBasedStateComponent()
 	{
 
+	}
+
+
+	void ActiveBasedStateComponent::Init(EntityHandle l_ownerEntityHandle
+		, CollisionComponent* l_collisionComponent
+		, IndefiniteRepeatableAnimationComponent* l_repeatableAnimComponent
+		, const uint32_t l_frameCountToActivate
+		, const uint32_t l_frameCountToDeactivate)
+	{
+		StateComponent::Init(l_ownerEntityHandle);
+
+		m_collisionComponent = l_collisionComponent;
+		m_repeatableAnimationComponent = l_repeatableAnimComponent;
+		m_frameCountToActivate = l_frameCountToActivate;
+		m_frameCountToDeactivate = l_frameCountToDeactivate;
+	}
+
+
+
+	uint32_t ActiveBasedStateComponent::GetframeCountToActivate() const
+	{
+		return m_frameCountToActivate;
+	}
+
+	uint32_t ActiveBasedStateComponent::GetframeCountToDeactivate() const
+	{
+		return m_frameCountToDeactivate;
 	}
 
 
 	bool ActiveBasedStateComponent::Update(UpdateComponents& l_updateContext)
 	{
 		using namespace LogSystem;
+		
+		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
-		if (true == m_startFrameCount) {
-			
-			LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "Frame count down has started for entity with index %u", m_ownerEntityHandle);
-
-			if (m_maxNumFrames == m_frameCount) {
-
-				m_startFrameCount = false;
-				m_frameCount = 0U;
-
-
-				m_isActive = false;
-
-				LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "Entity with index %u is inactivated", m_ownerEntityHandle);
-
-				return true;
+		if (false == m_repeatableAnimationComponent->IsInWindowBounds() && false == m_delayedActivateCallbackAlreadySet && true == lv_ownerEntity.GetActiveState()) {
+			if (EntityType::PLAYER != lv_ownerEntity.GetType()) {
+				LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "Active component is setting active state to false due to pos: (%f, %f)", lv_ownerEntity.GetCurrentPos().x, lv_ownerEntity.GetCurrentPos().y);
+				lv_ownerEntity.SetActiveState(false);
 			}
-
-			m_frameCount += 1U;
-			LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "Frame count %u", m_frameCount);
-
 		}
 
 		return true;
 	}
 
-	bool ActiveBasedStateComponent::HasStartedFrameCount() const
+	void ActiveBasedStateComponent::SetDelayedActivationCallbackFlag(const bool l_newValue)
 	{
-		return m_startFrameCount;
-	}
-
-	void ActiveBasedStateComponent::StartCount()
-	{
-		m_startFrameCount = true;
-	}
-
-	bool ActiveBasedStateComponent::IsActive() const
-	{
-		return m_isActive;
+		m_delayedActivateCallbackAlreadySet = l_newValue;
 	}
 
 
-	void ActiveBasedStateComponent::SetActiveState(const bool l_state)
+	void ActiveBasedStateComponent::Reset()
 	{
-		m_isActive = l_state;
-
-		if (nullptr != m_collisionComponent) {
-			m_collisionComponent->ResetCollision();
-		}
-
-
-		if (nullptr != m_collisionStateComponent) {
-			m_collisionStateComponent->ResetCollisionState();
-		}
+		m_delayedActivateCallbackAlreadySet = false;
 	}
+
 }

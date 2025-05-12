@@ -21,7 +21,7 @@ namespace Asteroid
 	{
 	public:
 
-		Entity(const glm::vec2& l_initialPos, uint32_t l_id, const EntityType l_type);
+		Entity(const glm::vec2& l_initialPos, uint32_t l_id, const EntityType l_type, const bool l_isActive);
 
 		Entity(Entity&&) = default;
 			
@@ -42,11 +42,16 @@ namespace Asteroid
 
 		uint32_t GetID() const;
 
+		void SetActiveState(const bool l_activeState);
+
+		bool GetActiveState() const;
+
 	protected:
 
 		glm::vec2 m_currentPos;
 		uint32_t m_id;
 		EntityType m_type;
+		bool m_isActive;
 
 
 		std::vector<std::pair<ComponentTypes ,std::unique_ptr<Component>>> m_components;

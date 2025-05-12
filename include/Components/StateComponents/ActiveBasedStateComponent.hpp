@@ -6,41 +6,45 @@
 
 
 #include "Components/StateComponent.hpp"
-
+#include "Components/IndefiniteRepeatableAnimationComponent.hpp"
 
 
 namespace Asteroid
 {
 
 	class CollisionComponent;
-	class CollisionBasedStateComponent;
+	class IndefiniteRepeatableAnimationComponent;
 
 	class ActiveBasedStateComponent : public StateComponent
 	{
 	public:
 
-		ActiveBasedStateComponent(EntityHandle l_ownerEntityHandle, const uint32_t l_maxNumFrames, const bool l_isActive
-								,CollisionComponent* l_collisionComponent, CollisionBasedStateComponent* l_collisionStateComp);
+		ActiveBasedStateComponent();
 
 		bool Update(UpdateComponents& l_updateContext) override;
 
-		bool HasStartedFrameCount() const;
 
-		void StartCount();
+		void Init(EntityHandle l_ownerEntityHandle
+			, CollisionComponent* l_collisionComponent
+			, IndefiniteRepeatableAnimationComponent* l_repeatableAnimComponent
+			, const uint32_t l_frameCountToActivate
+			, const uint32_t l_frameCountToDeactivate);
 
-		bool IsActive() const;
+		uint32_t GetframeCountToActivate() const;
+		uint32_t GetframeCountToDeactivate() const;
 
-		void SetActiveState(const bool l_state);
+		void SetDelayedActivationCallbackFlag(const bool l_newValue);
+
+		void Reset();
 
 	private:
 
-		bool m_startFrameCount{ false };
-		uint32_t m_frameCount{};
-		uint32_t m_maxNumFrames{};
-		bool m_isActive{ false };
-
 		CollisionComponent* m_collisionComponent{};
-		CollisionBasedStateComponent* m_collisionStateComponent{};
+		IndefiniteRepeatableAnimationComponent* m_repeatableAnimationComponent{};
+		uint32_t m_frameCountToActivate;
+		uint32_t m_frameCountToDeactivate;
+		bool m_delayedActivateCallbackAlreadySet{ false };
+
 	};
 
 }
