@@ -33,6 +33,8 @@ namespace Asteroid
 
 		const AnimationMetaData* GetAnimationMetaData() const;
 
+		void Reset();
+
 	private:
 
 		const AnimationMetaData* m_animationMetaData;

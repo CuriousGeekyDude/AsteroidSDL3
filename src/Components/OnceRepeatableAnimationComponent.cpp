@@ -38,6 +38,11 @@ namespace Asteroid
 	}
 
 
+	void OnceRepeatableAnimationComponent::Reset()
+	{
+		m_startAnimation = false;
+		m_currentOffset = 0U;
+	}
 
 	bool OnceRepeatableAnimationComponent::Update(UpdateComponents& l_updateContext)
 	{
