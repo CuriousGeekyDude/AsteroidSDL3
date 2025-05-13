@@ -10,6 +10,7 @@
 #include "Components/CollisionComponents/AsteroidCollisionComponent.hpp"
 #include "Components/CollisionComponents/BulletCollisionComponent.hpp"
 #include "Components/AttributeComponents/AsteroidAttributeComponent.hpp"
+#include "Components/AttributeComponents/PlayerAttributeComponent.hpp"
 #include "Systems/Colors.hpp"
 #include "Systems/RenderingData.hpp"
 #include "Components/UpdateComponents.hpp"
@@ -151,6 +152,7 @@ namespace Asteroid
 		constexpr float lv_totalSecondsSecondLevel = 10.f; //120
 		constexpr uint32_t lv_minAsteroidsToHitToGoToSecondLevel = 1U; //35
 		constexpr uint32_t lv_minAsteroidsToHitToWinInSecondLevel = 1U;
+		bool lv_isPlayerAlive = true;
 
 		while (false == lv_quit) {
 
@@ -197,8 +199,13 @@ namespace Asteroid
 
 			m_callbacksTimer.Update();
 
-			if ((m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel && 1U == m_currentLevel) 
-				|| (m_timeSinceStartInSeconds <= lv_totalSecondsSecondLevel && 2U == m_currentLevel)) {
+
+
+			auto* lv_playerAttribComp = (PlayerAttributeComponent*)m_entities[m_playerEntityHandle].GetComponent(ComponentTypes::ATTRIBUTE);
+			lv_isPlayerAlive = 0U == lv_playerAttribComp->GetHp() ? false : true;
+
+			if (((m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel && 1U == m_currentLevel) 
+				|| (m_timeSinceStartInSeconds <= lv_totalSecondsSecondLevel && 2U == m_currentLevel)) && true == lv_isPlayerAlive) {
 
 				m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
 				m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
@@ -209,6 +216,10 @@ namespace Asteroid
 						assert(l_entity.Update(lv_updateComponent));
 					}
 				}
+
+				
+
+
 				m_entitySpawnerFromPools.UpdatePools();
 				UpdateCircleBounds();
 
@@ -242,6 +253,8 @@ namespace Asteroid
 
 					ImGui::Text("Total num of asteroids hit by bullets since the start: %u", lv_updateComponent.m_totalNumAsteroidsHitByBullets);
 					ImGui::Text("Seconds: %f", m_timeSinceStartInSeconds);
+					ImGui::Text("Player health: %u", lv_playerAttribComp->GetHp());
+
 					ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 					ImGui::End();
 				}
@@ -263,7 +276,7 @@ namespace Asteroid
 
 					ImGui::Begin("Game status");
 
-					if (lv_minAsteroidsToHitToGoToSecondLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets) {
+					if (lv_minAsteroidsToHitToGoToSecondLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets && true == lv_isPlayerAlive) {
 
 						static bool lv_enteredThisLoop{ false };
 
@@ -304,7 +317,12 @@ namespace Asteroid
 						static bool lv_repeat{ false };
 						static bool lv_exit{ false };
 
-						ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
+						if (false == lv_isPlayerAlive) {
+							ImGui::Text("You died. Would you like to repeat this level or exit?");
+						}
+						else {
+							ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
+						}
 						if (true == ImGui::Button("Repeat")) {
 							lv_repeat = true;
 						}
@@ -323,7 +341,8 @@ namespace Asteroid
 							m_entitySpawnerFromPools.ResetPools();
 							m_timeSinceStartInSeconds = 0.f;
 							lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
-
+							lv_isPlayerAlive = true;
+							lv_playerAttribComp->ResetHealth();
 
 
 							lv_repeat = false;
@@ -343,7 +362,7 @@ namespace Asteroid
 					
 					ImGui::Begin("Game status");
 
-					if (lv_minAsteroidsToHitToWinInSecondLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets) {
+					if (lv_minAsteroidsToHitToWinInSecondLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets && true == lv_isPlayerAlive) {
 
 						ImGui::Text("You won the game congrats!");
 						
@@ -375,6 +394,8 @@ namespace Asteroid
 							m_entitySpawnerFromPools.ResetPools();
 							m_timeSinceStartInSeconds = 0.f;
 							lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+							lv_isPlayerAlive = true;
+							lv_playerAttribComp->ResetHealth();
 
 							m_currentLevel = 1U;
 
@@ -407,7 +428,10 @@ namespace Asteroid
 						static bool lv_repeat2{ false };
 						static bool lv_exit2{ false };
 
-						ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
+						if (false == lv_isPlayerAlive) {
+							ImGui::Text("You died! Would you like to repeat this level or exit?");
+						}
+						ImGui::Text("Failed to clear this level! Would you like to repeat this level or exit?");
 						if (true == ImGui::Button("Repeat")) {
 							lv_repeat2 = true;
 							m_currentLevel = 2U;
@@ -426,6 +450,8 @@ namespace Asteroid
 							m_entitySpawnerFromPools.ResetPools();
 							m_timeSinceStartInSeconds = 0.f;
 							lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+							lv_isPlayerAlive = true;
+							lv_playerAttribComp->ResetHealth();
 
 
 							lv_repeat2 = false;
@@ -557,19 +583,22 @@ namespace Asteroid
 			auto lv_collisionComponent = std::make_unique<PlayerCollisionComponent>();
 			auto lv_entityAnimationComp = std::make_unique<IndefiniteRepeatableAnimationComponent>();
 			auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
+			auto lv_playerAttribComponent = std::make_unique<PlayerAttributeComponent>();
 
 			lv_movementComponent->Init(0);
-			lv_collisionComponent->Init(0, 0, 0, true, lv_entityAnimationComp.get());
+			lv_collisionComponent->Init(0, 0, 0, true, lv_entityAnimationComp.get(), lv_playerAttribComponent.get());
 			lv_entityAnimationComp->Init(0, lv_spaceshipAnimMeta, lv_movementComponent.get()
 										,lv_activeComponent.get(), 0, 0, true);
 			lv_activeComponent->Init(0, lv_collisionComponent.get(), lv_entityAnimationComp.get(),
 				1, 1);
+			lv_playerAttribComponent->Init(0, 10U);
 			auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ (float)lv_windowRes.x/2.f, (float)lv_windowRes.y/2.f }, 0, EntityType::PLAYER, true)));
 
 			lv_player.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
 			lv_player.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
 			lv_player.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityAnimationComp));
 			lv_player.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
+			lv_player.AddComponent(ComponentTypes::ATTRIBUTE, std::move(lv_playerAttribComponent));
 			
 			m_playerEntityHandle = 0U;
 			

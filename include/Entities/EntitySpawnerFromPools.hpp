@@ -41,7 +41,7 @@ namespace Asteroid
 		Engine* m_engine;
 		EntityPool m_bulletsPool;
 
-		static constexpr uint32_t m_asteroidMinNumInScene{20U};
+		static constexpr uint32_t m_asteroidMinNumInScene{5U};
 		std::array<uint32_t, m_asteroidMinNumInScene> m_randomIndexCellNumbers{};
 		std::array<float, m_asteroidMinNumInScene> m_randomDirectionsForAsteroids{};
 		EntityPool m_asteroidPool;

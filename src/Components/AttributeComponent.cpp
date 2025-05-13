@@ -20,8 +20,13 @@ namespace Asteroid
 	{
 		Component::Init(l_ownerEntityHandle);
 
-
+		m_initialHp = l_hp;
 		m_hp = l_hp;
 	}
 
+
+	uint32_t AttributeComponent::GetHp() const
+	{
+		return m_hp;
+	}
 }

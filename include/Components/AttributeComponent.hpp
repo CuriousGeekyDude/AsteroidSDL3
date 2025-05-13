@@ -24,9 +24,12 @@ namespace Asteroid
 
 		virtual ~AttributeComponent() = default;
 
-	private:
+		uint32_t GetHp() const;
+
+	protected:
 
 		uint32_t m_hp{};
+		uint32_t m_initialHp{};
 
 	};
 
