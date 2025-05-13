@@ -24,6 +24,9 @@ namespace Asteroid
 
 	bool PlayerAttributeComponent::Update(UpdateComponents& l_updateContext)
 	{
+
+
+
 		return true;
 	}
 
