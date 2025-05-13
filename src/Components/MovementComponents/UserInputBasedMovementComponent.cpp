@@ -27,7 +27,7 @@ namespace Asteroid
 		glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
 		bool lv_keyIsPressed = false;
 		float lv_d = (1 - std::expf(-l_updateContext.m_deltaTime * 0.16f));
-		float lv_damper{ 0.064f };
+		float lv_damper{ 0.065f };
 		
 		float lv_tempSpeed{ lv_damper * lv_d * l_updateContext.m_deltaTime };
 
