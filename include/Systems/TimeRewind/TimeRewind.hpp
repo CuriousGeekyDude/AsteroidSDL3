@@ -16,6 +16,8 @@ namespace Asteroid
 
 	class Entity;
 	class InputSystem;
+	struct DelayedSetStateCallback;
+	class CallbacksTimer;
 
 	class TimeRewind final
 	{
@@ -24,10 +26,10 @@ namespace Asteroid
 		TimeRewind();
 
 
-		void Update(const std::vector<Entity>& l_entities, const InputSystem& l_inputSystem ,const float l_time, const uint32_t l_totalNumBulletsHitAsteroid);
+		void Update(const std::vector<Entity>& l_entities, const InputSystem& l_inputSystem ,const float l_time, const uint32_t l_totalNumBulletsHitAsteroid, const std::vector<DelayedSetStateCallback>& l_delayedCallbacks);
 
 
-		void RewindTimeByOneFrame(std::vector<Entity>& l_entities, InputSystem& l_inputSystem,float& l_time, uint32_t& l_totalNumBulletsHitAsteroid);
+		void RewindTimeByOneFrame(std::vector<Entity>& l_entities, InputSystem& l_inputSystem,float& l_time, uint32_t& l_totalNumBulletsHitAsteroid, CallbacksTimer& l_callbackTimer);
 
 
 		void Flush();

@@ -16,6 +16,7 @@
 #include "Components/MovementComponents/UserInputBasedMovementComponent.hpp"
 #include "Components/OnceRepeatableAnimationComponent.hpp"
 #include "Systems/InputSystem.hpp"
+#include "Systems/CallbacksTimer.hpp"
 
 
 
@@ -27,18 +28,18 @@ namespace Asteroid
 		,m_endIndex(m_startIndex)
 	{
 		m_pastFrame.resize(m_totalNumPastFramesToRecord);
-
+		
 
 		for (auto& l_frame : m_pastFrame) {
 			
 			l_frame.m_allEntitysMetaDataInThisFrame[0].m_collisionMetaData.m_alreadyRegisteredCollisionEntityIDs.reserve(128U);
-
+			l_frame.m_delayedCallbacks.reserve(1024U);
 		}
 
 	}
 
 
-	void TimeRewind::Update(const std::vector<Entity>& l_entities, const InputSystem& l_inputSystem,const float l_time, const uint32_t l_totalNumBulletsHitAsteroid)
+	void TimeRewind::Update(const std::vector<Entity>& l_entities, const InputSystem& l_inputSystem,const float l_time, const uint32_t l_totalNumBulletsHitAsteroid, const std::vector<DelayedSetStateCallback>& l_delayedCallbacks)
 	{
 		auto& lv_frame = m_pastFrame[m_endIndex];
 		lv_frame.m_time = l_time;
@@ -46,6 +47,7 @@ namespace Asteroid
 
 		lv_frame.m_mousePos = l_inputSystem.GetMousePosRelativeToWindow();
 		lv_frame.m_isMouseHidden = l_inputSystem.IsMouseHidden();
+		lv_frame.m_delayedCallbacks = l_delayedCallbacks;
 
 		for (size_t i = 0; i < l_entities.size(); ++i) {
 
@@ -176,7 +178,7 @@ namespace Asteroid
 	}
 
 
-	void TimeRewind::RewindTimeByOneFrame(std::vector<Entity>& l_entities, InputSystem& l_inputSystem,float& l_time, uint32_t& l_totalNumBulletsHitAsteroid)
+	void TimeRewind::RewindTimeByOneFrame(std::vector<Entity>& l_entities, InputSystem& l_inputSystem,float& l_time, uint32_t& l_totalNumBulletsHitAsteroid, CallbacksTimer& l_callbackTimer)
 	{
 		uint32_t lv_index{};
 
@@ -198,6 +200,7 @@ namespace Asteroid
 		l_totalNumBulletsHitAsteroid = lv_frame.m_totalNumBulletsHitAsteroid;
 		l_inputSystem.SetHiddenStateOfMouse(lv_frame.m_isMouseHidden);
 		l_inputSystem.SetMousePos(lv_frame.m_mousePos);
+		l_callbackTimer.SetDelayedCallbacks(lv_frame.m_delayedCallbacks);
 
 		for (size_t i = 0; i < l_entities.size(); ++i) {
 
@@ -321,7 +324,27 @@ namespace Asteroid
 		m_startIndex = 0U;
 		m_endIndex = m_startIndex;
 		
-		memset(m_pastFrame.data(), 0, sizeof(Frame)*m_pastFrame.size());
+		for (auto& l_frame : m_pastFrame) {
+			l_frame.m_time = 0.f;
+			l_frame.m_mousePos = glm::vec2(0.f);
+			l_frame.m_totalNumBulletsHitAsteroid = 0U;
+			l_frame.m_isMouseHidden = false;
+			
+			for (auto& l_entityData : l_frame.m_allEntitysMetaDataInThisFrame) {
+				l_entityData.m_activeMetaData.m_delayedActivateCallbackAlreadySet = false;
+				l_entityData.m_attribMetaData.m_asteroidStates = AsteroidStates::AGGRESIVE;
+				l_entityData.m_attribMetaData.m_hp = 10;
+				l_entityData.m_collisionMetaData.m_alreadyRegisteredCollisionEntityIDs.clear();
+				l_entityData.m_collisionMetaData.m_firstCollision = true;
+				l_entityData.m_collisionMetaData.m_hitBullet = 0U;
+				l_entityData.m_collisionMetaData.m_isCollisionActive = true;
+				l_entityData.m_collisionMetaData.m_resetCollision = true;
+				
+				memset(&l_entityData.m_indefRepAnimMetaData, 0, sizeof(l_entityData.m_indefRepAnimMetaData));
+				memset(&l_entityData.m_movementMetaData, 0, sizeof(l_entityData.m_movementMetaData));
+				memset(l_entityData.m_onceRepAnimMetaData.data(), 0, sizeof(OnceRepeatAnimationMetaData)*l_entityData.m_onceRepAnimMetaData.size());
+			}
+		}
 	}
 
 }

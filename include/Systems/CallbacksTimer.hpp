@@ -19,9 +19,12 @@ namespace Asteroid
 
 		void AddSetStateCallback(DelayedSetStateCallback&& l_delayedCallback);
 
-		void Update(const bool l_timeRewinded);
+		void Update();
 
 		void FlushAllCallbacks();
+
+		const std::vector<DelayedSetStateCallback>& GetDelayedCallbacks() const;
+		void SetDelayedCallbacks(const std::vector<DelayedSetStateCallback>& l_delayedCallbacks);
 
 
 	private:

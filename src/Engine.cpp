@@ -204,11 +204,11 @@ namespace Asteroid
 
 			if (true == lv_loopOverInThisLevel) {
 				if (true == m_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_T) && false == m_inputSystem.IsKeyUp(InputSystem::Keys::KEY_T)) {
-					m_timeRewind.RewindTimeByOneFrame(m_entities, m_inputSystem,m_timeSinceStartInSeconds, lv_updateComponent.m_totalNumAsteroidsHitByBullets);
+					m_timeRewind.RewindTimeByOneFrame(m_entities, m_inputSystem,m_timeSinceStartInSeconds, lv_updateComponent.m_totalNumAsteroidsHitByBullets, m_callbacksTimer);
 					lv_timeRewinded = true;
 				}
 				else {
-					m_timeRewind.Update(m_entities, m_inputSystem,m_timeSinceStartInSeconds, lv_updateComponent.m_totalNumAsteroidsHitByBullets);
+					m_timeRewind.Update(m_entities, m_inputSystem,m_timeSinceStartInSeconds, lv_updateComponent.m_totalNumAsteroidsHitByBullets, m_callbacksTimer.GetDelayedCallbacks());
 					lv_timeRewinded = false;
 				}
 			}
@@ -216,7 +216,7 @@ namespace Asteroid
 				lv_timeRewinded = false;
 			}
 			
-			m_callbacksTimer.Update(lv_timeRewinded);
+			m_callbacksTimer.Update();
 
 			auto* lv_playerAttribComp = (PlayerAttributeComponent*)m_entities[m_playerEntityHandle].GetComponent(ComponentTypes::ATTRIBUTE);
 			lv_isPlayerAlive = (0U == lv_playerAttribComp->GetHp()) ? false : true;

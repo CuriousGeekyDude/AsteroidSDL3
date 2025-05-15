@@ -250,7 +250,7 @@ namespace Asteroid
 
 
 		const auto& lv_inputSystem = m_engine->GetInputSystem();
-		if (true == lv_inputSystem.IsNoRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_F) && true == lv_inputSystem.IsMouseHidden()) {
+		if ((true == lv_inputSystem.IsNoRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_F)) && true == lv_inputSystem.IsMouseHidden()) {
 
 			return true;
 		}

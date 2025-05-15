@@ -21,14 +21,13 @@ namespace Asteroid
 		m_delayedSetStateCallbacks.emplace_back(std::move(l_delayedCallback));
 	}
 
-	void CallbacksTimer::Update(const bool l_timeRewinded)
+	void CallbacksTimer::Update()
 	{
 
 		using namespace LogSystem;
 
 		LOG(Severity::FAILURE, Channel::MEMORY, "Callback timer vector size is %u", (uint32_t)m_delayedSetStateCallbacks.size());
 
-		if (false == l_timeRewinded) {
 			for (size_t i = 0U; i < m_delayedSetStateCallbacks.size(); ++i) {
 
 				if (m_delayedSetStateCallbacks[i].m_maxNumFrames == m_delayedSetStateCallbacks[i].m_currentFrame) {
@@ -44,14 +43,11 @@ namespace Asteroid
 				}
 
 			}
-		}
-		else {
+		
+		/*else {
 			for (size_t i = 0U; i < m_delayedSetStateCallbacks.size(); ++i) {
 
-				if (m_delayedSetStateCallbacks[i].m_maxNumFrames == m_delayedSetStateCallbacks[i].m_currentFrame) {
-					--m_delayedSetStateCallbacks[i].m_currentFrame;
-				}
-				else if (m_delayedSetStateCallbacks[i].m_currentFrame < m_delayedSetStateCallbacks[i].m_maxNumFrames) {
+				if ((m_delayedSetStateCallbacks[i].m_maxNumFrames + 1) >= m_delayedSetStateCallbacks[i].m_currentFrame) {
 					--m_delayedSetStateCallbacks[i].m_currentFrame;
 				}
 				else {
@@ -60,9 +56,19 @@ namespace Asteroid
 				}
 
 			}
-		}
+		}*/
 
 
+	}
+
+
+	const std::vector<DelayedSetStateCallback>& CallbacksTimer::GetDelayedCallbacks() const
+	{
+		return m_delayedSetStateCallbacks;
+	}
+	void CallbacksTimer::SetDelayedCallbacks(const std::vector<DelayedSetStateCallback>& l_delayedCallbacks)
+	{
+		m_delayedSetStateCallbacks = l_delayedCallbacks;
 	}
 
 	void CallbacksTimer::FlushAllCallbacks()
