@@ -38,6 +38,12 @@ namespace Asteroid
 
 		bool GetCollisionState() const;
 
+		bool IsCollisionReset() const;
+		bool IsFirstCollision() const;
+
+		void SetCollisionResetFlag(const bool l_resetCollision);
+		void SetCollisionFirstFlag(const bool l_collisionFirst);
+
 		void Reset();
 
 		uint32_t GetFrameCountToActivateCollision() const;

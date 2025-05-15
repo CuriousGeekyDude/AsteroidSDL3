@@ -53,4 +53,11 @@ namespace Asteroid
 		m_rayMovement = l_rayMovement;
 	}
 
+
+
+	AsteroidStates AsteroidAttributeComponent::GetState() const
+	{
+		return m_state;
+	}
+
 }

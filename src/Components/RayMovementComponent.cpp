@@ -42,14 +42,25 @@ namespace Asteroid
 			const auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();
 
 			const glm::vec2 lv_newPos = lv_currentPos + (m_speed.x * l_updateContext.m_deltaTime)*m_rayDirection;
-			m_transform[2][0] = lv_newPos.x;
-			m_transform[2][1] = lv_newPos.y;
 
 			lv_ownerEntity.SetCurrentPos(lv_newPos);
 
 		}
 
 		return true;
+	}
+
+	const glm::vec2& RayMovementComponent::GetInitialPos() const
+	{
+		return m_initialPos;
+	}
+	const glm::vec2& RayMovementComponent::GetRayDirection() const
+	{
+		return m_rayDirection;
+	}
+	float RayMovementComponent::GetInitalT() const
+	{
+		return m_initialT;
 	}
 
 }

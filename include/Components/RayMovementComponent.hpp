@@ -26,6 +26,10 @@ namespace Asteroid
 		void Init(EntityHandle l_ownerEntityHandle);
 
 
+		const glm::vec2& GetInitialPos() const;
+		const glm::vec2& GetRayDirection() const;
+		float GetInitalT() const;
+
 	private:
 		glm::vec2 m_initialPos{};
 		glm::vec2 m_rayDirection{};

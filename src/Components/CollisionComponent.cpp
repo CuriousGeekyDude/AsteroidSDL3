@@ -30,6 +30,15 @@ namespace Asteroid
 	}
 
 
+	bool CollisionComponent::IsCollisionReset() const
+	{
+		return m_resetCollision;
+	}
+	bool CollisionComponent::IsFirstCollision() const
+	{
+		return m_firstCollision;
+	}
+
 	void CollisionComponent::Init(EntityHandle l_ownerEntityHandle
 		, const uint32_t l_frameCountToActivateCollision
 		, const uint32_t l_frameCountToDeactivateCollision
@@ -51,6 +60,17 @@ namespace Asteroid
 	bool CollisionComponent::GetCollisionState() const
 	{
 		return m_isCollisionActive;
+	}
+
+
+
+	void CollisionComponent::SetCollisionResetFlag(const bool l_resetCollision)
+	{
+		m_resetCollision = l_resetCollision;
+	}
+	void CollisionComponent::SetCollisionFirstFlag(const bool l_collisionFirst)
+	{
+		m_firstCollision = l_collisionFirst;
 	}
 
 

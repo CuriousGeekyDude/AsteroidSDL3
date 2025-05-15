@@ -66,7 +66,6 @@ namespace Asteroid
 
 		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
-		m_transform = lv_deltaTransform * m_transform;
 		auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();
 		auto lv_newPos3 = lv_deltaTransform * glm::vec3{ lv_currentPos, 1.f };
 		lv_ownerEntity.SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });

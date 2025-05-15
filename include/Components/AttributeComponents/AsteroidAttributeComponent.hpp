@@ -28,6 +28,10 @@ namespace Asteroid
 
 		bool Update(UpdateComponents& l_updateContext) override;
 
+		AsteroidStates GetState() const;
+
+
+
 	private:
 
 		AsteroidStates m_state{};

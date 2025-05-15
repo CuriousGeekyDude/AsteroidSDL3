@@ -22,7 +22,7 @@ namespace Asteroid
 		EntitySpawnerFromPools(Engine* l_engine);
 
 		void InitPool(const EntityType l_type, const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities);
-		void SpawnNewEntitiesIfConditionsMet(const uint32_t l_level);
+		void SpawnNewEntitiesIfConditionsMet(const uint32_t l_level, const bool l_timeRewinded);
 
 		void UpdatePools();
 
@@ -30,8 +30,8 @@ namespace Asteroid
 
 	private:
 
-		bool BulletSpawnConditionMet();
-		bool AsteroidSpawnConditionMet();
+		bool BulletSpawnConditionMet(const bool l_timeRewinded);
+		bool AsteroidSpawnConditionMet(const bool l_timeRewinded);
 
 
 		void GenerateRandomIndexCellNumbers(const uint32_t l_maxNumCurrentCells);

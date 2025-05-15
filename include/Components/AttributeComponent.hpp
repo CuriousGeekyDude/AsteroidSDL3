@@ -26,6 +26,8 @@ namespace Asteroid
 
 		uint32_t GetHp() const;
 
+		void SetHP(const uint32_t l_hp);
+
 	protected:
 
 		uint32_t m_hp{};

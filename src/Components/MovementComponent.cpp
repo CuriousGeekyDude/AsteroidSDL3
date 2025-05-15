@@ -14,10 +14,6 @@ namespace Asteroid
 
 	}
 
-	const glm::mat3& MovementComponent::GetTransform() const
-	{
-		return m_transform;
-	}
 
 	const glm::vec2& MovementComponent::GetSpeed() const
 	{

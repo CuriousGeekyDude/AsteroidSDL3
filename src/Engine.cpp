@@ -154,6 +154,7 @@ namespace Asteroid
 		constexpr uint32_t lv_minAsteroidsToHitToGoToSecondLevel = 30U; //35
 		constexpr uint32_t lv_minAsteroidsToHitToWinInSecondLevel = 20U;
 		bool lv_isPlayerAlive = true;
+		bool lv_timeRewinded{ false };
 
 		while (false == lv_quit) {
 
@@ -198,21 +199,35 @@ namespace Asteroid
 
 			m_renderer.RenderEntity(lv_backgroundStarsRenderData);
 
-			m_callbacksTimer.Update();
+			bool lv_loopOverInThisLevel = ((m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel && 1U == m_currentLevel)
+				|| (m_timeSinceStartInSeconds <= lv_totalSecondsSecondLevel && 2U == m_currentLevel)) && true == lv_isPlayerAlive;
 
-
+			if (true == lv_loopOverInThisLevel) {
+				if (true == m_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_T) && false == m_inputSystem.IsKeyUp(InputSystem::Keys::KEY_T)) {
+					m_timeRewind.RewindTimeByOneFrame(m_entities, m_inputSystem,m_timeSinceStartInSeconds, lv_updateComponent.m_totalNumAsteroidsHitByBullets);
+					lv_timeRewinded = true;
+				}
+				else {
+					m_timeRewind.Update(m_entities, m_inputSystem,m_timeSinceStartInSeconds, lv_updateComponent.m_totalNumAsteroidsHitByBullets);
+					lv_timeRewinded = false;
+				}
+			}
+			else {
+				lv_timeRewinded = false;
+			}
+			
+			m_callbacksTimer.Update(lv_timeRewinded);
 
 			auto* lv_playerAttribComp = (PlayerAttributeComponent*)m_entities[m_playerEntityHandle].GetComponent(ComponentTypes::ATTRIBUTE);
 			lv_isPlayerAlive = (0U == lv_playerAttribComp->GetHp()) ? false : true;
 			LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "HP: %u", lv_playerAttribComp->GetHp());
 
 
-			if (((m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel && 1U == m_currentLevel) 
-				|| (m_timeSinceStartInSeconds <= lv_totalSecondsSecondLevel && 2U == m_currentLevel)) && true == lv_isPlayerAlive) {
+			if (true == lv_loopOverInThisLevel) {
 
 				m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
 				m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
-				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet(m_currentLevel);
+				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet(m_currentLevel, lv_timeRewinded);
 				lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
 				for (auto& l_entity : m_entities) {
 					if (true == l_entity.GetActiveState()) {
@@ -303,6 +318,8 @@ namespace Asteroid
 
 							}
 							m_entitySpawnerFromPools.ResetPools();
+							m_timeRewind.Flush();
+							lv_playerAttribComp->ResetHealth();
 
 							DelayedSetStateCallback lv_exitCallback
 							{
@@ -357,6 +374,7 @@ namespace Asteroid
 								}
 
 							}
+							m_timeRewind.Flush();
 
 							m_entitySpawnerFromPools.ResetPools();
 							m_timeSinceStartInSeconds = 0.f;
@@ -419,6 +437,7 @@ namespace Asteroid
 								}
 
 							}
+							m_timeRewind.Flush();
 
 							m_entitySpawnerFromPools.ResetPools();
 							m_timeSinceStartInSeconds = 0.f;
@@ -484,6 +503,7 @@ namespace Asteroid
 								}
 
 							}
+							m_timeRewind.Flush();
 
 							m_entitySpawnerFromPools.ResetPools();
 							m_timeSinceStartInSeconds = 0.f;

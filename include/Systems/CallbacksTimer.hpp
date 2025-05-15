@@ -19,7 +19,7 @@ namespace Asteroid
 
 		void AddSetStateCallback(DelayedSetStateCallback&& l_delayedCallback);
 
-		void Update();
+		void Update(const bool l_timeRewinded);
 
 		void FlushAllCallbacks();
 

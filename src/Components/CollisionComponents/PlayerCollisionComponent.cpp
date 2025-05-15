@@ -44,6 +44,13 @@ namespace Asteroid
 
 
 
+	void PlayerCollisionComponent::SetAlreadyRegisteredCollisionIDs(const std::vector<std::pair<uint32_t, bool>>& l_registeredCollisions)
+	{
+		m_alreadyRegisteredCollisionEntityIDs = l_registeredCollisions;
+	}
+
+
+
 	void PlayerCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_collisionReactContext, CallbacksTimer& l_timer)
 	{
 		using namespace LogSystem;
@@ -95,6 +102,12 @@ namespace Asteroid
 
 		}
 
+	}
+
+
+	std::vector<std::pair<uint32_t, bool>> PlayerCollisionComponent::GetAlreadyRegisteredCollisionIDs() const
+	{
+		return m_alreadyRegisteredCollisionEntityIDs;
 	}
 
 }

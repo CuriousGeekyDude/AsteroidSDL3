@@ -260,6 +260,16 @@ namespace Asteroid
 		return false;
 	}
 
+
+	void InputSystem::SetMousePos(const glm::vec2& l_mousePos)
+	{
+		m_mousePosRelToWindow = l_mousePos;
+	}
+	void InputSystem::SetHiddenStateOfMouse(const bool l_isHidden)
+	{
+		m_mouseHidden = l_isHidden;
+	}
+
 	bool InputSystem::IsMouseButtonPressed(const Mouse l_mouseButton) const
 	{
 		if (true == m_mouseStatesPressed[(int)l_mouseButton]) {

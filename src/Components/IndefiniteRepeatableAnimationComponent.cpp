@@ -54,6 +54,13 @@ namespace Asteroid
 	}
 
 
+
+	uint32_t IndefiniteRepeatableAnimationComponent::GetCurrentOffset() const
+	{
+		return m_currentOffset;
+	}
+
+
 	bool IndefiniteRepeatableAnimationComponent::Update(UpdateComponents& l_updateContext)
 	{
 
@@ -124,6 +131,16 @@ namespace Asteroid
 	void IndefiniteRepeatableAnimationComponent::Reset()
 	{
 		m_isInWindowBound = true;
+	}
+
+
+	void IndefiniteRepeatableAnimationComponent::SetCurrentOffset(const uint32_t l_newOffset)
+	{
+		m_currentOffset = l_newOffset;
+	}
+	void IndefiniteRepeatableAnimationComponent::SetWindowsBound(const bool l_windowsBound)
+	{
+		m_isInWindowBound = l_windowsBound;
 	}
 
 

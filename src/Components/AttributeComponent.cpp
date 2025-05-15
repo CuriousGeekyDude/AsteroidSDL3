@@ -29,4 +29,9 @@ namespace Asteroid
 	{
 		return m_hp;
 	}
+
+	void AttributeComponent::SetHP(const uint32_t l_hp)
+	{
+		m_hp = l_hp;
+	}
 }

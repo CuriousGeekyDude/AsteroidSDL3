@@ -73,6 +73,9 @@ namespace Asteroid
 
 		bool IsMouseHidden() const;
 
+		void SetMousePos(const glm::vec2& l_mousePos);
+		void SetHiddenStateOfMouse(const bool l_isHidden);
+
 	private:
 
 		void RegisterKeyboardInputs(const SDL_Event& l_event);

@@ -16,6 +16,7 @@
 #include "Components/AnimationMetaData.hpp"
 #include "Systems/Grid.hpp"
 #include "Systems/CallbacksTimer.hpp"
+#include "Systems/TimeRewind/TimeRewind.hpp"
 #include <vector>
 #include <glm.hpp>
 
@@ -98,6 +99,7 @@ namespace Asteroid
 		EntitySpawnerFromPools m_entitySpawnerFromPools;
 		Grid m_grid;
 		CallbacksTimer m_callbacksTimer{};
+		TimeRewind m_timeRewind{};
 
 		GpuResourceManager m_gpuResourceManager;
 

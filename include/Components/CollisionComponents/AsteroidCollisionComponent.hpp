@@ -36,6 +36,10 @@ namespace Asteroid
 			, ActiveBasedStateComponent* l_activeComponent);
 
 
+		uint32_t IsHitByBullet() const;
+
+		void SetBulletHitFlag(const uint32_t l_hitBullet);
+
 	private:
 
 		OnceRepeatableAnimationComponent* m_fireExplosionAnimation{};

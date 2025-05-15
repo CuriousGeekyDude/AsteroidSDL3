@@ -36,7 +36,12 @@ namespace Asteroid
 
 		void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity, CallbacksTimer& l_timer) override;
 
+
+		std::vector<std::pair<uint32_t, bool>> GetAlreadyRegisteredCollisionIDs() const;
 		   
+
+		void SetAlreadyRegisteredCollisionIDs(const std::vector<std::pair<uint32_t, bool>>& l_registeredCollisions);
+
 	private:
 
 		PlayerAttributeComponent* m_attribComponent{};

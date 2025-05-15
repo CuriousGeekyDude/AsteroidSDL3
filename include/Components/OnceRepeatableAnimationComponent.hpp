@@ -33,6 +33,14 @@ namespace Asteroid
 
 		const AnimationMetaData* GetAnimationMetaData() const;
 
+		uint32_t GetCurrentOffset() const;
+		bool AnimationHasStarted() const;
+		const glm::vec2& GetInitialAnimationPos() const;
+
+		void SetCurrentOffset(const uint32_t l_newOffset);
+		void SetInitialAnimationPos(const glm::vec2& l_initialEntityPos);
+		void SetAnimationStartState(const bool l_startAnimation);
+
 		void Reset();
 
 	private:

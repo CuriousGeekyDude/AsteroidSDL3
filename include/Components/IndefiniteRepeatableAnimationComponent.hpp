@@ -46,6 +46,11 @@ namespace Asteroid
 
 		void Reset();
 
+		uint32_t GetCurrentOffset() const;
+		void SetCurrentOffset(const uint32_t l_newOffset);
+		void SetWindowsBound(const bool l_windowsBound);
+
+
 		uint32_t GetFrameCountToActivateVisbility() const;
 		uint32_t GetFrameCountToDeactivateVisbility() const;
 

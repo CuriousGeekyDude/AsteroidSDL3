@@ -99,6 +99,36 @@ namespace Asteroid
 
 	}
 
+
+
+	void OnceRepeatableAnimationComponent::SetCurrentOffset(const uint32_t l_newOffset)
+	{
+		m_currentOffset = l_newOffset;
+	}
+	void OnceRepeatableAnimationComponent::SetInitialAnimationPos(const glm::vec2& l_initialEntityPos)
+	{
+		m_initialEntityPos = l_initialEntityPos;
+	}
+	void OnceRepeatableAnimationComponent::SetAnimationStartState(const bool l_startAnimation)
+	{
+		m_startAnimation = l_startAnimation;
+	}
+
+
+	uint32_t OnceRepeatableAnimationComponent::GetCurrentOffset() const
+	{
+		return m_currentOffset;
+	}
+	bool OnceRepeatableAnimationComponent::AnimationHasStarted() const
+	{
+		return m_startAnimation;
+	}
+	const glm::vec2& OnceRepeatableAnimationComponent::GetInitialAnimationPos() const
+	{
+		return m_initialEntityPos;
+	}
+
+
 	void OnceRepeatableAnimationComponent::StartAnimation()
 	{
 		m_startAnimation = true;
