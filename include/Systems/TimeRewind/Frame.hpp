@@ -15,8 +15,8 @@ namespace Asteroid
 
 	struct Frame final
 	{
-		//193 is the total number of entities we always initialize 
-		std::array<EntityFrameTimeRewind, 193U> m_allEntitysMetaDataInThisFrame{};
+		//194 is the total number of entities we always initialize 
+		std::array<EntityFrameTimeRewind, 194U> m_allEntitysMetaDataInThisFrame{};
 		std::vector<DelayedSetStateCallback> m_delayedCallbacks{};
 		glm::vec2 m_mousePos{};
 		float m_time{};

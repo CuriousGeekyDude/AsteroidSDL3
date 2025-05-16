@@ -41,6 +41,11 @@ int main()
 	FillMeta(lv_meta, 1, 1, 40, 40, AnimationType::LASER_BEAM);
 	lv_engineInitialData.m_animationMetaData.push_back(lv_meta);
 
+	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
+		.emplace_back(std::pair<std::string, std::string>("Cursor", "Assets/Cursor.png"));
+	FillMeta(lv_meta, 2, 1, 32, 32, AnimationType::CURSOR);
+	lv_engineInitialData.m_animationMetaData.push_back(lv_meta);
+
 
 	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
 		.emplace_back(std::pair<std::string, std::string>("BackgroundStarClusters", "Assets/Background.jpg"));

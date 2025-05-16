@@ -14,6 +14,7 @@ namespace Asteroid
 		MAIN_SPACESHIP,
 		LASER_BEAM,
 		WARP_ASTEROID,
+		CURSOR,
 		INVALID
 	};
 }

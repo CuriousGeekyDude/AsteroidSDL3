@@ -56,7 +56,10 @@ namespace Asteroid
 			const auto lv_entityType = l_entities[i].GetType();
 
 			const auto* lv_activeComp = (ActiveBasedStateComponent*)l_entities[i].GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
-			lv_entity.m_activeMetaData.m_delayedActivateCallbackAlreadySet = lv_activeComp->IsDelayedCallbackAlreadySet();
+
+			if (nullptr != lv_activeComp) {
+				lv_entity.m_activeMetaData.m_delayedActivateCallbackAlreadySet = lv_activeComp->IsDelayedCallbackAlreadySet();
+			}
 
 
 			lv_entity.m_entityMetaData.m_id = l_entities[i].GetID();
@@ -208,7 +211,10 @@ namespace Asteroid
 
 
 			auto* lv_activeComp = (ActiveBasedStateComponent*)l_entities[i].GetComponent(ComponentTypes::ACTIVE_BASED_STATE);
-			lv_activeComp->SetDelayedActivationCallbackFlag(lv_entity.m_activeMetaData.m_delayedActivateCallbackAlreadySet);
+
+			if (nullptr != lv_activeComp) {
+				lv_activeComp->SetDelayedActivationCallbackFlag(lv_entity.m_activeMetaData.m_delayedActivateCallbackAlreadySet);
+			}
 
 			l_entities[i].SetActiveState(lv_entity.m_entityMetaData.m_isActive);
 			l_entities[i].SetCurrentPos(lv_entity.m_entityMetaData.m_pos);

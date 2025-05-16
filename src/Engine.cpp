@@ -11,6 +11,7 @@
 #include "Components/CollisionComponents/BulletCollisionComponent.hpp"
 #include "Components/AttributeComponents/AsteroidAttributeComponent.hpp"
 #include "Components/AttributeComponents/PlayerAttributeComponent.hpp"
+#include "Components/AttributeComponents/CursorAttributeComponent.hpp"
 #include "Systems/Colors.hpp"
 #include "Systems/RenderingData.hpp"
 #include "Components/UpdateComponents.hpp"
@@ -627,8 +628,8 @@ namespace Asteroid
 		glm::ivec2 lv_windowRes{};
 		GetCurrentWindowSize(lv_windowRes);
 
-		m_circleBoundsEntities.reserve(150U);
-		m_entities.reserve(150U);
+		m_circleBoundsEntities.reserve(256U);
+		m_entities.reserve(256U);
 
 		const auto* lv_warpAsteroidAnimMeta = GetAnimationMeta(AnimationType::WARP_ASTEROID);
 
@@ -755,6 +756,32 @@ namespace Asteroid
 
 			}
 		}
+
+
+		{
+
+			const auto* lv_cursorAnim = GetAnimationMeta(AnimationType::CURSOR);
+			auto lv_index = m_entities.size();
+
+			auto lv_movementComp = std::make_unique<RayMovementComponent>();
+			auto lv_mainAnimComp = std::make_unique<IndefiniteRepeatableAnimationComponent>();
+			auto lv_cursorAttribComp = std::make_unique<CursorAttributeComponent>();
+
+			lv_movementComp->Init(lv_index);
+			lv_mainAnimComp->Init(lv_index, lv_cursorAnim, lv_movementComp.get(), nullptr, 0, 0);
+			lv_cursorAttribComp->Init(lv_index, 0, lv_movementComp.get(), lv_mainAnimComp.get());
+
+			auto& lv_cursor = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_index, EntityType::CURSOR, true)));
+
+			lv_cursor.AddComponent(ComponentTypes::ATTRIBUTE, std::move(lv_cursorAttribComp));
+			lv_cursor.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComp));
+			lv_cursor.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_mainAnimComp));
+
+			m_circleBoundsEntities.push_back(Circle{ .m_center{lv_cursor.GetCurrentPos()}, .m_radius{32.f}});
+
+
+		}
+
 	}
 
 	void Engine::UpdateCircleBounds()
