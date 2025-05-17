@@ -207,7 +207,8 @@ namespace Asteroid
 	{
 		using namespace LogSystem;
 
-		if (true == m_mouseHidden && 3 == m_totalNumLeftMouseClicks) {
+		if ((true == m_mouseHidden && 3 == m_totalNumRightMouseClicks) || false == m_mouseHidden) {
+
 			bool lv_result = SDL_SetWindowRelativeMouseMode(l_window, false);
 
 			if (false == lv_result) {
