@@ -93,6 +93,7 @@ namespace Asteroid
 		uint32_t m_currentLevel{1U};
 
 		uint32_t m_backgroundStarsTextureHandle{};
+		uint32_t m_backgroundStars2TextureHandle{};
 
 		RenderSystem::Renderer m_renderer;
 		InputSystem m_inputSystem;

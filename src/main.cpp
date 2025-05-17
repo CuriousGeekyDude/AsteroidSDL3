@@ -49,6 +49,8 @@ int main()
 
 	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
 		.emplace_back(std::pair<std::string, std::string>("BackgroundStarClusters", "Assets/Background.jpg"));
+	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
+		.emplace_back(std::pair<std::string, std::string>("BackgroundStarClusters2", "Assets/Background2.jpg"));
 
 	lv_engineInitialData.m_animationMetaData.push_back
 	(Utilities::ProcessFileOfRelativePathsOfTextures("InitFiles/Animation/ExplosionBombFireAsteroid/RelativePathTextures.txt"

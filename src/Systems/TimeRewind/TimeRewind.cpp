@@ -337,18 +337,22 @@ namespace Asteroid
 			l_frame.m_isMouseHidden = false;
 			
 			for (auto& l_entityData : l_frame.m_allEntitysMetaDataInThisFrame) {
-				l_entityData.m_activeMetaData.m_delayedActivateCallbackAlreadySet = false;
-				l_entityData.m_attribMetaData.m_asteroidStates = AsteroidStates::AGGRESIVE;
-				l_entityData.m_attribMetaData.m_hp = 10;
-				l_entityData.m_collisionMetaData.m_alreadyRegisteredCollisionEntityIDs.clear();
-				l_entityData.m_collisionMetaData.m_firstCollision = true;
-				l_entityData.m_collisionMetaData.m_hitBullet = 0U;
-				l_entityData.m_collisionMetaData.m_isCollisionActive = true;
-				l_entityData.m_collisionMetaData.m_resetCollision = true;
-				
-				memset(&l_entityData.m_indefRepAnimMetaData, 0, sizeof(l_entityData.m_indefRepAnimMetaData));
-				memset(&l_entityData.m_movementMetaData, 0, sizeof(l_entityData.m_movementMetaData));
-				memset(l_entityData.m_onceRepAnimMetaData.data(), 0, sizeof(OnceRepeatAnimationMetaData)*l_entityData.m_onceRepAnimMetaData.size());
+
+				if (EntityType::CURSOR != l_entityData.m_entityMetaData.m_type) {
+
+					l_entityData.m_activeMetaData.m_delayedActivateCallbackAlreadySet = false;
+					l_entityData.m_attribMetaData.m_asteroidStates = AsteroidStates::AGGRESIVE;
+					l_entityData.m_attribMetaData.m_hp = 10;
+					l_entityData.m_collisionMetaData.m_alreadyRegisteredCollisionEntityIDs.clear();
+					l_entityData.m_collisionMetaData.m_firstCollision = true;
+					l_entityData.m_collisionMetaData.m_hitBullet = 0U;
+					l_entityData.m_collisionMetaData.m_isCollisionActive = true;
+					l_entityData.m_collisionMetaData.m_resetCollision = true;
+
+					memset(&l_entityData.m_indefRepAnimMetaData, 0, sizeof(l_entityData.m_indefRepAnimMetaData));
+					memset(&l_entityData.m_movementMetaData, 0, sizeof(l_entityData.m_movementMetaData));
+					memset(l_entityData.m_onceRepAnimMetaData.data(), 0, sizeof(OnceRepeatAnimationMetaData) * l_entityData.m_onceRepAnimMetaData.size());
+				}
 			}
 		}
 	}

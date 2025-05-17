@@ -95,6 +95,7 @@ namespace Asteroid
 		}
 
 		m_backgroundStarsTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("BackgroundStarClusters");
+		m_backgroundStars2TextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("BackgroundStarClusters2");
 
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Creation of all textures on gpu was successful.");
 
@@ -150,6 +151,11 @@ namespace Asteroid
 		lv_backgroundStarsRenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
 		lv_backgroundStarsRenderData.m_entityTextureHandle = m_backgroundStarsTextureHandle;
 
+		RenderSystem::RenderingData lv_backgroundStars2RenderData{};
+		lv_backgroundStars2RenderData.m_angleOfRotation = 0.f;
+		lv_backgroundStars2RenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
+		lv_backgroundStars2RenderData.m_entityTextureHandle = m_backgroundStars2TextureHandle;
+
 		constexpr float lv_totalSecondsFirstLevel = 90.f; //90
 		constexpr float lv_totalSecondsSecondLevel = 120.f; //120
 		constexpr uint32_t lv_minAsteroidsToHitToGoToSecondLevel = 30U; //35
@@ -198,7 +204,22 @@ namespace Asteroid
 			lv_backgroundStarsRenderData.m_centerOfRotation.x = (float)lv_currentWindowSize.x / 2.f;
 			lv_backgroundStarsRenderData.m_centerOfRotation.y = (float)lv_currentWindowSize.y / 2.f;
 
-			m_renderer.RenderEntity(lv_backgroundStarsRenderData);
+
+
+			lv_backgroundStars2RenderData.m_heightToRender = lv_currentWindowSize.y;
+			lv_backgroundStars2RenderData.m_widthToRender = lv_currentWindowSize.x;
+			lv_backgroundStars2RenderData.m_centerOfRotation.x = (float)lv_currentWindowSize.x / 2.f;
+			lv_backgroundStars2RenderData.m_centerOfRotation.y = (float)lv_currentWindowSize.y / 2.f;
+
+
+			if(1U == m_currentLevel) {
+				m_renderer.RenderEntity(lv_backgroundStarsRenderData);
+
+			}
+			else {
+				m_renderer.RenderEntity(lv_backgroundStars2RenderData);
+			}
+
 
 			bool lv_loopOverInThisLevel = ((m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel && 1U == m_currentLevel)
 				|| (m_timeSinceStartInSeconds <= lv_totalSecondsSecondLevel && 2U == m_currentLevel)) && true == lv_isPlayerAlive;
@@ -307,7 +328,10 @@ namespace Asteroid
 
 							m_callbacksTimer.FlushAllCallbacks();
 							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
-								m_entities[i].SetActiveState(false);
+
+								if (EntityType::CURSOR != m_entities[i].GetType()) {
+									m_entities[i].SetActiveState(false);
+								}
 
 								if (EntityType::ASTEROID == m_entities[i].GetType()) {
 									auto* lv_asteroidExp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION);
@@ -364,7 +388,11 @@ namespace Asteroid
 
 							m_callbacksTimer.FlushAllCallbacks();
 							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
-								m_entities[i].SetActiveState(false);
+
+
+								if (EntityType::CURSOR != m_entities[i].GetType()) {
+									m_entities[i].SetActiveState(false);
+								}
 
 								if (EntityType::ASTEROID == m_entities[i].GetType()) {
 									auto* lv_asteroidExp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION);
@@ -427,7 +455,10 @@ namespace Asteroid
 
 							m_callbacksTimer.FlushAllCallbacks();
 							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
-								m_entities[i].SetActiveState(false);
+
+								if (EntityType::CURSOR != m_entities[i].GetType()) {
+									m_entities[i].SetActiveState(false);
+								}
 
 								if (EntityType::ASTEROID == m_entities[i].GetType()) {
 									auto* lv_asteroidExp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION);
@@ -493,7 +524,10 @@ namespace Asteroid
 
 							m_callbacksTimer.FlushAllCallbacks();
 							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
-								m_entities[i].SetActiveState(false);
+
+								if (EntityType::CURSOR != m_entities[i].GetType()) {
+									m_entities[i].SetActiveState(false);
+								}
 								
 								if (EntityType::ASTEROID == m_entities[i].GetType()) {
 									auto* lv_asteroidExp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION);
