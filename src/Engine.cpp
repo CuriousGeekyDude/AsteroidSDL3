@@ -511,7 +511,9 @@ namespace Asteroid
 						if (false == lv_isPlayerAlive) {
 							ImGui::Text("You died! Would you like to repeat this level or exit?");
 						}
-						ImGui::Text("Failed to clear this level! Would you like to repeat this level or exit?");
+						else {
+							ImGui::Text("Failed to clear this level! Would you like to repeat this level or exit?");
+						}
 						if (true == ImGui::Button("Repeat")) {
 							lv_repeat2 = true;
 							m_currentLevel = 2U;
