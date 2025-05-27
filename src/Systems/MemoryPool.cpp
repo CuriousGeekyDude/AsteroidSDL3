@@ -18,7 +18,7 @@ namespace Asteroid
 		using namespace LogSystem;
 
 		//Total bytes will always be the smallest power of 2 bigger than the requested bytes
-		m_totalBytesAllocatedForPool =  static_cast<float>(std::powf(2.f,std::ceilf(std::log2f((float)l_minBytesToAllocate))));
+		m_totalBytesAllocatedForPool =  static_cast<size_t>(std::powf(2.f,std::ceilf(std::log2f((float)l_minBytesToAllocate))));
 		
 		m_totalNumFreeList = static_cast<uint32_t>(m_totalBytesAllocatedForPool / m_blockSizeInBytes);
 
