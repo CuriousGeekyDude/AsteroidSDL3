@@ -17,6 +17,7 @@ namespace Asteroid
 	{
 	public:
 
+		//Block size is assumed to always be multiple of 16 
 		MemoryPool(const size_t l_minBytesToAllocate, const size_t l_blockSizes);
 		
 
@@ -32,14 +33,13 @@ namespace Asteroid
 	private:
 
 		const size_t m_blockSizeInBytes;
-		static constexpr uint32_t m_gaurdValue{(uint32_t)0x12345678};
+		static constexpr uint32_t m_gaurdValue{0x12345678};
 
 		char* m_array{ nullptr };
-		size_t m_totalBytesAllocatedForPool{ 0 };
+		size_t m_totalBytesAllocatedForPool{ 0U };
 
 		uint32_t m_headHandleOfFreeList{0U};
 		uint32_t m_totalNumFreeList{0U};
-		uint32_t m_totalNumAllocatedBlocks{0U};
 
 
 	};
