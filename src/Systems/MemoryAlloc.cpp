@@ -4,7 +4,7 @@
 
 
 
-#include "Systems/MemoryAloc.hpp"
+#include "Systems/MemoryAlloc.hpp"
 
 
 namespace Asteroid
@@ -14,9 +14,9 @@ namespace Asteroid
 	MemoryAlloc::MemoryAlloc()
 		: m_pool16(8192, 16)
 		, m_pool32(8192, 32)
-		, m_pool64(8192, 64)
-		, m_pool128(8192, 128)
-		, m_pool256(8192, 256)
+		, m_pool64(131072, 64)
+		, m_pool128(16384, 128)
+		, m_pool256(1024, 256)
 	{
 
 	}
