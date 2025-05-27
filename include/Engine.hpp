@@ -15,6 +15,7 @@
 #include "Entities/EntitySpawnerFromPools.hpp"
 #include "Components/AnimationMetaData.hpp"
 #include "Systems/Grid.hpp"
+#include "Systems/MemoryAlloc.hpp"
 #include "Systems/CallbacksTimer.hpp"
 #include "Systems/TimeRewind/TimeRewind.hpp"
 #include <vector>
@@ -101,6 +102,8 @@ namespace Asteroid
 		Grid m_grid;
 		CallbacksTimer m_callbacksTimer{};
 		TimeRewind m_timeRewind{};
+
+		MemoryAlloc m_allocator{};
 
 		GpuResourceManager m_gpuResourceManager;
 

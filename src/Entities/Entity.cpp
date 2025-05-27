@@ -16,8 +16,7 @@ namespace Asteroid
 	}
 
 
-	void Entity::AddComponent(const ComponentTypes l_componentType
-		,std::unique_ptr<Component>&& l_component)
+	void Entity::AddComponent(const ComponentTypes l_componentType ,Component* l_component)
 	{
 		using namespace LogSystem;
 		for (auto& l_component : m_components) {
@@ -28,7 +27,7 @@ namespace Asteroid
 			}
 		}
 
-		m_components.emplace_back(std::pair<ComponentTypes, std::unique_ptr<Component>>(l_componentType, std::move(l_component)));
+		m_components.emplace_back(std::pair<ComponentTypes, Component*>(l_componentType, l_component));
 	}
 
 
@@ -70,7 +69,7 @@ namespace Asteroid
 
 		for (auto& l_component : m_components) {
 			if (l_componentType == l_component.first) {
-				return l_component.second.get();
+				return l_component.second;
 			}
 		}
 

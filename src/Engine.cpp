@@ -676,26 +676,35 @@ namespace Asteroid
 			assert(nullptr != lv_spaceshipAnimMeta);
 
 
-			auto lv_movementComponent = std::make_unique<UserInputBasedMovementComponent>();
-			auto lv_collisionComponent = std::make_unique<PlayerCollisionComponent>();
-			auto lv_entityAnimationComp = std::make_unique<IndefiniteRepeatableAnimationComponent>();
-			auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
-			auto lv_playerAttribComponent = std::make_unique<PlayerAttributeComponent>();
+			UserInputBasedMovementComponent* lv_movementComponent = static_cast<UserInputBasedMovementComponent*>(m_allocator.Allocate(sizeof(UserInputBasedMovementComponent)));
+			PlayerCollisionComponent* lv_collisionComponent = static_cast<PlayerCollisionComponent*>(m_allocator.Allocate(sizeof(PlayerCollisionComponent)));
+			IndefiniteRepeatableAnimationComponent* lv_entityAnimationComp = static_cast<IndefiniteRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(IndefiniteRepeatableAnimationComponent)));
+			ActiveBasedStateComponent* lv_activeComponent = static_cast<ActiveBasedStateComponent*>(m_allocator.Allocate(sizeof(ActiveBasedStateComponent)));
+			PlayerAttributeComponent* lv_playerAttribComponent = static_cast<PlayerAttributeComponent*>(m_allocator.Allocate(sizeof(PlayerAttributeComponent)));
+
+			
+			lv_movementComponent = new(lv_movementComponent) UserInputBasedMovementComponent();
+			lv_collisionComponent = new(lv_collisionComponent) PlayerCollisionComponent();
+			lv_entityAnimationComp = new(lv_entityAnimationComp) IndefiniteRepeatableAnimationComponent();
+			lv_activeComponent = new(lv_activeComponent) ActiveBasedStateComponent();
+			lv_playerAttribComponent = new(lv_playerAttribComponent) PlayerAttributeComponent();
+
+
 
 			lv_movementComponent->Init(0);
-			lv_collisionComponent->Init(0, 0, 0, true, lv_entityAnimationComp.get(), lv_playerAttribComponent.get(), lv_warpAsteroidAnimMeta->m_totalNumFrames + 20U);
-			lv_entityAnimationComp->Init(0, lv_spaceshipAnimMeta, lv_movementComponent.get()
-										,lv_activeComponent.get(), 0, 0, true);
-			lv_activeComponent->Init(0, lv_collisionComponent.get(), lv_entityAnimationComp.get(),
+			lv_collisionComponent->Init(0, 0, 0, true, lv_entityAnimationComp, lv_playerAttribComponent, lv_warpAsteroidAnimMeta->m_totalNumFrames + 20U);
+			lv_entityAnimationComp->Init(0, lv_spaceshipAnimMeta, lv_movementComponent
+										,lv_activeComponent, 0, 0, true);
+			lv_activeComponent->Init(0, lv_collisionComponent, lv_entityAnimationComp,
 				1, 1);
 			lv_playerAttribComponent->Init(0, 10U);
 			auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ (float)lv_windowRes.x/2.f, (float)lv_windowRes.y/2.f }, 0, EntityType::PLAYER, true)));
 
-			lv_player.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
-			lv_player.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
-			lv_player.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityAnimationComp));
-			lv_player.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
-			lv_player.AddComponent(ComponentTypes::ATTRIBUTE, std::move(lv_playerAttribComponent));
+			lv_player.AddComponent(ComponentTypes::MOVEMENT, lv_movementComponent);
+			lv_player.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, lv_activeComponent);
+			lv_player.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, lv_entityAnimationComp);
+			lv_player.AddComponent(ComponentTypes::COLLISION, lv_collisionComponent);
+			lv_player.AddComponent(ComponentTypes::ATTRIBUTE, lv_playerAttribComponent);
 			
 			m_playerEntityHandle = 0U;
 			
@@ -713,24 +722,31 @@ namespace Asteroid
 
 				const uint32_t lv_bulletIdx = 1U + i;
 
-				auto lv_collisionComponent = std::make_unique<BulletCollisionComponent>();
-				auto lv_movementComponent = std::make_unique<RayMovementComponent>();
-				auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
-				auto lv_entityMainAnimation = std::make_unique<IndefiniteRepeatableAnimationComponent>();
+
+				BulletCollisionComponent* lv_collisionComponent = static_cast<BulletCollisionComponent*>(m_allocator.Allocate(sizeof(BulletCollisionComponent)));
+				RayMovementComponent* lv_movementComponent = static_cast<RayMovementComponent*>(m_allocator.Allocate(sizeof(RayMovementComponent)));
+				ActiveBasedStateComponent* lv_activeComponent = static_cast<ActiveBasedStateComponent*>(m_allocator.Allocate(sizeof(ActiveBasedStateComponent)));
+				IndefiniteRepeatableAnimationComponent* lv_entityMainAnimation = static_cast<IndefiniteRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(IndefiniteRepeatableAnimationComponent)));
+
+				lv_collisionComponent = new(lv_collisionComponent) BulletCollisionComponent();
+				lv_movementComponent = new(lv_movementComponent) RayMovementComponent();
+				lv_activeComponent = new(lv_activeComponent) ActiveBasedStateComponent();
+				lv_entityMainAnimation = new(lv_entityMainAnimation) IndefiniteRepeatableAnimationComponent();
+
 
 				lv_collisionComponent->Init(lv_bulletIdx,0, 0, true
-											, lv_entityMainAnimation.get(), lv_activeComponent.get());
+											, lv_entityMainAnimation, lv_activeComponent);
 				lv_movementComponent->Init(lv_bulletIdx);
-				lv_activeComponent->Init(lv_bulletIdx, lv_collisionComponent.get(), lv_entityMainAnimation.get(), 0, 0);
-				lv_entityMainAnimation->Init(lv_bulletIdx, lv_bulletAnimMetaData, lv_movementComponent.get(), lv_activeComponent.get(), 0, 0, true);
+				lv_activeComponent->Init(lv_bulletIdx, lv_collisionComponent, lv_entityMainAnimation, 0, 0);
+				lv_entityMainAnimation->Init(lv_bulletIdx, lv_bulletAnimMetaData, lv_movementComponent, lv_activeComponent, 0, 0, true);
 
 				auto& lv_bullet = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_bulletIdx, EntityType::BULLET, false)));
 			
 
-				lv_bullet.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
-				lv_bullet.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
-				lv_bullet.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
-				lv_bullet.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityMainAnimation));
+				lv_bullet.AddComponent(ComponentTypes::COLLISION, lv_collisionComponent);
+				lv_bullet.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, lv_activeComponent);
+				lv_bullet.AddComponent(ComponentTypes::MOVEMENT, lv_movementComponent);
+				lv_bullet.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, lv_entityMainAnimation);
 				
 
 				
@@ -755,36 +771,45 @@ namespace Asteroid
 
 				const uint32_t lv_asteroidIdx = lv_entitiesLastIndex + i;
 
-				auto lv_collisionComponent = std::make_unique<AsteroidCollisionComponent>();
-				auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
-				auto lv_movementComponent = std::make_unique<RayMovementComponent>();
-				auto lv_entityMainAnimation = std::make_unique<IndefiniteRepeatableAnimationComponent>();
-				auto lv_fireExplosionAnimationComponent = std::make_unique<OnceRepeatableAnimationComponent>();
-				auto lv_warpAsteroidAnimComponent = std::make_unique<OnceRepeatableAnimationComponent>();
-				auto lv_asteroidAttribComponent = std::make_unique<AsteroidAttributeComponent>();
+
+				AsteroidCollisionComponent* lv_collisionComponent = static_cast<AsteroidCollisionComponent*>(m_allocator.Allocate(sizeof(AsteroidCollisionComponent)));
+				ActiveBasedStateComponent* lv_activeComponent = static_cast<ActiveBasedStateComponent*>(m_allocator.Allocate(sizeof(ActiveBasedStateComponent)));
+				RayMovementComponent* lv_movementComponent = static_cast<RayMovementComponent*>(m_allocator.Allocate(sizeof(RayMovementComponent)));
+				IndefiniteRepeatableAnimationComponent* lv_entityMainAnimation = static_cast<IndefiniteRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(IndefiniteRepeatableAnimationComponent)));
+				OnceRepeatableAnimationComponent* lv_fireExplosionAnimationComponent = static_cast<OnceRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(OnceRepeatableAnimationComponent)));
+				OnceRepeatableAnimationComponent* lv_warpAsteroidAnimComponent = static_cast<OnceRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(OnceRepeatableAnimationComponent)));
+				AsteroidAttributeComponent* lv_asteroidAttribComponent = static_cast<AsteroidAttributeComponent*>(m_allocator.Allocate(sizeof(AsteroidAttributeComponent)));
+
+				lv_collisionComponent = new(lv_collisionComponent) AsteroidCollisionComponent();
+				lv_activeComponent = new(lv_activeComponent) ActiveBasedStateComponent();
+				lv_movementComponent = new(lv_movementComponent) RayMovementComponent();
+				lv_entityMainAnimation = new(lv_entityMainAnimation) IndefiniteRepeatableAnimationComponent();
+				lv_fireExplosionAnimationComponent = new(lv_fireExplosionAnimationComponent) OnceRepeatableAnimationComponent();
+				lv_warpAsteroidAnimComponent = new(lv_warpAsteroidAnimComponent) OnceRepeatableAnimationComponent();
+				lv_asteroidAttribComponent = new(lv_asteroidAttribComponent) AsteroidAttributeComponent();
 
 				lv_collisionComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta->m_totalNumFrames + 20U, lv_explosionAsteroidAnimMeta->m_totalNumFrames / 3
-					, true, lv_entityMainAnimation.get(), lv_fireExplosionAnimationComponent.get()
-					, lv_activeComponent.get());
-				lv_activeComponent->Init(lv_asteroidIdx, lv_collisionComponent.get(), lv_entityMainAnimation.get()
+					, true, lv_entityMainAnimation, lv_fireExplosionAnimationComponent
+					, lv_activeComponent);
+				lv_activeComponent->Init(lv_asteroidIdx, lv_collisionComponent, lv_entityMainAnimation
 										, 1, lv_explosionAsteroidAnimMeta->m_totalNumFrames);
 				lv_movementComponent->Init(lv_asteroidIdx);
-				lv_entityMainAnimation->Init(lv_asteroidIdx, lv_asteroidAnimMeta, lv_movementComponent.get()
-											, lv_activeComponent.get(), lv_warpAsteroidAnimMeta->m_totalNumFrames - 20U, 0, true);
-				lv_fireExplosionAnimationComponent->Init(lv_asteroidIdx, lv_explosionAsteroidAnimMeta , lv_movementComponent.get());
-				lv_warpAsteroidAnimComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta, lv_movementComponent.get(), false);
+				lv_entityMainAnimation->Init(lv_asteroidIdx, lv_asteroidAnimMeta, lv_movementComponent
+											, lv_activeComponent, lv_warpAsteroidAnimMeta->m_totalNumFrames - 20U, 0, true);
+				lv_fireExplosionAnimationComponent->Init(lv_asteroidIdx, lv_explosionAsteroidAnimMeta , lv_movementComponent);
+				lv_warpAsteroidAnimComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta, lv_movementComponent, false);
 
-				lv_asteroidAttribComponent->Init(lv_asteroidIdx, 3, AsteroidStates::PASSIVE, lv_movementComponent.get());
+				lv_asteroidAttribComponent->Init(lv_asteroidIdx, 3, AsteroidStates::PASSIVE, lv_movementComponent);
 
 				auto& lv_asteroid = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_asteroidIdx,  EntityType::ASTEROID, false)));
 
-				lv_asteroid.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
-				lv_asteroid.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
-				lv_asteroid.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
-				lv_asteroid.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityMainAnimation));
-				lv_asteroid.AddComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION, std::move(lv_fireExplosionAnimationComponent));
-				lv_asteroid.AddComponent(ComponentTypes::WARP_ASTEROID_ANIMATION, std::move(lv_warpAsteroidAnimComponent));
-				lv_asteroid.AddComponent(ComponentTypes::ATTRIBUTE, std::move(lv_asteroidAttribComponent));
+				lv_asteroid.AddComponent(ComponentTypes::COLLISION, lv_collisionComponent);
+				lv_asteroid.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, lv_activeComponent);
+				lv_asteroid.AddComponent(ComponentTypes::MOVEMENT, lv_movementComponent);
+				lv_asteroid.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, lv_entityMainAnimation);
+				lv_asteroid.AddComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION, lv_fireExplosionAnimationComponent);
+				lv_asteroid.AddComponent(ComponentTypes::WARP_ASTEROID_ANIMATION, lv_warpAsteroidAnimComponent);
+				lv_asteroid.AddComponent(ComponentTypes::ATTRIBUTE, lv_asteroidAttribComponent);
 
 
 				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_asteroid.GetCurrentPos()}, .m_radius{lv_asteroidAnimMeta->m_widthToRenderTextures/2.f} });
@@ -799,19 +824,23 @@ namespace Asteroid
 			const auto* lv_cursorAnim = GetAnimationMeta(AnimationType::CURSOR);
 			auto lv_index = m_entities.size();
 
-			auto lv_movementComp = std::make_unique<RayMovementComponent>();
-			auto lv_mainAnimComp = std::make_unique<IndefiniteRepeatableAnimationComponent>();
-			auto lv_cursorAttribComp = std::make_unique<CursorAttributeComponent>();
+			RayMovementComponent* lv_movementComp = static_cast<RayMovementComponent*>(m_allocator.Allocate(sizeof(RayMovementComponent)));
+			IndefiniteRepeatableAnimationComponent* lv_mainAnimComp = static_cast<IndefiniteRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(IndefiniteRepeatableAnimationComponent)));
+			CursorAttributeComponent* lv_cursorAttribComp = static_cast<CursorAttributeComponent*>(m_allocator.Allocate(sizeof(CursorAttributeComponent)));
+
+			lv_movementComp = new(lv_movementComp) RayMovementComponent();
+			lv_mainAnimComp = new(lv_mainAnimComp) IndefiniteRepeatableAnimationComponent();
+			lv_cursorAttribComp = new(lv_cursorAttribComp) CursorAttributeComponent();
 
 			lv_movementComp->Init(lv_index);
-			lv_mainAnimComp->Init(lv_index, lv_cursorAnim, lv_movementComp.get(), nullptr, 0, 0);
-			lv_cursorAttribComp->Init(lv_index, 0, lv_movementComp.get(), lv_mainAnimComp.get());
+			lv_mainAnimComp->Init(lv_index, lv_cursorAnim, lv_movementComp, nullptr, 0, 0);
+			lv_cursorAttribComp->Init(lv_index, 0, lv_movementComp, lv_mainAnimComp);
 
 			auto& lv_cursor = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_index, EntityType::CURSOR, true)));
 
-			lv_cursor.AddComponent(ComponentTypes::ATTRIBUTE, std::move(lv_cursorAttribComp));
-			lv_cursor.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComp));
-			lv_cursor.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_mainAnimComp));
+			lv_cursor.AddComponent(ComponentTypes::ATTRIBUTE, lv_cursorAttribComp);
+			lv_cursor.AddComponent(ComponentTypes::MOVEMENT, lv_movementComp);
+			lv_cursor.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, lv_mainAnimComp);
 
 			m_circleBoundsEntities.push_back(Circle{ .m_center{lv_cursor.GetCurrentPos()}, .m_radius{32.f}});
 
