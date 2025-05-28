@@ -281,21 +281,10 @@ namespace Asteroid
 
 					ImGui::Begin("Player Info");                          // Create a window called "Hello, world!" and append into it.
 
-					ImGui::Text("Angle of rotation: %f", -((UserInputBasedMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT))->GetCurrentAngleOfRotation());
-					//ImGui::SliderFloat("Speed", &f,0.1f, 5.f, "%.3f");
+					ImGui::Text("Score: %u", lv_updateComponent.m_totalNumAsteroidsHitByBullets);
+					ImGui::Text("Seconds: %u", (uint32_t)m_timeSinceStartInSeconds);
+					ImGui::Text("Health: %u", lv_playerAttribComp->GetHp());
 
-					ImGui::Text("Speed: (%f, %f)", m_entityConnector.RequestSpeedFromPlayer().x, m_entityConnector.RequestSpeedFromPlayer().y);
-					ImGui::Text("Total number of non-empty cells: %u", m_grid.GetTotalNumNonEmptyCells());
-					ImGui::Text("Total number of cells: %u", m_grid.GetTotalNumCurrentCells());
-
-					/*auto* lv_movementComp = (PlayerMovementComponent*)lv_player.GetComponent(ComponentTypes::MOVEMENT);
-					lv_movementComp->SetSpeed(f);*/
-
-					ImGui::Text("Total num of asteroids hit by bullets since the start: %u", lv_updateComponent.m_totalNumAsteroidsHitByBullets);
-					ImGui::Text("Seconds: %f", m_timeSinceStartInSeconds);
-					ImGui::Text("Player health: %u", lv_playerAttribComp->GetHp());
-
-					ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 					ImGui::End();
 				}
 
