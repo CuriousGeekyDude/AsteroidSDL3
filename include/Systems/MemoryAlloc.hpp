@@ -5,7 +5,7 @@
 
 
 #include "Systems/MemoryPool.hpp"
-
+#include "Systems/LogSystem.hpp"
 
 
 namespace Asteroid
@@ -25,15 +25,16 @@ namespace Asteroid
 
 
 		template<typename T>
-		void Destruct(T* l_block, const size_t l_sizeOfBlock)
+		bool Destruct(T* l_block, const size_t l_sizeOfBlock)
 		{
 			if (nullptr == l_block) {
-				return;
+				LOG(Severity::WARNING, Channel::MEMORY, "Tried to destruct a nullptr.");
+				return false;
 			}
 
 			l_block->~T();
 			
-			Deallocate(l_block, l_sizeOfBlock);
+			return Deallocate(l_block, l_sizeOfBlock);
 		}
 
 	private:
@@ -45,9 +46,10 @@ namespace Asteroid
 
 		MemoryPool m_pool16;
 		MemoryPool m_pool32;
+		MemoryPool m_pool48;
 		MemoryPool m_pool64;
-		MemoryPool m_pool128;
-		MemoryPool m_pool256;
+		MemoryPool m_pool80;
+		MemoryPool m_pool96;
 
 	};
 

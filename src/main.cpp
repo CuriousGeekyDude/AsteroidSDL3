@@ -2,7 +2,7 @@
 
 #include "Engine.hpp"
 #include "Utilities/UtilityFunctions.hpp"
-
+#include <iostream>
 
 
 void FillMeta(Asteroid::AnimationMetaData& l_meta, uint32_t l_firstIndex
@@ -66,14 +66,24 @@ int main()
 		, lv_engineInitialData.m_mappedTextureNamesToTheirPaths, AnimationType::WARP_ASTEROID
 		, 250, 150));
 	
-	Engine lv_asteroidEngine(std::move(lv_engineInitialData));
 
-	if (false == lv_asteroidEngine.Init()) {
-		return -1;
+	try {
+
+		Engine lv_asteroidEngine(std::move(lv_engineInitialData));
+
+		if (false == lv_asteroidEngine.Init()) {
+			return -1;
+		}
+
+		if (false == lv_asteroidEngine.GameLoop()) {
+			return -1;
+		}
 	}
-
-	if (false == lv_asteroidEngine.GameLoop()) {
-		return -1;
+	catch (const std::runtime_error& l_error) {
+		std::cout << l_error.what() << std::endl;
+	}
+	catch (const std::bad_alloc& l_error) {
+		std::cout << l_error.what() << std::endl;
 	}
 	
 

@@ -14,9 +14,10 @@ namespace Asteroid
 	MemoryAlloc::MemoryAlloc()
 		: m_pool16(8192, 16)
 		, m_pool32(8192, 32)
+		, m_pool48(131072, 48)
 		, m_pool64(131072, 64)
-		, m_pool128(16384, 128)
-		, m_pool256(1024, 256)
+		, m_pool80(1024, 80)
+		, m_pool96(2048, 96)
 	{
 
 	}
@@ -32,14 +33,17 @@ namespace Asteroid
 		else if (l_blockSize <= 32) {
 			return m_pool32.Allocate();
 		}
+		else if (l_blockSize <= 48) {
+			return m_pool48.Allocate();
+		}
 		else if (l_blockSize <= 64) {
 			return m_pool64.Allocate();
 		}
-		else if (l_blockSize <= 128) {
-			return m_pool128.Allocate();
+		else if (l_blockSize <= 80) {
+			return m_pool80.Allocate();
 		}
-		else if (l_blockSize <= 256) {
-			return m_pool256.Allocate();
+		else if (l_blockSize <= 96) {
+			return m_pool96.Allocate();
 		}
 
 
@@ -61,14 +65,17 @@ namespace Asteroid
 		else if (l_blockSize <= 32) {
 			return m_pool32.Deallocate(l_block);
 		}
+		else if (l_blockSize <= 48) {
+			return m_pool48.Deallocate(l_block);
+		}
 		else if (l_blockSize <= 64) {
 			return m_pool64.Deallocate(l_block);
 		}
-		else if (l_blockSize <= 128) {
-			return m_pool128.Deallocate(l_block);
+		else if (l_blockSize <= 80) {
+			return m_pool80.Deallocate(l_block);
 		}
-		else if (l_blockSize <= 256) {
-			return m_pool256.Deallocate(l_block);
+		else if (l_blockSize <= 96) {
+			return m_pool96.Deallocate(l_block);
 		}
 		else {
 
