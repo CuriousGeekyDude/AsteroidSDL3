@@ -17,11 +17,10 @@ namespace Asteroid
 
 		//Block size is assumed to always be multiple of 16.
 
-		/* Bytes requested to allocate should always be power of 2.
-		* If it is not then it will be rounded up to the smallest power of 2 
-		* bigger than the requested size.
+		/* 
+		* Bytes requested will be rounded to the nearest multiple of 
+		* l_blockSizes bigger than or equal to the requested bytes.
 		*/
-
 		MemoryPool(const size_t l_minBytesToAllocate, const size_t l_blockSizes);
 		
 
