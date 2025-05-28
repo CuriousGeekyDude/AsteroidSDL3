@@ -126,13 +126,8 @@ namespace Asteroid
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-
-		// Setup Dear ImGui style
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		ImGui::StyleColorsDark();
-		//ImGui::StyleColorsLight();
-
-		// Setup Platform/Renderer backends
 		ImGui_ImplSDL3_InitForSDLRenderer(m_window, m_renderer.GetSDLRenderer());
 		ImGui_ImplSDLRenderer3_Init(m_renderer.GetSDLRenderer());
 
@@ -156,9 +151,9 @@ namespace Asteroid
 		lv_backgroundStars2RenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
 		lv_backgroundStars2RenderData.m_entityTextureHandle = m_backgroundStars2TextureHandle;
 
-		constexpr float lv_totalSecondsFirstLevel = 90.f; //90
-		constexpr float lv_totalSecondsSecondLevel = 120.f; //120
-		constexpr uint32_t lv_minAsteroidsToHitToGoToSecondLevel = 30U; //35
+		constexpr float lv_totalSecondsFirstLevel = 75.f;
+		constexpr float lv_totalSecondsSecondLevel = 120.f;
+		constexpr uint32_t lv_minAsteroidsToHitToGoToSecondLevel = 30U;
 		constexpr uint32_t lv_minAsteroidsToHitToWinInSecondLevel = 20U;
 		bool lv_isPlayerAlive = true;
 		bool lv_timeRewinded{ false };
@@ -239,12 +234,9 @@ namespace Asteroid
 			}
 			
 			m_callbacksTimer.Update();
-
 			auto* lv_playerAttribComp = (PlayerAttributeComponent*)m_entities[m_playerEntityHandle].GetComponent(ComponentTypes::ATTRIBUTE);
 			lv_isPlayerAlive = (0U == lv_playerAttribComp->GetHp()) ? false : true;
 			LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "HP: %u", lv_playerAttribComp->GetHp());
-
-
 			if (true == lv_loopOverInThisLevel) {
 
 				m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
@@ -256,10 +248,6 @@ namespace Asteroid
 						assert(l_entity.Update(lv_updateComponent));
 					}
 				}
-
-				
-
-
 				m_entitySpawnerFromPools.UpdatePools();
 				UpdateCircleBounds();
 
@@ -270,16 +258,11 @@ namespace Asteroid
 				ImGui_ImplSDL3_NewFrame();
 				ImGui::NewFrame();
 
-				/*if (show_demo_window)
-					ImGui::ShowDemoWindow(&show_demo_window);*/
-
-					// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 				{
-					//static float f = 0.1f;
 
 					auto& lv_player = m_entities[m_playerEntityHandle];
 
-					ImGui::Begin("Player Info");                          // Create a window called "Hello, world!" and append into it.
+					ImGui::Begin("Player Info");
 
 					ImGui::Text("Score: %u", lv_updateComponent.m_totalNumAsteroidsHitByBullets);
 					ImGui::Text("Seconds: %u", (uint32_t)m_timeSinceStartInSeconds);
@@ -287,11 +270,6 @@ namespace Asteroid
 
 					ImGui::End();
 				}
-
-
-
-				
-
 			}
 			else {
 				
@@ -471,25 +449,6 @@ namespace Asteroid
 							lv_repeat3 = false;
 
 						}
-
-						/*static bool lv_enteredThisLoop{ false };
-
-
-						if (false == lv_enteredThisLoop) {
-
-							m_callbacksTimer.FlushAllCallbacks();
-
-							DelayedSetStateCallback lv_exitCallback
-							{
-								.m_callback{[&lv_quit]() {lv_quit = true; }},
-								.m_maxNumFrames = 512U
-							};
-
-							m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));
-						}
-
-						lv_enteredThisLoop = true;*/
-
 
 					}
 					else {
