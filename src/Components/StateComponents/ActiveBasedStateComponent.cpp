@@ -35,7 +35,10 @@ namespace Asteroid
 		m_frameCountToDeactivate = l_frameCountToDeactivate;
 	}
 
-
+	bool ActiveBasedStateComponent::IsDelayedCallbackAlreadySet() const
+	{
+		return m_delayedActivateCallbackAlreadySet;
+	}
 
 	uint32_t ActiveBasedStateComponent::GetframeCountToActivate() const
 	{

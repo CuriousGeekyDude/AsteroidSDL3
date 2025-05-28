@@ -15,7 +15,9 @@
 #include "Entities/EntitySpawnerFromPools.hpp"
 #include "Components/AnimationMetaData.hpp"
 #include "Systems/Grid.hpp"
+#include "Systems/MemoryAlloc.hpp"
 #include "Systems/CallbacksTimer.hpp"
+#include "Systems/TimeRewind/TimeRewind.hpp"
 #include <vector>
 #include <glm.hpp>
 
@@ -89,14 +91,19 @@ namespace Asteroid
 		std::vector<AnimationMetaData> m_animationMetaData;
 		Time m_trackLastFrameElapsedTime;
 		float m_timeSinceStartInSeconds{};
+		uint32_t m_currentLevel{1U};
 
 		uint32_t m_backgroundStarsTextureHandle{};
+		uint32_t m_backgroundStars2TextureHandle{};
 
 		RenderSystem::Renderer m_renderer;
 		InputSystem m_inputSystem;
 		EntitySpawnerFromPools m_entitySpawnerFromPools;
 		Grid m_grid;
 		CallbacksTimer m_callbacksTimer{};
+		TimeRewind m_timeRewind{};
+
+		MemoryAlloc m_allocator{};
 
 		GpuResourceManager m_gpuResourceManager;
 

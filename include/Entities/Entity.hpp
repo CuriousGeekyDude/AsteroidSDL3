@@ -25,7 +25,7 @@ namespace Asteroid
 
 		Entity(Entity&&) = default;
 			
-		void AddComponent(const ComponentTypes l_componentType, std::unique_ptr<Component>&& l_component);
+		void AddComponent(const ComponentTypes l_componentType, Component* l_component);
 
 		Component* GetComponent(const ComponentTypes l_componentType) const;
 
@@ -54,6 +54,6 @@ namespace Asteroid
 		bool m_isActive;
 
 
-		std::vector<std::pair<ComponentTypes ,std::unique_ptr<Component>>> m_components;
+		std::vector<std::pair<ComponentTypes , Component*>> m_components;
 	};
 }

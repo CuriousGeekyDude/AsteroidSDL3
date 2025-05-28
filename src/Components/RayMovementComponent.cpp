@@ -39,19 +39,28 @@ namespace Asteroid
 		if (false == m_pauseMovement) {
 			auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
+			const auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();
 
-
-			m_initialT += m_speed.x * l_updateContext.m_deltaTime;
-
-			const glm::vec2 lv_newPos = m_initialPos + (m_initialT)*m_rayDirection;
-			m_transform[2][0] = lv_newPos.x;
-			m_transform[2][1] = lv_newPos.y;
+			const glm::vec2 lv_newPos = lv_currentPos + (m_speed.x * l_updateContext.m_deltaTime)*m_rayDirection;
 
 			lv_ownerEntity.SetCurrentPos(lv_newPos);
 
 		}
 
 		return true;
+	}
+
+	const glm::vec2& RayMovementComponent::GetInitialPos() const
+	{
+		return m_initialPos;
+	}
+	const glm::vec2& RayMovementComponent::GetRayDirection() const
+	{
+		return m_rayDirection;
+	}
+	float RayMovementComponent::GetInitalT() const
+	{
+		return m_initialT;
 	}
 
 }

@@ -21,6 +21,11 @@ namespace Asteroid
 
 		void Update();
 
+		void FlushAllCallbacks();
+
+		const std::vector<DelayedSetStateCallback>& GetDelayedCallbacks() const;
+		void SetDelayedCallbacks(const std::vector<DelayedSetStateCallback>& l_delayedCallbacks);
+
 
 	private:
 

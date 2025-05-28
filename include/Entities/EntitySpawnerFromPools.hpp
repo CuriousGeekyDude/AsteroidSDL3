@@ -22,15 +22,16 @@ namespace Asteroid
 		EntitySpawnerFromPools(Engine* l_engine);
 
 		void InitPool(const EntityType l_type, const uint32_t l_firstEntityIndex, const uint32_t l_totalNumEntities);
-		void SpawnNewEntitiesIfConditionsMet();
+		void SpawnNewEntitiesIfConditionsMet(const uint32_t l_level, const bool l_timeRewinded);
 
 		void UpdatePools();
 
+		void ResetPools();
 
 	private:
 
-		bool BulletSpawnConditionMet();
-		bool AsteroidSpawnConditionMet();
+		bool BulletSpawnConditionMet(const bool l_timeRewinded);
+		bool AsteroidSpawnConditionMet(const bool l_timeRewinded);
 
 
 		void GenerateRandomIndexCellNumbers(const uint32_t l_maxNumCurrentCells);
@@ -40,7 +41,7 @@ namespace Asteroid
 		Engine* m_engine;
 		EntityPool m_bulletsPool;
 
-		static constexpr uint32_t m_asteroidMinNumInScene{20U};
+		static constexpr uint32_t m_asteroidMinNumInScene{5U};
 		std::array<uint32_t, m_asteroidMinNumInScene> m_randomIndexCellNumbers{};
 		std::array<float, m_asteroidMinNumInScene> m_randomDirectionsForAsteroids{};
 		EntityPool m_asteroidPool;

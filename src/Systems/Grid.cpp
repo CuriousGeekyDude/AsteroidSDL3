@@ -75,6 +75,7 @@ namespace Asteroid
 				for (uint32_t z = 0; z < (uint32_t)l_circleBounds.size(); ++z) {
 
 					CollisionComponent* lv_collisionComp = (CollisionComponent*)l_entities[z].GetComponent(ComponentTypes::COLLISION);
+					if (nullptr == lv_collisionComp) { continue; }
 					if (true == l_entities[z].GetActiveState() && true == lv_collisionComp->GetCollisionState()) {
 						if (true == CircleRectangleIntersection(l_circleBounds[z], lv_currentCellRectangle)) {
 

@@ -3,7 +3,11 @@
 
 
 #include "Components/CollisionComponents/PlayerCollisionComponent.hpp"
-
+#include "Entities/Entity.hpp"
+#include "Components/AttributeComponents/PlayerAttributeComponent.hpp"
+#include "Components/CollisionComponents/AsteroidCollisionComponent.hpp"
+#include "Systems/CallbacksTimer.hpp"
+#include "Systems/LogSystem.hpp"
 
 
 namespace Asteroid
@@ -12,7 +16,7 @@ namespace Asteroid
 
 	PlayerCollisionComponent::PlayerCollisionComponent()
 	{
-
+		m_alreadyRegisteredCollisionEntityIDs.reserve(128U);
 	}
 
 
@@ -22,9 +26,14 @@ namespace Asteroid
 		, const uint32_t l_frameCountToActivateCollision
 		, const uint32_t l_frameCountToDeactivateCollision
 		, const bool l_isCollisionActive
-		, IndefiniteRepeatableAnimationComponent* l_repeatableAnimComponent)
+		, IndefiniteRepeatableAnimationComponent* l_repeatableAnimComponent
+		, PlayerAttributeComponent* l_playerAttribComponent
+		, const uint32_t l_frameTimeToFlushRegisteredCollision)
 	{
 		CollisionComponent::Init(l_ownerEntityHandle, l_frameCountToActivateCollision, l_frameCountToDeactivateCollision, l_isCollisionActive, l_repeatableAnimComponent);
+
+		m_attribComponent = l_playerAttribComponent;
+		m_frameTimeToFlushRegisteredCollisionIDs = l_frameTimeToFlushRegisteredCollision;
 
 	}
 
@@ -33,9 +42,72 @@ namespace Asteroid
 		return true;
 	}
 
+
+
+	void PlayerCollisionComponent::SetAlreadyRegisteredCollisionIDs(const std::vector<std::pair<uint32_t, bool>>& l_registeredCollisions)
+	{
+		m_alreadyRegisteredCollisionEntityIDs = l_registeredCollisions;
+	}
+
+
+
 	void PlayerCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_collisionReactContext, CallbacksTimer& l_timer)
 	{
+		using namespace LogSystem;
 
+		auto lv_collidedEntityID = l_entityItCollidedWith.GetID();
+
+		if (EntityType::ASTEROID == l_entityItCollidedWith.GetType()) {
+
+
+			for (uint32_t i = 0; i < m_alreadyRegisteredCollisionEntityIDs.size(); ++i) {
+
+				if (lv_collidedEntityID == m_alreadyRegisteredCollisionEntityIDs[i].first) {
+					if (true == m_alreadyRegisteredCollisionEntityIDs[i].second) {
+
+						m_attribComponent->DecrementHPByOne();
+						
+						m_alreadyRegisteredCollisionEntityIDs[i].second = false;
+
+						DelayedSetStateCallback lv_delayedCallback
+						{
+							.m_callback{[&, i]() {m_alreadyRegisteredCollisionEntityIDs[i].second = true; }},
+							.m_maxNumFrames = m_frameTimeToFlushRegisteredCollisionIDs
+						};
+
+						l_timer.AddSetStateCallback(std::move(lv_delayedCallback));
+
+						return;
+					}
+					else {
+						return;
+					}
+				}
+
+			}
+
+			m_attribComponent->DecrementHPByOne();
+
+			m_alreadyRegisteredCollisionEntityIDs.push_back(std::pair<uint32_t, bool>(lv_collidedEntityID, false));
+
+			auto lv_size = m_alreadyRegisteredCollisionEntityIDs.size();
+
+			DelayedSetStateCallback lv_delayedCallback
+			{
+				.m_callback{[&, lv_size]() {m_alreadyRegisteredCollisionEntityIDs[lv_size - 1].second = true; }},
+				.m_maxNumFrames = m_frameTimeToFlushRegisteredCollisionIDs
+			};
+
+			l_timer.AddSetStateCallback(std::move(lv_delayedCallback));
+
+		}
+
+	}
+
+
+	std::vector<std::pair<uint32_t, bool>> PlayerCollisionComponent::GetAlreadyRegisteredCollisionIDs() const
+	{
+		return m_alreadyRegisteredCollisionEntityIDs;
 	}
 
 }

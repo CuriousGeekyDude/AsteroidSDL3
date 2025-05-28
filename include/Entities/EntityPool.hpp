@@ -27,6 +27,8 @@ namespace Asteroid
 		void Update(const std::vector<Entity>& l_entities);
 
 
+		void Reset();
+
 		uint32_t GetTotalNumInactiveEntities() const;
 		uint32_t GetTotalNumActiveEntities() const;
 

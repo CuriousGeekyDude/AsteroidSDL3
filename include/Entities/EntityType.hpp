@@ -11,6 +11,7 @@ namespace Asteroid
 	{
 		PLAYER = 0,
 		BULLET,
-		ASTEROID
+		ASTEROID,
+		CURSOR
 	};
 }

@@ -21,8 +21,6 @@ namespace Asteroid
 
 		virtual ~MovementComponent() = default;
 
-		const glm::mat3& GetTransform() const;
-
 		void SetSpeed(const glm::vec2& l_newSpeed);
 
 		float GetCurrentAngleOfRotation() const;
@@ -38,7 +36,6 @@ namespace Asteroid
 		bool GetPauseState() const;
 
 	protected:
-		glm::mat3 m_transform{ glm::identity<glm::mat3>() };
 		float m_thetaDegrees{};
 		
 		bool m_pauseMovement{ false };

@@ -207,7 +207,8 @@ namespace Asteroid
 	{
 		using namespace LogSystem;
 
-		if (true == m_mouseHidden && 3 == m_totalNumLeftMouseClicks) {
+		if ((true == m_mouseHidden && 3 == m_totalNumRightMouseClicks) || false == m_mouseHidden) {
+
 			bool lv_result = SDL_SetWindowRelativeMouseMode(l_window, false);
 
 			if (false == lv_result) {
@@ -258,6 +259,16 @@ namespace Asteroid
 		}
 
 		return false;
+	}
+
+
+	void InputSystem::SetMousePos(const glm::vec2& l_mousePos)
+	{
+		m_mousePosRelToWindow = l_mousePos;
+	}
+	void InputSystem::SetHiddenStateOfMouse(const bool l_isHidden)
+	{
+		m_mouseHidden = l_isHidden;
 	}
 
 	bool InputSystem::IsMouseButtonPressed(const Mouse l_mouseButton) const

@@ -22,6 +22,8 @@ namespace Asteroid
 
 	private:
 
+		float m_damper{ 0.1f };
+
 	};
 
 }

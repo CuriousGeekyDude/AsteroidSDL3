@@ -28,23 +28,52 @@ namespace Asteroid
 
 		LOG(Severity::FAILURE, Channel::MEMORY, "Callback timer vector size is %u", (uint32_t)m_delayedSetStateCallbacks.size());
 
-		for (size_t i = 0U; i < m_delayedSetStateCallbacks.size(); ++i) {
+			for (size_t i = 0U; i < m_delayedSetStateCallbacks.size(); ++i) {
 
-			if (m_delayedSetStateCallbacks[i].m_maxNumFrames == m_delayedSetStateCallbacks[i].m_currentFrame) {
-				m_delayedSetStateCallbacks[i].m_callback();
-				m_delayedSetStateCallbacks[i].m_currentFrame += 1U;
+				if (m_delayedSetStateCallbacks[i].m_maxNumFrames == m_delayedSetStateCallbacks[i].m_currentFrame) {
+					m_delayedSetStateCallbacks[i].m_callback();
+					m_delayedSetStateCallbacks[i].m_currentFrame += 1U;
+				}
+				else if (m_delayedSetStateCallbacks[i].m_currentFrame < m_delayedSetStateCallbacks[i].m_maxNumFrames) {
+					m_delayedSetStateCallbacks[i].m_currentFrame += 1U;
+				}
+				else {
+					std::swap(m_delayedSetStateCallbacks[i], m_delayedSetStateCallbacks.back());
+					m_delayedSetStateCallbacks.pop_back();
+				}
+
 			}
-			else if (m_delayedSetStateCallbacks[i].m_currentFrame < m_delayedSetStateCallbacks[i].m_maxNumFrames) {
-				m_delayedSetStateCallbacks[i].m_currentFrame += 1U;
+		
+		/*else {
+			for (size_t i = 0U; i < m_delayedSetStateCallbacks.size(); ++i) {
+
+				if ((m_delayedSetStateCallbacks[i].m_maxNumFrames + 1) >= m_delayedSetStateCallbacks[i].m_currentFrame) {
+					--m_delayedSetStateCallbacks[i].m_currentFrame;
+				}
+				else {
+					std::swap(m_delayedSetStateCallbacks[i], m_delayedSetStateCallbacks.back());
+					m_delayedSetStateCallbacks.pop_back();
+				}
+
 			}
-			else {
-				std::swap(m_delayedSetStateCallbacks[i], m_delayedSetStateCallbacks.back());
-				m_delayedSetStateCallbacks.pop_back();
-			}
-
-		}
+		}*/
 
 
+	}
+
+
+	const std::vector<DelayedSetStateCallback>& CallbacksTimer::GetDelayedCallbacks() const
+	{
+		return m_delayedSetStateCallbacks;
+	}
+	void CallbacksTimer::SetDelayedCallbacks(const std::vector<DelayedSetStateCallback>& l_delayedCallbacks)
+	{
+		m_delayedSetStateCallbacks = l_delayedCallbacks;
+	}
+
+	void CallbacksTimer::FlushAllCallbacks()
+	{
+		m_delayedSetStateCallbacks.resize(0);
 	}
 
 }

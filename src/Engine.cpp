@@ -9,6 +9,9 @@
 #include "Components/CollisionComponents/PlayerCollisionComponent.hpp"
 #include "Components/CollisionComponents/AsteroidCollisionComponent.hpp"
 #include "Components/CollisionComponents/BulletCollisionComponent.hpp"
+#include "Components/AttributeComponents/AsteroidAttributeComponent.hpp"
+#include "Components/AttributeComponents/PlayerAttributeComponent.hpp"
+#include "Components/AttributeComponents/CursorAttributeComponent.hpp"
 #include "Systems/Colors.hpp"
 #include "Systems/RenderingData.hpp"
 #include "Components/UpdateComponents.hpp"
@@ -92,6 +95,7 @@ namespace Asteroid
 		}
 
 		m_backgroundStarsTextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("BackgroundStarClusters");
+		m_backgroundStars2TextureHandle = m_gpuResourceManager.RetrieveGpuTextureHandle("BackgroundStarClusters2");
 
 		LOG(Severity::INFO, Channel::INITIALIZATION, "Creation of all textures on gpu was successful.");
 
@@ -117,6 +121,7 @@ namespace Asteroid
 
 	bool Engine::GameLoop()
 	{
+		using namespace LogSystem;
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -146,8 +151,17 @@ namespace Asteroid
 		lv_backgroundStarsRenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
 		lv_backgroundStarsRenderData.m_entityTextureHandle = m_backgroundStarsTextureHandle;
 
-		float lv_totalSecondsFirstLevel = 90.f;
-		uint32_t lv_minAsteroidsToHitToGoToNextLevel = 35U;
+		RenderSystem::RenderingData lv_backgroundStars2RenderData{};
+		lv_backgroundStars2RenderData.m_angleOfRotation = 0.f;
+		lv_backgroundStars2RenderData.m_entityPos = glm::vec2{ 0.f, 0.f };
+		lv_backgroundStars2RenderData.m_entityTextureHandle = m_backgroundStars2TextureHandle;
+
+		constexpr float lv_totalSecondsFirstLevel = 90.f; //90
+		constexpr float lv_totalSecondsSecondLevel = 120.f; //120
+		constexpr uint32_t lv_minAsteroidsToHitToGoToSecondLevel = 30U; //35
+		constexpr uint32_t lv_minAsteroidsToHitToWinInSecondLevel = 20U;
+		bool lv_isPlayerAlive = true;
+		bool lv_timeRewinded{ false };
 
 		while (false == lv_quit) {
 
@@ -190,20 +204,62 @@ namespace Asteroid
 			lv_backgroundStarsRenderData.m_centerOfRotation.x = (float)lv_currentWindowSize.x / 2.f;
 			lv_backgroundStarsRenderData.m_centerOfRotation.y = (float)lv_currentWindowSize.y / 2.f;
 
-			m_renderer.RenderEntity(lv_backgroundStarsRenderData);
 
+
+			lv_backgroundStars2RenderData.m_heightToRender = lv_currentWindowSize.y;
+			lv_backgroundStars2RenderData.m_widthToRender = lv_currentWindowSize.x;
+			lv_backgroundStars2RenderData.m_centerOfRotation.x = (float)lv_currentWindowSize.x / 2.f;
+			lv_backgroundStars2RenderData.m_centerOfRotation.y = (float)lv_currentWindowSize.y / 2.f;
+
+
+			if(1U == m_currentLevel) {
+				m_renderer.RenderEntity(lv_backgroundStarsRenderData);
+
+			}
+			else {
+				m_renderer.RenderEntity(lv_backgroundStars2RenderData);
+			}
+
+
+			bool lv_loopOverInThisLevel = ((m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel && 1U == m_currentLevel)
+				|| (m_timeSinceStartInSeconds <= lv_totalSecondsSecondLevel && 2U == m_currentLevel)) && true == lv_isPlayerAlive;
+
+			if (true == lv_loopOverInThisLevel) {
+				if (true == m_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_T) && false == m_inputSystem.IsKeyUp(InputSystem::Keys::KEY_T)) {
+					m_timeRewind.RewindTimeByOneFrame(m_entities, m_inputSystem,m_timeSinceStartInSeconds, lv_updateComponent.m_totalNumAsteroidsHitByBullets, m_callbacksTimer);
+					lv_timeRewinded = true;
+				}
+				else {
+					m_timeRewind.Update(m_entities, m_inputSystem,m_timeSinceStartInSeconds, lv_updateComponent.m_totalNumAsteroidsHitByBullets, m_callbacksTimer.GetDelayedCallbacks());
+					lv_timeRewinded = false;
+				}
+			}
+			else {
+				lv_timeRewinded = false;
+			}
+			
 			m_callbacksTimer.Update();
 
-			if (m_timeSinceStartInSeconds <= lv_totalSecondsFirstLevel) {
+			auto* lv_playerAttribComp = (PlayerAttributeComponent*)m_entities[m_playerEntityHandle].GetComponent(ComponentTypes::ATTRIBUTE);
+			lv_isPlayerAlive = (0U == lv_playerAttribComp->GetHp()) ? false : true;
+			LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "HP: %u", lv_playerAttribComp->GetHp());
+
+
+			if (true == lv_loopOverInThisLevel) {
+
 				m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
 				m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
-				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet();
+				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet(m_currentLevel, lv_timeRewinded);
 				lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
 				for (auto& l_entity : m_entities) {
 					if (true == l_entity.GetActiveState()) {
 						assert(l_entity.Update(lv_updateComponent));
 					}
 				}
+
+				
+
+
 				m_entitySpawnerFromPools.UpdatePools();
 				UpdateCircleBounds();
 
@@ -237,6 +293,8 @@ namespace Asteroid
 
 					ImGui::Text("Total num of asteroids hit by bullets since the start: %u", lv_updateComponent.m_totalNumAsteroidsHitByBullets);
 					ImGui::Text("Seconds: %f", m_timeSinceStartInSeconds);
+					ImGui::Text("Player health: %u", lv_playerAttribComp->GetHp());
+
 					ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 					ImGui::End();
 				}
@@ -248,59 +306,264 @@ namespace Asteroid
 			}
 			else {
 				
+
 				ImGui_ImplSDLRenderer3_NewFrame();
 				ImGui_ImplSDL3_NewFrame();
 				ImGui::NewFrame();
 
-				ImGui::Begin("Game status");
 
-				if (lv_minAsteroidsToHitToGoToNextLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets) {
+				if (1U == m_currentLevel) {
 
-					static bool lv_enteredThisLoop{ false };
+					ImGui::Begin("Game status");
+
+					if (lv_minAsteroidsToHitToGoToSecondLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets && true == lv_isPlayerAlive) {
+
+						static bool lv_enteredThisLoop{ false };
 
 
-					ImGui::Text("Congrats! You have successfully completed this level!");
+						ImGui::Text("Congrats! You have successfully completed this level!");
+						ImGui::Text("Starting the next level...");
+
+						if (false == lv_enteredThisLoop) {
+
+							m_callbacksTimer.FlushAllCallbacks();
+							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
+
+								if (EntityType::CURSOR != m_entities[i].GetType()) {
+									m_entities[i].SetActiveState(false);
+								}
+
+								if (EntityType::ASTEROID == m_entities[i].GetType()) {
+									auto* lv_asteroidExp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION);
+									auto* lv_asteroidWarp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::WARP_ASTEROID_ANIMATION);
+
+									lv_asteroidWarp->Reset();
+									lv_asteroidExp->Reset();
+								}
+
+							}
+							m_entitySpawnerFromPools.ResetPools();
+							m_timeRewind.Flush();
+							lv_playerAttribComp->ResetHealth();
+
+							DelayedSetStateCallback lv_exitCallback
+							{
+								.m_callback{[&]() 
+								{
+									m_currentLevel += 1U; 
+									m_timeSinceStartInSeconds = 0U;
+									lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+									lv_enteredThisLoop = false;
+								}},
+								.m_maxNumFrames = 512U
+							};
+
+							m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));
+						}
+
+						lv_enteredThisLoop = true;
+
+
+					}
+					else {
+
+						static bool lv_repeat{ false };
+						static bool lv_exit{ false };
+
+						if (false == lv_isPlayerAlive) {
+							ImGui::Text("You died. Would you like to repeat this level or exit?");
+						}
+						else {
+							ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
+						}
+						if (true == ImGui::Button("Repeat")) {
+							lv_repeat = true;
+						}
+						if (true == ImGui::Button("Exit")) {
+							lv_exit = true;
+						}
+
+						if (true == lv_repeat) {
+
+
+							m_callbacksTimer.FlushAllCallbacks();
+							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
+
+
+								if (EntityType::CURSOR != m_entities[i].GetType()) {
+									m_entities[i].SetActiveState(false);
+								}
+
+								if (EntityType::ASTEROID == m_entities[i].GetType()) {
+									auto* lv_asteroidExp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION);
+									auto* lv_asteroidWarp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::WARP_ASTEROID_ANIMATION);
+
+									lv_asteroidWarp->Reset();
+									lv_asteroidExp->Reset();
+								}
+
+							}
+							m_timeRewind.Flush();
+
+							m_entitySpawnerFromPools.ResetPools();
+							m_timeSinceStartInSeconds = 0.f;
+							lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+							lv_isPlayerAlive = true;
+							lv_playerAttribComp->ResetHealth();
+
+
+							lv_repeat = false;
+							lv_exit = false;
+						}
+
+						if (true == lv_exit) {
+							lv_quit = true;
+						}
+					}
+
+
+
+					ImGui::End();
+				}
+				else if (2U == m_currentLevel) {
 					
-					if (false == lv_enteredThisLoop) {
-						DelayedSetStateCallback lv_exitCallback
-						{
-							.m_callback{[&lv_quit]() {lv_quit = true; }},
-							.m_maxNumFrames = 60U
-						};
+					ImGui::Begin("Game status");
 
-						m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));
+					if (lv_minAsteroidsToHitToWinInSecondLevel <= lv_updateComponent.m_totalNumAsteroidsHitByBullets && true == lv_isPlayerAlive) {
+
+						ImGui::Text("You won the game congrats!");
+						
+
+						static bool lv_repeat3{ false };
+						static bool lv_exit3{ false };
+
+						ImGui::Text("Would you like to play again or exit?");
+
+						if (true == ImGui::Button("Play again")) {
+
+							lv_repeat3 = true;
+						}
+
+						if (true == ImGui::Button("Exit")) {
+
+							lv_quit = true;
+
+						}
+
+
+						if (true == lv_repeat3) {
+
+							m_callbacksTimer.FlushAllCallbacks();
+							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
+
+								if (EntityType::CURSOR != m_entities[i].GetType()) {
+									m_entities[i].SetActiveState(false);
+								}
+
+								if (EntityType::ASTEROID == m_entities[i].GetType()) {
+									auto* lv_asteroidExp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION);
+									auto* lv_asteroidWarp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::WARP_ASTEROID_ANIMATION);
+
+									lv_asteroidWarp->Reset();
+									lv_asteroidExp->Reset();
+								}
+
+							}
+							m_timeRewind.Flush();
+
+							m_entitySpawnerFromPools.ResetPools();
+							m_timeSinceStartInSeconds = 0.f;
+							lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+							lv_isPlayerAlive = true;
+							lv_playerAttribComp->ResetHealth();
+
+							m_currentLevel = 1U;
+
+							lv_repeat3 = false;
+
+						}
+
+						/*static bool lv_enteredThisLoop{ false };
+
+
+						if (false == lv_enteredThisLoop) {
+
+							m_callbacksTimer.FlushAllCallbacks();
+
+							DelayedSetStateCallback lv_exitCallback
+							{
+								.m_callback{[&lv_quit]() {lv_quit = true; }},
+								.m_maxNumFrames = 512U
+							};
+
+							m_callbacksTimer.AddSetStateCallback(std::move(lv_exitCallback));
+						}
+
+						lv_enteredThisLoop = true;*/
+
+
+					}
+					else {
+
+						static bool lv_repeat2{ false };
+						static bool lv_exit2{ false };
+
+						if (false == lv_isPlayerAlive) {
+							ImGui::Text("You died! Would you like to repeat this level or exit?");
+						}
+						else {
+							ImGui::Text("Failed to clear this level! Would you like to repeat this level or exit?");
+						}
+						if (true == ImGui::Button("Repeat")) {
+							lv_repeat2 = true;
+							m_currentLevel = 2U;
+						}
+						if (true == ImGui::Button("Exit")) {
+							lv_exit2 = true;
+						}
+
+						if (true == lv_repeat2) {
+
+							m_callbacksTimer.FlushAllCallbacks();
+							for (uint32_t i = m_playerEntityHandle + 1; i < (uint32_t)m_entities.size(); ++i) {
+
+								if (EntityType::CURSOR != m_entities[i].GetType()) {
+									m_entities[i].SetActiveState(false);
+								}
+								
+								if (EntityType::ASTEROID == m_entities[i].GetType()) {
+									auto* lv_asteroidExp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION);
+									auto* lv_asteroidWarp = (OnceRepeatableAnimationComponent*)m_entities[i].GetComponent(ComponentTypes::WARP_ASTEROID_ANIMATION);
+
+									lv_asteroidWarp->Reset();
+									lv_asteroidExp->Reset();
+								}
+
+							}
+							m_timeRewind.Flush();
+
+							m_entitySpawnerFromPools.ResetPools();
+							m_timeSinceStartInSeconds = 0.f;
+							lv_updateComponent.m_totalNumAsteroidsHitByBullets = 0U;
+							lv_isPlayerAlive = true;
+							lv_playerAttribComp->ResetHealth();
+
+
+							lv_repeat2 = false;
+							lv_exit2 = false;
+						}
+
+						if (true == lv_exit2) {
+							lv_quit = true;
+						}
+
 					}
 
-					lv_enteredThisLoop = true;
 
+					ImGui::End();
 
 				}
-				else {
 
-					static bool lv_repeat{ false };
-					static bool lv_exit{ false };
-
-					ImGui::Text("Failed to clear this level! Would you like to repeat or exit?");
-					if (true == ImGui::Button("Repeat")) {
-						lv_repeat = true;
-					}
-					if (true == ImGui::Button("Exit")) {
-						lv_exit = true;
-					}
-
-					if (true == lv_repeat) {
-						m_timeSinceStartInSeconds = 0.f;
-
-						lv_repeat = false;
-						lv_exit = false;
-					}
-
-					if (true == lv_exit) {
-						lv_quit = true;
-					}
-				}
-
-				ImGui::End();
 			}
 
 
@@ -320,8 +583,6 @@ namespace Asteroid
 
 			m_timeSinceStartInSeconds += ((float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime/1000.f);
 		}
-
-		LOG(LogSystem::Severity::INFO, LogSystem::Channel::GRAPHICS, "End of game loop.");
 
 		return true;
 
@@ -403,8 +664,10 @@ namespace Asteroid
 		glm::ivec2 lv_windowRes{};
 		GetCurrentWindowSize(lv_windowRes);
 
-		m_circleBoundsEntities.reserve(150U);
-		m_entities.reserve(150U);
+		m_circleBoundsEntities.reserve(256U);
+		m_entities.reserve(256U);
+
+		const auto* lv_warpAsteroidAnimMeta = GetAnimationMeta(AnimationType::WARP_ASTEROID);
 
 		//Main player initialization
 		{
@@ -413,23 +676,35 @@ namespace Asteroid
 			assert(nullptr != lv_spaceshipAnimMeta);
 
 
-			auto lv_movementComponent = std::make_unique<UserInputBasedMovementComponent>();
-			auto lv_collisionComponent = std::make_unique<PlayerCollisionComponent>();
-			auto lv_entityAnimationComp = std::make_unique<IndefiniteRepeatableAnimationComponent>();
-			auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
+			UserInputBasedMovementComponent* lv_movementComponent = static_cast<UserInputBasedMovementComponent*>(m_allocator.Allocate(sizeof(UserInputBasedMovementComponent)));
+			PlayerCollisionComponent* lv_collisionComponent = static_cast<PlayerCollisionComponent*>(m_allocator.Allocate(sizeof(PlayerCollisionComponent)));
+			IndefiniteRepeatableAnimationComponent* lv_entityAnimationComp = static_cast<IndefiniteRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(IndefiniteRepeatableAnimationComponent)));
+			ActiveBasedStateComponent* lv_activeComponent = static_cast<ActiveBasedStateComponent*>(m_allocator.Allocate(sizeof(ActiveBasedStateComponent)));
+			PlayerAttributeComponent* lv_playerAttribComponent = static_cast<PlayerAttributeComponent*>(m_allocator.Allocate(sizeof(PlayerAttributeComponent)));
+
+			
+			lv_movementComponent = new(lv_movementComponent) UserInputBasedMovementComponent();
+			lv_collisionComponent = new(lv_collisionComponent) PlayerCollisionComponent();
+			lv_entityAnimationComp = new(lv_entityAnimationComp) IndefiniteRepeatableAnimationComponent();
+			lv_activeComponent = new(lv_activeComponent) ActiveBasedStateComponent();
+			lv_playerAttribComponent = new(lv_playerAttribComponent) PlayerAttributeComponent();
+
+
 
 			lv_movementComponent->Init(0);
-			lv_collisionComponent->Init(0, 0, 0, true, lv_entityAnimationComp.get());
-			lv_entityAnimationComp->Init(0, lv_spaceshipAnimMeta, lv_movementComponent.get()
-										,lv_activeComponent.get(), 0, 0, true);
-			lv_activeComponent->Init(0, lv_collisionComponent.get(), lv_entityAnimationComp.get(),
+			lv_collisionComponent->Init(0, 0, 0, true, lv_entityAnimationComp, lv_playerAttribComponent, lv_warpAsteroidAnimMeta->m_totalNumFrames + 20U);
+			lv_entityAnimationComp->Init(0, lv_spaceshipAnimMeta, lv_movementComponent
+										,lv_activeComponent, 0, 0, true);
+			lv_activeComponent->Init(0, lv_collisionComponent, lv_entityAnimationComp,
 				1, 1);
+			lv_playerAttribComponent->Init(0, 10U);
 			auto& lv_player = m_entities.emplace_back(std::move(Entity(glm::vec2{ (float)lv_windowRes.x/2.f, (float)lv_windowRes.y/2.f }, 0, EntityType::PLAYER, true)));
 
-			lv_player.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
-			lv_player.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
-			lv_player.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityAnimationComp));
-			lv_player.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
+			lv_player.AddComponent(ComponentTypes::MOVEMENT, lv_movementComponent);
+			lv_player.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, lv_activeComponent);
+			lv_player.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, lv_entityAnimationComp);
+			lv_player.AddComponent(ComponentTypes::COLLISION, lv_collisionComponent);
+			lv_player.AddComponent(ComponentTypes::ATTRIBUTE, lv_playerAttribComponent);
 			
 			m_playerEntityHandle = 0U;
 			
@@ -447,24 +722,31 @@ namespace Asteroid
 
 				const uint32_t lv_bulletIdx = 1U + i;
 
-				auto lv_collisionComponent = std::make_unique<BulletCollisionComponent>();
-				auto lv_movementComponent = std::make_unique<RayMovementComponent>();
-				auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
-				auto lv_entityMainAnimation = std::make_unique<IndefiniteRepeatableAnimationComponent>();
+
+				BulletCollisionComponent* lv_collisionComponent = static_cast<BulletCollisionComponent*>(m_allocator.Allocate(sizeof(BulletCollisionComponent)));
+				RayMovementComponent* lv_movementComponent = static_cast<RayMovementComponent*>(m_allocator.Allocate(sizeof(RayMovementComponent)));
+				ActiveBasedStateComponent* lv_activeComponent = static_cast<ActiveBasedStateComponent*>(m_allocator.Allocate(sizeof(ActiveBasedStateComponent)));
+				IndefiniteRepeatableAnimationComponent* lv_entityMainAnimation = static_cast<IndefiniteRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(IndefiniteRepeatableAnimationComponent)));
+
+				lv_collisionComponent = new(lv_collisionComponent) BulletCollisionComponent();
+				lv_movementComponent = new(lv_movementComponent) RayMovementComponent();
+				lv_activeComponent = new(lv_activeComponent) ActiveBasedStateComponent();
+				lv_entityMainAnimation = new(lv_entityMainAnimation) IndefiniteRepeatableAnimationComponent();
+
 
 				lv_collisionComponent->Init(lv_bulletIdx,0, 0, true
-											, lv_entityMainAnimation.get(), lv_activeComponent.get());
+											, lv_entityMainAnimation, lv_activeComponent);
 				lv_movementComponent->Init(lv_bulletIdx);
-				lv_activeComponent->Init(lv_bulletIdx, lv_collisionComponent.get(), lv_entityMainAnimation.get(), 0, 0);
-				lv_entityMainAnimation->Init(lv_bulletIdx, lv_bulletAnimMetaData, lv_movementComponent.get(), lv_activeComponent.get(), 0, 0, true);
+				lv_activeComponent->Init(lv_bulletIdx, lv_collisionComponent, lv_entityMainAnimation, 0, 0);
+				lv_entityMainAnimation->Init(lv_bulletIdx, lv_bulletAnimMetaData, lv_movementComponent, lv_activeComponent, 0, 0, true);
 
 				auto& lv_bullet = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_bulletIdx, EntityType::BULLET, false)));
 			
 
-				lv_bullet.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
-				lv_bullet.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
-				lv_bullet.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
-				lv_bullet.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityMainAnimation));
+				lv_bullet.AddComponent(ComponentTypes::COLLISION, lv_collisionComponent);
+				lv_bullet.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, lv_activeComponent);
+				lv_bullet.AddComponent(ComponentTypes::MOVEMENT, lv_movementComponent);
+				lv_bullet.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, lv_entityMainAnimation);
 				
 
 				
@@ -480,7 +762,6 @@ namespace Asteroid
 			constexpr uint32_t lv_totalNumAsteroids{ 128U };
 			const auto* lv_asteroidAnimMeta = GetAnimationMeta(AnimationType::ASTEROID);
 			const auto* lv_explosionAsteroidAnimMeta = GetAnimationMeta(AnimationType::EXPLOSION_FIRE_ASTEROID);
-			const auto* lv_warpAsteroidAnimMeta = GetAnimationMeta(AnimationType::WARP_ASTEROID);
 			assert(nullptr != lv_asteroidAnimMeta);
 			assert(nullptr != lv_warpAsteroidAnimMeta);
 			const uint32_t lv_entitiesLastIndex = (uint32_t)m_entities.size();
@@ -490,38 +771,82 @@ namespace Asteroid
 
 				const uint32_t lv_asteroidIdx = lv_entitiesLastIndex + i;
 
-				auto lv_collisionComponent = std::make_unique<AsteroidCollisionComponent>();
-				auto lv_activeComponent = std::make_unique<ActiveBasedStateComponent>();
-				auto lv_movementComponent = std::make_unique<RayMovementComponent>();
-				auto lv_entityMainAnimation = std::make_unique<IndefiniteRepeatableAnimationComponent>();
-				auto lv_fireExplosionAnimationComponent = std::make_unique<OnceRepeatableAnimationComponent>();
-				auto lv_warpAsteroidAnimComponent = std::make_unique<OnceRepeatableAnimationComponent>();
+
+				AsteroidCollisionComponent* lv_collisionComponent = static_cast<AsteroidCollisionComponent*>(m_allocator.Allocate(sizeof(AsteroidCollisionComponent)));
+				ActiveBasedStateComponent* lv_activeComponent = static_cast<ActiveBasedStateComponent*>(m_allocator.Allocate(sizeof(ActiveBasedStateComponent)));
+				RayMovementComponent* lv_movementComponent = static_cast<RayMovementComponent*>(m_allocator.Allocate(sizeof(RayMovementComponent)));
+				IndefiniteRepeatableAnimationComponent* lv_entityMainAnimation = static_cast<IndefiniteRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(IndefiniteRepeatableAnimationComponent)));
+				OnceRepeatableAnimationComponent* lv_fireExplosionAnimationComponent = static_cast<OnceRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(OnceRepeatableAnimationComponent)));
+				OnceRepeatableAnimationComponent* lv_warpAsteroidAnimComponent = static_cast<OnceRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(OnceRepeatableAnimationComponent)));
+				AsteroidAttributeComponent* lv_asteroidAttribComponent = static_cast<AsteroidAttributeComponent*>(m_allocator.Allocate(sizeof(AsteroidAttributeComponent)));
+
+				lv_collisionComponent = new(lv_collisionComponent) AsteroidCollisionComponent();
+				lv_activeComponent = new(lv_activeComponent) ActiveBasedStateComponent();
+				lv_movementComponent = new(lv_movementComponent) RayMovementComponent();
+				lv_entityMainAnimation = new(lv_entityMainAnimation) IndefiniteRepeatableAnimationComponent();
+				lv_fireExplosionAnimationComponent = new(lv_fireExplosionAnimationComponent) OnceRepeatableAnimationComponent();
+				lv_warpAsteroidAnimComponent = new(lv_warpAsteroidAnimComponent) OnceRepeatableAnimationComponent();
+				lv_asteroidAttribComponent = new(lv_asteroidAttribComponent) AsteroidAttributeComponent();
 
 				lv_collisionComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta->m_totalNumFrames + 20U, lv_explosionAsteroidAnimMeta->m_totalNumFrames / 3
-					, true, lv_entityMainAnimation.get(), lv_fireExplosionAnimationComponent.get()
-					, lv_activeComponent.get());
-				lv_activeComponent->Init(lv_asteroidIdx, lv_collisionComponent.get(), lv_entityMainAnimation.get()
+					, true, lv_entityMainAnimation, lv_fireExplosionAnimationComponent
+					, lv_activeComponent);
+				lv_activeComponent->Init(lv_asteroidIdx, lv_collisionComponent, lv_entityMainAnimation
 										, 1, lv_explosionAsteroidAnimMeta->m_totalNumFrames);
 				lv_movementComponent->Init(lv_asteroidIdx);
-				lv_entityMainAnimation->Init(lv_asteroidIdx, lv_asteroidAnimMeta, lv_movementComponent.get()
-											, lv_activeComponent.get(), lv_warpAsteroidAnimMeta->m_totalNumFrames - 20U, 0, true);
-				lv_fireExplosionAnimationComponent->Init(lv_asteroidIdx, lv_explosionAsteroidAnimMeta , lv_movementComponent.get());
-				lv_warpAsteroidAnimComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta, lv_movementComponent.get(), false);
+				lv_entityMainAnimation->Init(lv_asteroidIdx, lv_asteroidAnimMeta, lv_movementComponent
+											, lv_activeComponent, lv_warpAsteroidAnimMeta->m_totalNumFrames - 20U, 0, true);
+				lv_fireExplosionAnimationComponent->Init(lv_asteroidIdx, lv_explosionAsteroidAnimMeta , lv_movementComponent);
+				lv_warpAsteroidAnimComponent->Init(lv_asteroidIdx, lv_warpAsteroidAnimMeta, lv_movementComponent, false);
+
+				lv_asteroidAttribComponent->Init(lv_asteroidIdx, 3, AsteroidStates::PASSIVE, lv_movementComponent);
 
 				auto& lv_asteroid = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_asteroidIdx,  EntityType::ASTEROID, false)));
 
-				lv_asteroid.AddComponent(ComponentTypes::COLLISION, std::move(lv_collisionComponent));
-				lv_asteroid.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, std::move(lv_activeComponent));
-				lv_asteroid.AddComponent(ComponentTypes::MOVEMENT, std::move(lv_movementComponent));
-				lv_asteroid.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, std::move(lv_entityMainAnimation));
-				lv_asteroid.AddComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION, std::move(lv_fireExplosionAnimationComponent));
-				lv_asteroid.AddComponent(ComponentTypes::WARP_ASTEROID_ANIMATION, std::move(lv_warpAsteroidAnimComponent));
-				
+				lv_asteroid.AddComponent(ComponentTypes::COLLISION, lv_collisionComponent);
+				lv_asteroid.AddComponent(ComponentTypes::ACTIVE_BASED_STATE, lv_activeComponent);
+				lv_asteroid.AddComponent(ComponentTypes::MOVEMENT, lv_movementComponent);
+				lv_asteroid.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, lv_entityMainAnimation);
+				lv_asteroid.AddComponent(ComponentTypes::EXPLOSION_FIRE_ASTEROID_ANIMATION, lv_fireExplosionAnimationComponent);
+				lv_asteroid.AddComponent(ComponentTypes::WARP_ASTEROID_ANIMATION, lv_warpAsteroidAnimComponent);
+				lv_asteroid.AddComponent(ComponentTypes::ATTRIBUTE, lv_asteroidAttribComponent);
+
+
 				m_circleBoundsEntities.push_back(Circle{ .m_center{lv_asteroid.GetCurrentPos()}, .m_radius{lv_asteroidAnimMeta->m_widthToRenderTextures/2.f} });
 
 
 			}
 		}
+
+
+		{
+
+			const auto* lv_cursorAnim = GetAnimationMeta(AnimationType::CURSOR);
+			auto lv_index = m_entities.size();
+
+			RayMovementComponent* lv_movementComp = static_cast<RayMovementComponent*>(m_allocator.Allocate(sizeof(RayMovementComponent)));
+			IndefiniteRepeatableAnimationComponent* lv_mainAnimComp = static_cast<IndefiniteRepeatableAnimationComponent*>(m_allocator.Allocate(sizeof(IndefiniteRepeatableAnimationComponent)));
+			CursorAttributeComponent* lv_cursorAttribComp = static_cast<CursorAttributeComponent*>(m_allocator.Allocate(sizeof(CursorAttributeComponent)));
+
+			lv_movementComp = new(lv_movementComp) RayMovementComponent();
+			lv_mainAnimComp = new(lv_mainAnimComp) IndefiniteRepeatableAnimationComponent();
+			lv_cursorAttribComp = new(lv_cursorAttribComp) CursorAttributeComponent();
+
+			lv_movementComp->Init(static_cast<EntityHandle>(lv_index));
+			lv_mainAnimComp->Init(static_cast<EntityHandle>(lv_index), lv_cursorAnim, lv_movementComp, nullptr, 0, 0);
+			lv_cursorAttribComp->Init(static_cast<EntityHandle>(lv_index), 0, lv_movementComp, lv_mainAnimComp);
+
+			auto& lv_cursor = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_index, EntityType::CURSOR, true)));
+
+			lv_cursor.AddComponent(ComponentTypes::ATTRIBUTE, lv_cursorAttribComp);
+			lv_cursor.AddComponent(ComponentTypes::MOVEMENT, lv_movementComp);
+			lv_cursor.AddComponent(ComponentTypes::INDEFINITE_ENTITY_ANIMATION, lv_mainAnimComp);
+
+			m_circleBoundsEntities.push_back(Circle{ .m_center{lv_cursor.GetCurrentPos()}, .m_radius{32.f}});
+
+
+		}
+
 	}
 
 	void Engine::UpdateCircleBounds()

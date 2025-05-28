@@ -37,6 +37,11 @@ namespace Asteroid
 
 		void Reset();
 
+		bool IsDelayedCallbackAlreadySet() const;
+
+
+		
+
 	private:
 
 		CollisionComponent* m_collisionComponent{};

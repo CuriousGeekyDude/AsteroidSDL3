@@ -24,15 +24,13 @@ namespace Asteroid
 
 	bool UserInputBasedMovementComponent::Update(UpdateComponents& l_updateContext)
 	{
-		glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
-		bool lv_keyIsPressed = false;
-		float lv_d = (1 - std::expf(-l_updateContext.m_deltaTime * 0.16f));
-		float lv_damper{ 0.064f };
-		
-		float lv_tempSpeed{ lv_damper * lv_d * l_updateContext.m_deltaTime };
-
+		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
 		const auto& lv_inputSystem = l_updateContext.m_engine->GetInputSystem();
+
+		/*glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
+		bool lv_keyIsPressed = false;
+		
 
 		if (true == lv_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_W)) {
 			m_speed += glm::vec2(0.f, -lv_tempSpeed);
@@ -64,19 +62,30 @@ namespace Asteroid
 		lv_deltaTransform[2][0] = m_speed.x;
 		lv_deltaTransform[2][1] = m_speed.y;
 
-		auto& lv_ownerEntity = l_updateContext.m_engine->GetEntityFromHandle(m_ownerEntityHandle);
 
-		m_transform = lv_deltaTransform * m_transform;
 		auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();
 		auto lv_newPos3 = lv_deltaTransform * glm::vec3{ lv_currentPos, 1.f };
-		lv_ownerEntity.SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });
-
-
+		lv_ownerEntity.SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });*/
 
 		if (true == lv_inputSystem.IsMouseHidden()) {
 
 			const auto& lv_mouseRelPos = lv_inputSystem.GetMousePosRelativeToWindow();
-			glm::vec2 lv_directionVector{lv_mouseRelPos.x - lv_newPos3.x, -lv_mouseRelPos.y + lv_newPos3.y};
+			auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();
+
+			glm::vec2 lv_newPos = lv_currentPos;
+
+			if (true == lv_inputSystem.IsMouseButtonPressed(InputSystem::Mouse::LEFT)) {
+				m_damper = (1 - std::expf(-m_damper));
+				//lv_d = std::clamp(lv_tempSpeed, 0.f, 1.5f);
+				lv_newPos += m_damper * (lv_mouseRelPos - lv_currentPos);
+			}
+			else {
+				m_damper = (1 - std::expf(-l_updateContext.m_deltaTime * 0.0015f));
+			}
+			
+			lv_ownerEntity.SetCurrentPos(lv_newPos);
+
+			glm::vec2 lv_directionVector{lv_mouseRelPos.x - lv_newPos.x, -lv_mouseRelPos.y + lv_newPos.y};
 			
 			if (0 != glm::dot(lv_directionVector, lv_directionVector)) {
 
@@ -93,10 +102,8 @@ namespace Asteroid
 				m_thetaDegrees *= -1.f;
 				m_thetaDegrees = glm::degrees<float>(m_thetaDegrees);
 			}
-			else {
-				m_thetaDegrees = 0.f;
-			}
-			
+		
+
 		}
 		else {
 			m_thetaDegrees = 0.f;

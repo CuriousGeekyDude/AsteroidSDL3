@@ -2,7 +2,7 @@
 
 #include "Engine.hpp"
 #include "Utilities/UtilityFunctions.hpp"
-
+#include <iostream>
 
 
 void FillMeta(Asteroid::AnimationMetaData& l_meta, uint32_t l_firstIndex
@@ -41,9 +41,16 @@ int main()
 	FillMeta(lv_meta, 1, 1, 40, 40, AnimationType::LASER_BEAM);
 	lv_engineInitialData.m_animationMetaData.push_back(lv_meta);
 
+	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
+		.emplace_back(std::pair<std::string, std::string>("Cursor", "Assets/Cursor.png"));
+	FillMeta(lv_meta, 2, 1, 32, 32, AnimationType::CURSOR);
+	lv_engineInitialData.m_animationMetaData.push_back(lv_meta);
+
 
 	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
 		.emplace_back(std::pair<std::string, std::string>("BackgroundStarClusters", "Assets/Background.jpg"));
+	lv_engineInitialData.m_mappedTextureNamesToTheirPaths
+		.emplace_back(std::pair<std::string, std::string>("BackgroundStarClusters2", "Assets/Background2.jpg"));
 
 	lv_engineInitialData.m_animationMetaData.push_back
 	(Utilities::ProcessFileOfRelativePathsOfTextures("InitFiles/Animation/ExplosionBombFireAsteroid/RelativePathTextures.txt"
@@ -59,14 +66,24 @@ int main()
 		, lv_engineInitialData.m_mappedTextureNamesToTheirPaths, AnimationType::WARP_ASTEROID
 		, 250, 150));
 	
-	Engine lv_asteroidEngine(std::move(lv_engineInitialData));
 
-	if (false == lv_asteroidEngine.Init()) {
-		return -1;
+	try {
+
+		Engine lv_asteroidEngine(std::move(lv_engineInitialData));
+
+		if (false == lv_asteroidEngine.Init()) {
+			return -1;
+		}
+
+		if (false == lv_asteroidEngine.GameLoop()) {
+			return -1;
+		}
 	}
-
-	if (false == lv_asteroidEngine.GameLoop()) {
-		return -1;
+	catch (const std::runtime_error& l_error) {
+		std::cout << l_error.what() << std::endl;
+	}
+	catch (const std::bad_alloc& l_error) {
+		std::cout << l_error.what() << std::endl;
 	}
 	
 

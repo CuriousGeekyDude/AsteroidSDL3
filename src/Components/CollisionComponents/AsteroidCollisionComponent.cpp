@@ -48,6 +48,19 @@ namespace Asteroid
 
 
 
+
+	uint32_t AsteroidCollisionComponent::IsHitByBullet() const
+	{
+		return m_hitBullet;
+	}
+
+
+
+	void AsteroidCollisionComponent::SetBulletHitFlag(const uint32_t l_hitBullet)
+	{
+		m_hitBullet = l_hitBullet;
+	}
+
 	void AsteroidCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith
 		, Entity& l_ownerEntity, CallbacksTimer& l_timer)
 	{
