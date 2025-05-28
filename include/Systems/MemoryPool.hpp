@@ -25,6 +25,14 @@ namespace Asteroid
 		MemoryPool(const size_t l_minBytesToAllocate, const size_t l_blockSizes);
 		
 
+		/*
+		* The returned void* is going to be cast to the type by the user and modified 
+		* through the course of the program. That naturally violates strict aliasing rule
+		* that compiler assumes us to respect when doing optimizations. 
+		* One way to respect this rule and still do type punning is to use memcpy().
+		* But due to how much refactoring that required, we wont respect that rule 
+		* and just build the project without optimization flags turned on.
+		*/
 		void* Allocate();
 
 

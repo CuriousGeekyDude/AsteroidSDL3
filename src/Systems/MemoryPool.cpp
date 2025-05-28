@@ -37,6 +37,7 @@ namespace Asteroid
 
 		for (size_t i = 0, j = 0; i < m_totalBytesAllocatedForPool; i += m_blockSizeInBytes, ++j) {
 
+			//Violates strict aliasing rules which compiler assumes us to respect when doing optimization.
 			uint32_t* lv_tempArray = reinterpret_cast<uint32_t*>(&m_array[i]);
 			lv_tempArray[0] = m_gaurdDebugValue;
 			lv_tempArray[1] = (uint32_t)(j+1);
@@ -50,7 +51,7 @@ namespace Asteroid
 	}
 
 
-
+	
 	void* MemoryPool::Allocate()
 	{
 		using namespace LogSystem;
@@ -59,9 +60,8 @@ namespace Asteroid
 			return nullptr;
 		}
 
-
+		//Violates strict aliasing rules which compiler assumes us to respect when doing optimization.
 		uint32_t* lv_blockToReturn = reinterpret_cast<uint32_t*>(&m_array[m_blockSizeInBytes * m_headHandleOfFreeList]);
-
 		uint32_t lv_nextBlockHandle = lv_blockToReturn[1];
 
 		m_headHandleOfFreeList = lv_nextBlockHandle;
@@ -92,8 +92,8 @@ namespace Asteroid
 
 			uint32_t lv_blockToBeFreedHandle = static_cast<uint32_t>(lv_totalNumBytesInBetween / m_blockSizeInBytes);
 
+			//Violates strict aliasing rules which compiler assumes us to respect when doing optimization.
 			uint32_t* lv_currentBlockUint32 = reinterpret_cast<uint32_t*>(l_block);
-
 			lv_currentBlockUint32[0] = m_gaurdDebugValue;
 			lv_currentBlockUint32[1] = m_headHandleOfFreeList;
 			m_headHandleOfFreeList = lv_blockToBeFreedHandle;
