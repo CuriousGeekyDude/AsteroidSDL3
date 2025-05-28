@@ -832,9 +832,9 @@ namespace Asteroid
 			lv_mainAnimComp = new(lv_mainAnimComp) IndefiniteRepeatableAnimationComponent();
 			lv_cursorAttribComp = new(lv_cursorAttribComp) CursorAttributeComponent();
 
-			lv_movementComp->Init(lv_index);
-			lv_mainAnimComp->Init(lv_index, lv_cursorAnim, lv_movementComp, nullptr, 0, 0);
-			lv_cursorAttribComp->Init(lv_index, 0, lv_movementComp, lv_mainAnimComp);
+			lv_movementComp->Init(static_cast<EntityHandle>(lv_index));
+			lv_mainAnimComp->Init(static_cast<EntityHandle>(lv_index), lv_cursorAnim, lv_movementComp, nullptr, 0, 0);
+			lv_cursorAttribComp->Init(static_cast<EntityHandle>(lv_index), 0, lv_movementComp, lv_mainAnimComp);
 
 			auto& lv_cursor = m_entities.emplace_back(std::move(Entity(glm::vec2{ 0.f, 0.f }, lv_index, EntityType::CURSOR, true)));
 
