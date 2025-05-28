@@ -38,8 +38,8 @@ namespace Asteroid
 				std::ifstream lv_file{l_fileOfRelativePathsTextures};
 
 				if (false == lv_file.is_open()) {
-					LOG(Severity::FAILURE, Channel::INITIALIZATION, "Failed to open a file containing relative path of textures to be initialized at the init of the engine.");
-					exit(EXIT_FAILURE);
+					LOG(Severity::FAILURE, Channel::INITIALIZATION, "Failed to open the following file: %s", l_fileOfRelativePathsTextures.c_str());
+					std::runtime_error("Failed to open a file containing relative path of textures to be initialized at the init of the engine.");
 				}
 				else {
 					
@@ -82,7 +82,7 @@ namespace Asteroid
 
 						if (std::string::npos == lv_posLast) {
 							LOG(Severity::FAILURE, Channel::INITIALIZATION, "Failed to find last occurence of /");
-							exit(EXIT_FAILURE);
+							std::runtime_error("Failed to find last occurence of /");
 						}
 
 						std::string lv_textureName = l_relPathTexture.substr(lv_posLast+1);

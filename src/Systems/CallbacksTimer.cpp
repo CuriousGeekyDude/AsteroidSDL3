@@ -43,21 +43,6 @@ namespace Asteroid
 				}
 
 			}
-		
-		/*else {
-			for (size_t i = 0U; i < m_delayedSetStateCallbacks.size(); ++i) {
-
-				if ((m_delayedSetStateCallbacks[i].m_maxNumFrames + 1) >= m_delayedSetStateCallbacks[i].m_currentFrame) {
-					--m_delayedSetStateCallbacks[i].m_currentFrame;
-				}
-				else {
-					std::swap(m_delayedSetStateCallbacks[i], m_delayedSetStateCallbacks.back());
-					m_delayedSetStateCallbacks.pop_back();
-				}
-
-			}
-		}*/
-
 
 	}
 

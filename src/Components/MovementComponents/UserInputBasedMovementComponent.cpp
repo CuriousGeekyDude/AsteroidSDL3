@@ -28,45 +28,6 @@ namespace Asteroid
 
 		const auto& lv_inputSystem = l_updateContext.m_engine->GetInputSystem();
 
-		/*glm::mat3 lv_deltaTransform = glm::identity<glm::mat3>();
-		bool lv_keyIsPressed = false;
-		
-
-		if (true == lv_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_W)) {
-			m_speed += glm::vec2(0.f, -lv_tempSpeed);
-			lv_keyIsPressed = true;
-		}
-		if (true == lv_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_S)) {
-			m_speed += glm::vec2(0.f, lv_tempSpeed);
-			lv_keyIsPressed = true;
-
-
-		}
-		if (true == lv_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_D)) {
-			m_speed += glm::vec2(lv_tempSpeed, 0.f);
-			lv_keyIsPressed = true;
-		}
-		if (true == lv_inputSystem.IsRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_A)) {
-			
-			m_speed += glm::vec2(-lv_tempSpeed, 0.f);
-			lv_keyIsPressed = true;
-
-
-		}
-		if (false == lv_keyIsPressed) {
-			lv_tempSpeed = std::clamp(lv_tempSpeed, 0.001f, 0.99f);
-			m_speed = m_speed * lv_tempSpeed;
- 		}
-		const float lv_speedLimit{3.5f};
-		m_speed = glm::vec2(std::clamp(m_speed.x, -lv_speedLimit, lv_speedLimit), std::clamp(m_speed.y, -lv_speedLimit, lv_speedLimit));
-		lv_deltaTransform[2][0] = m_speed.x;
-		lv_deltaTransform[2][1] = m_speed.y;
-
-
-		auto& lv_currentPos = lv_ownerEntity.GetCurrentPos();
-		auto lv_newPos3 = lv_deltaTransform * glm::vec3{ lv_currentPos, 1.f };
-		lv_ownerEntity.SetCurrentPos(glm::vec2{ lv_newPos3.x, lv_newPos3.y });*/
-
 		if (true == lv_inputSystem.IsMouseHidden()) {
 
 			const auto& lv_mouseRelPos = lv_inputSystem.GetMousePosRelativeToWindow();
@@ -76,7 +37,6 @@ namespace Asteroid
 
 			if (true == lv_inputSystem.IsMouseButtonPressed(InputSystem::Mouse::LEFT)) {
 				m_damper = (1 - std::expf(-m_damper));
-				//lv_d = std::clamp(lv_tempSpeed, 0.f, 1.5f);
 				lv_newPos += m_damper * (lv_mouseRelPos - lv_currentPos);
 			}
 			else {

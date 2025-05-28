@@ -20,8 +20,6 @@ namespace Asteroid
 
 		LOG(Severity::INFO, Channel::GRAPHICS, "Attempting to load %s", l_texturePath.c_str());
 
-		//LogSystem::LogCommandLine("Attempting to load {4}.", "INFO", "GPU-RESOURCE-CREATION", __LINE__, __FILE__, );
-
 		auto* lv_gpuTexture = IMG_LoadTexture(l_renderer, l_texturePath.c_str());
 
 		if (nullptr == lv_gpuTexture) {

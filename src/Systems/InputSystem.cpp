@@ -24,7 +24,7 @@ namespace Asteroid
 		if (nullptr == lv_keyStates) {
 			LOG(Severity::FAILURE, Channel::GRAPHICS, "Keyboard state returned is null pointer for the following reason: %s", SDL_GetError());
 
-			exit(EXIT_FAILURE);
+			std::runtime_error("Keyboard state returned is null pointer.");
 		}
 
 		memset(m_keyStates.data(), (int)KeyStates::INVALID, sizeof(KeyStates) * m_keyStates.size());

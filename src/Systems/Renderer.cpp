@@ -95,7 +95,8 @@ namespace Asteroid
 			auto* lv_sdlTexture = m_gpuResourceManager->RetrieveGpuTexture(l_renderData.m_entityTextureHandle);
 
 			if (nullptr == lv_sdlTexture) {
-				exit(EXIT_FAILURE);
+				LOG(Severity::FAILURE, Channel::GRAPHICS, "Requested texture with handle %u does not exist", l_renderData.m_entityTextureHandle);
+				std::runtime_error("Requested texture does not exist.");
 			}
 
 			SDL_FRect lv_dstRect;

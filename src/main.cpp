@@ -21,6 +21,7 @@ int main()
 
 	using namespace Asteroid;
 
+	try {
 
 	AnimationMetaData lv_meta{};
 
@@ -67,7 +68,7 @@ int main()
 		, 250, 150));
 	
 
-	try {
+	
 
 		Engine lv_asteroidEngine(std::move(lv_engineInitialData));
 
@@ -83,6 +84,9 @@ int main()
 		std::cout << l_error.what() << std::endl;
 	}
 	catch (const std::bad_alloc& l_error) {
+		std::cout << l_error.what() << std::endl;
+	}
+	catch (const std::out_of_range& l_error) {
 		std::cout << l_error.what() << std::endl;
 	}
 	

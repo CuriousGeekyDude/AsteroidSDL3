@@ -124,7 +124,7 @@ namespace Asteroid
 
 			if (-1 == lv_totalNumCharWritten) {
 				OutputDebugString(L"snprintf() failed to produce formatted string for logging.\n");
-				exit(EXIT_FAILURE);
+				std::runtime_error("snprintf() failed to produce formatted string for logging.");
 			}
 
 			size_t lv_totalFinalMsgFilled{};
@@ -150,7 +150,7 @@ namespace Asteroid
 
 			if (-1 == lv_totalNumCharWritten) {
 				OutputDebugString(L"ConstructFinalMsg() failed to produce formatted string for logging.\n");
-				exit(EXIT_FAILURE);
+				std::runtime_error("ConstructFinalMsg() failed to produce formatted string for logging.");
 			}
 
 			return lv_finalMsg;

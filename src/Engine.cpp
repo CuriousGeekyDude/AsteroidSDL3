@@ -543,7 +543,7 @@ namespace Asteroid
 
 		if ((uint32_t)m_entities.size() <= l_entityHandle.m_entityHandle) {
 			LOG(Severity::FAILURE, Channel::MEMORY, "An attempt was made to access out of bound memory in vector of entities. The index used: %u\n", l_entityHandle.m_entityHandle);
-			exit(EXIT_FAILURE);
+			throw std::out_of_range("An attempt was made to access out of bound memory in vector of entities.");
 		}
 		else {
 			return m_entities[l_entityHandle.m_entityHandle];
@@ -555,7 +555,7 @@ namespace Asteroid
 
 		if ((uint32_t)m_entities.size() <= l_entityHandle.m_entityHandle) {
 			LOG(Severity::FAILURE, Channel::MEMORY, "An attempt was made to access out of bound memory in vector of entities.\n");
-			exit(EXIT_FAILURE);
+			throw std::out_of_range("An attempt was made to access out of bound memory in vector of entities.");
 		}
 		else {
 			return m_entities[l_entityHandle.m_entityHandle];
@@ -573,7 +573,8 @@ namespace Asteroid
 		}
 
 		LOG(Severity::FAILURE, Channel::PROGRAM_LOGIC, "No entity with the requested type exist yet.\n");
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("No entity with the requested type exist yet.");
+
 	}
 	const Entity& Engine::GetEntityFromType(const EntityType l_type) const
 	{
@@ -586,7 +587,7 @@ namespace Asteroid
 		}
 
 		LOG(Severity::FAILURE, Channel::PROGRAM_LOGIC, "No entity with the requested type exist yet.\n");
-		exit(EXIT_FAILURE);
+		throw std::runtime_error("No entity with the requested type exist yet.");
 	}
 
 
@@ -813,8 +814,10 @@ namespace Asteroid
 		bool lv_result = SDL_GetWindowSize(m_window, &l_windowRes.x, &l_windowRes.y);
 
 		if (false == lv_result) {
+			
 			LOG(Severity::FAILURE, Channel::GRAPHICS, "Failed to get current window size: %s", SDL_GetError());
-			exit(EXIT_FAILURE);
+			
+			throw std::runtime_error("Failed to get current window size");
 		}
 
 	}

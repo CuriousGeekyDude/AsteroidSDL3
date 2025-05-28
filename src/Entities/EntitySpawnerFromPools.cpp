@@ -231,15 +231,6 @@ namespace Asteroid
 		else {
 			return false;
 		}
-
-		/*const auto& lv_inputSystem = m_engine->GetInputSystem();
-		if (true == lv_inputSystem.IsNoRepetitionAllowedKeyPressed(InputSystem::Keys::KEY_T) && true == lv_inputSystem.IsMouseHidden()) {
-
-			return true;
-		}
-		else {
-			return false;
-		}*/
 	}
 
 	bool EntitySpawnerFromPools::BulletSpawnConditionMet(const bool l_timeRewinded)
