@@ -37,6 +37,10 @@ namespace Asteroid
 
 		}
 
+
+		std::runtime_error("Player is not present amongst the entities");
+
+
 	}
 
 
@@ -62,6 +66,8 @@ namespace Asteroid
 				}
 			}
 		}
+
+		std::runtime_error("Player is not present amongst the entities");
 	}
 
 	float EntityConnector::RequestAngleRotationFromPlayer()
@@ -87,6 +93,8 @@ namespace Asteroid
 				}
 			}
 		}
+
+		std::runtime_error("Player is not present amongst the entities");
 
 	}
 
