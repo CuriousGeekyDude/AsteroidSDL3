@@ -74,7 +74,7 @@ namespace Asteroid
 			RayMovementComponent* lv_bulletMovComponent = (RayMovementComponent*)lv_bullet.GetComponent(ComponentTypes::MOVEMENT);
 			constexpr float lv_initialT{ 55.f };
 
-			lv_bulletMovComponent->SetSpeed(glm::vec2{0.6f});
+			lv_bulletMovComponent->SetSpeed(glm::vec2{0.78f});
 
 			if(0 == lv_direction.x && 0 == lv_direction.y) {
 				lv_bulletMovComponent->SetRayDirection(lv_direction);
