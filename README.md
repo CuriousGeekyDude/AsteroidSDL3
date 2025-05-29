@@ -33,6 +33,7 @@ A 2D classical Asteroid game.
 - You win the game by completing all 2 levels.
 
 ## Show casing the game
-- You can find the gameplay of level 1 in [here](https://www.youtube.com/watch?v=8yb8TZ3AsAY) and level 2 in [here](https://youtu.be/GDKWZfirOok).
+- Level 1 gameplay : [![LEVEL 1](https://img.youtube.com/watch?v=8yb8TZ3AsAY/maxresdefault.jpg)](https://www.youtube.com/watch?v=8yb8TZ3AsAY)
+
 
   
