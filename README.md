@@ -1,10 +1,10 @@
 # AsteroidSDL3
 
-## Requirements
-You need to have a x64 computer and visual studio 2022 installed.
-
 ## About
-A 2D classical Asteroid game made up of 2 levels.
+A classical 2D Asteroid game made up of 2 levels.
+
+## Requirements
+You need to have a x64 computer and a Mscvc compiler that supports C++20.
 
 ## How to build
 
