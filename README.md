@@ -42,10 +42,13 @@ You need to have a x64 computer and a mscvc compiler that supports C++20.
 ## Show casing the game
 - Below are short gifs show casing gameplay of the game.
 - Level 1
+
 ![Demo](Media/gif1.gif)
 - Level 2
+
 ![Demo](Media/gif2.gif)
 - Time rewind
+
 ![Demo](Media/TimeRewindGif.gif)
 
 - For complete show case of Level 1 gameplay: [Level 1](https://www.youtube.com/watch?v=8yb8TZ3AsAY)
