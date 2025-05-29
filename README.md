@@ -23,4 +23,16 @@ A 2D classical Asteroid game.
 -  Implemented a simple state finite state machine for asteroids in order to change between passive and aggressive depending on the level we are in.
 -  Implemented an input system that wraps over SDL3 events, tailored to our needs.
 
+## How to play
+- In order to rotate and move the ship one first has to capture the mouse. For that you press the key C. The usual mouse is hidden and instead the custom mouse appears and the ship points in that direction. In order to move the ship one directs the custom mouse somewhere and holds the left button of the mouse. The further away the custom mouse is from the ship the higher its acceleration is going to be.
+- Ship fires bullets by hitting the key F.
+- In left top you will find a small window that displays the score, health, and seconds passed since the start of the level.
+- You complete the first level by making sure you survive for 75 seconds and score at least 30 hits by hitting asteroids with bullets.
+- You complete the second level which is the last one by surviving for 120 seconds and scoring at least 20 hits with the bullets.
+- You rewind back in time by holding the key T.
+- You win the game by completing all 2 levels.
+
+## Show casing the game
+- You can find the gameplay of level 1 in [here](https://www.youtube.com/watch?v=8yb8TZ3AsAY) and level 2 in [here](https://youtu.be/GDKWZfirOok).
+
   
