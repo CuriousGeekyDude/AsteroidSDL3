@@ -26,7 +26,7 @@ You need to have a x64 computer and a mscvc compiler that supports C++20.
 - Press key C -> Hides OS mouse and displays custom game mouse(this is assumed to be pressed for every other control we mention in the next few lines)
 - Hold left button of mouse -> Ship accelerates towards custom mouse and deccelerates when it is near it
 - Move the mouse -> Rotates the ship
-- Press right button of mouse 3 consecutive times -> Reveals OS mouse and hides custom game mouse, essentially reverse of pressing C
+- Press right button of mouse 3 times consecutively -> Reveals OS mouse and hides custom game mouse, essentially reverse of pressing C
 - Press key F -> Shoots bullets
 - Hold key T -> Rewinds time in the same level
 
