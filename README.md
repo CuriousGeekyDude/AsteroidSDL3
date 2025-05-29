@@ -20,7 +20,7 @@ You need to have a x64 computer and a msvc compiler that supports C++20.
 - Implemented a relatively smooth movement system for player to move the ship around with just holding left mouse button. The acceleration is determined by how far the custom mouse in the screen is from the ship. It accelerates towards it and deccelerates when it gets closer to it.
 - Implemented a simple finite state machine for asteroids in order to change between passive and aggressive depending on the level we are in.
 - Logging system to register different levels of severity and channels in both the output console of visual studio, a logging file, and the command line. It is worth noting that logging system only works if you are on windows and use visual studio. Otherwise you need to disable it and potentially comment out the header associated with outputing to visual studio console.
-- Implemented an input system that wraps over SDL3 events, tailored to our needs.
+- Implemented an input system that wraps over SDL3 input events, tailored to our needs.
 
 ## Controls
 - Press key C -> Hides OS mouse and displays custom game mouse(this is assumed to have been pressed for every other control we mention in the next few lines to work)
