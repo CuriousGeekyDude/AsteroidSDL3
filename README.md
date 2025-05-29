@@ -20,6 +20,7 @@ A 2D classical Asteroid game.
 -  Implemented custom memory allocator that uses memory pools which are implemented using the following [paper](https://arxiv.org/pdf/2210.16471). This highly reduces memory fragmentation on the heap. This is mainly used at the moment to store the components.
 -  Implemented object pools in order to spawn bullets and asteroids from them. This prevents allocation on the heap for the mentioned entities at runtime which results in a far better performance. An object pool for each entity is allocated before the start of the game loop.
 -  Implemented a relatively smooth movement system for player to move the ship around with just holding left mouse button. The acceleration is determined by how far the custom mouse in the screen is from the ship. It accelerates towards it and deccelerates when it gets closer to it.
+-  Implemented a simple state finite state machine for asteroids in order to change between passive and aggressive depending on the level we are in.
 -  Implemented an input system that wraps over SDL3 events, tailored to our needs.
 
   
