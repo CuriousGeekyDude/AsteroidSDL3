@@ -19,7 +19,7 @@ You need to have a x64 computer and a mscvc compiler that supports C++20.
 - Implemented object pools in order to spawn bullets and asteroids from them. This prevents allocation on the heap for the mentioned entities at runtime which results in a far better performance. An object pool for each entity is allocated before the start of the game loop.
 - Implemented a relatively smooth movement system for player to move the ship around with just holding left mouse button. The acceleration is determined by how far the custom mouse in the screen is from the ship. It accelerates towards it and deccelerates when it gets closer to it.
 - Implemented a simple finite state machine for asteroids in order to change between passive and aggressive depending on the level we are in.
-- Logging system to register different levels of severity and channels in both the output console of visual studio, a logging file, and the command line.
+- Logging system to register different levels of severity and channels in both the output console of visual studio, a logging file, and the command line. It is worth noting that logging system only works if you are on windows and use visual studio. Otherwise you need to disable it and potentially comment out the header associated with outputing to visual studio console.
 - Implemented an input system that wraps over SDL3 events, tailored to our needs.
 
 ## Controls
