@@ -40,7 +40,8 @@ You need to have a x64 computer and a mscvc compiler that supports C++20.
 - If you fail any of the levels, you will be prompted whether you would like to repeat it or exit the game.
 
 ## Show casing the game
-- Below are short gifs show casing gameplay of the game.
+Below are short gifs show casing gameplay of the game.
+
 - Level 1
 
 ![Demo](Media/gif1.gif)
