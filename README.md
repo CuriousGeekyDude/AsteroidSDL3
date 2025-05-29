@@ -31,11 +31,13 @@ You need to have a x64 computer and a mscvc compiler that supports C++20.
 - Hold key T -> Rewinds time in the same level
 
 ## Game rules
-- The game is comprised of 2 levels. In order to win, you have to complete each level successfully.
+- The game is comprised of 2 levels. In order to win it, you have to complete each level successfully.
+- In each level, in top left of the screen, you will find a small window that describes the seconds passed since the start of the level, score, and your health point.
 - Each time an asteroid in either of the levels hits you, you will lose one unit of health point.
 - You can rewind time up to maximum of 30 seconds back in time in each level. You cannot rewind back and go from level 2 to level 1. Each rewind only takes place in that same level you apply it.
-- In the 1st level, you start with health 10 by default. In this level the asteroids are passive and move in random directions. You have to not die(health becoming 0) for 75 seconds and also destroy at least 30 asteroids with your infinite supply of bullets.
-- Ine the 2nd level, you start with health 10 by default again. In this level the asteroids become aggressive and pursue you continuously. You will have to survive for 120 seconds and destroy at least 20 asteroids with your infinite supply of bullets.
+- In the 1st level, you start with health 10 by default. In this level the asteroids are passive and move in random directions. You have to not die(health becoming 0) for 75 seconds and also destroy(score) at least 30 asteroids with your infinite supply of bullets.
+- Ine the 2nd level, you start with health 10 by default again. In this level the asteroids become aggressive and pursue you continuously. You will have to survive for 120 seconds and destroy(score) at least 20 asteroids with your infinite supply of bullets.
+- If you fail any of the levels, you will be prompted whether you would like to repeat it or exit the game.
 
 ## Show casing the game
 - Level 1 gameplay : [Level 1](https://www.youtube.com/watch?v=8yb8TZ3AsAY)
