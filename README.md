@@ -8,11 +8,10 @@ You need to have a x64 computer and a Mscvc compiler that supports C++20.
 
 ## How to build
 
-1) Run the build.bat. It will generate the solution automatically.
+1) Run the build-vs2022.bat. It will generate a vs2022 solution. If you want some other solution then you need to trivially edit this batch file on windows or manually run premake executable on your OS of choice.
 2) Run the generated solution and compile!
 
 ## Main features
-- Loggin system to register different levels of severity and channels in both the output console of visual studio, a logging file, and the command line.
 - Implemented collision system using the concept of the grid. The grid is divided into equal sized rectangles and records which entities reside in that rectangle. Only the spheres around the entities in that rectangle are tested against each other for collision. The scheme used here is inspired by tiled deferred shading method for registering point lights in tiles.
 - Implemented an event management system using std::function and lambdas in order to register events such as start of animations of explosion and warp, delayed activation and deactivation of collision state of asteroids before spawning and in the middle of the explosion animation etc.
 - Implemented time rewind up to 30 seconds back in time by keeping track of only the important data of each frame in a ring buffer in order to be able to reconstruct the frame again as we go back in time.
@@ -21,6 +20,7 @@ You need to have a x64 computer and a Mscvc compiler that supports C++20.
 -  Implemented object pools in order to spawn bullets and asteroids from them. This prevents allocation on the heap for the mentioned entities at runtime which results in a far better performance. An object pool for each entity is allocated before the start of the game loop.
 -  Implemented a relatively smooth movement system for player to move the ship around with just holding left mouse button. The acceleration is determined by how far the custom mouse in the screen is from the ship. It accelerates towards it and deccelerates when it gets closer to it.
 -  Implemented a simple finite state machine for asteroids in order to change between passive and aggressive depending on the level we are in.
+- Logging system to register different levels of severity and channels in both the output console of visual studio, a logging file, and the command line.
 -  Implemented an input system that wraps over SDL3 events, tailored to our needs.
 
 ## How to play
