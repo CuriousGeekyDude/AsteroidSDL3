@@ -40,13 +40,9 @@ You need to have a x64 computer and a mscvc compiler that supports C++20.
 - If you fail any of the levels, you will be prompted whether you would like to repeat it or exit the game.
 
 ## Show casing the game
-Below are short gifs show casing gameplay of the game.
-
-- Level 1
+Below are short gifs show casing gameplay of the game. The first one is level 1, second one is level 2, and the last one is time rewind.
 ![Demo](Media/gif1.gif)
-- Level 2
 ![Demo](Media/gif2.gif)
-- Time rewind
 ![Demo](Media/TimeRewindGif.gif)
 
 - For complete show case of Level 1 gameplay: [Level 1](https://www.youtube.com/watch?v=8yb8TZ3AsAY)
