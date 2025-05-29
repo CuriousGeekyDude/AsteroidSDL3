@@ -1,15 +1,15 @@
 # AsteroidSDL3
 
 ## Requirements
-You need to have a x64 computer and visual studio 2022.
+You need to have a x64 computer and visual studio 2022 installed.
 
 ## About
-A 2D classical Asteroid game.
+A 2D classical Asteroid game made up of 2 levels.
 
 ## How to build
 
 1) Run the build.bat. It will generate the solution automatically.
-2) Run the generated solution and happy compiling!
+2) Run the generated solution and compile!
 
 ## Main features
 - Loggin system to register different levels of severity and channels in both the output console of visual studio, a logging file, and the command line.
