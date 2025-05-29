@@ -34,7 +34,7 @@ You need to have a x64 computer and a mscvc compiler that supports C++20.
 - The game is comprised of 2 levels. In order to win, you have to complete each level successfully.
 - Each time an asteroid in either of the levels hits you, you will lose one unit of health point.
 - You can rewind time up to maximum of 30 seconds back in time in each level. You cannot rewind back and go from level 2 to level 1. Each rewind only takes place in that same level you apply it.
-- In the 1st level, you start with health 10 by default. You have to not die(health becoming 0) for 75 seconds and also destroy at least 30 asteroids with your infinite supply of bullets.
+- In the 1st level, you start with health 10 by default. In this level the asteroids are passive and move in random directions. You have to not die(health becoming 0) for 75 seconds and also destroy at least 30 asteroids with your infinite supply of bullets.
 - Ine the 2nd level, you start with health 10 by default again. In this level the asteroids become aggressive and pursue you continuously. You will have to survive for 120 seconds and destroy at least 20 asteroids with your infinite supply of bullets.
 
 ## Show casing the game
