@@ -55,5 +55,8 @@ Below are short gifs show casing gameplay of the game.
 - For complete show case of Level 1 gameplay: [Level 1](https://www.youtube.com/watch?v=8yb8TZ3AsAY)
 - For complete show case of Level 2 gameplay: [Level 2](https://www.youtube.com/watch?v=GDKWZfirOok)
 
-
+## TODO
+- Implement black hole and time acceleration and decceleration system.
+- Implement warping of space graphics technique.
+- Implement better and more AIs. Perhaps add intelligent enemy spaceships and other types of asteroids as well.
   
