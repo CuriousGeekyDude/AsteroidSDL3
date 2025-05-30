@@ -4,7 +4,7 @@
 A classical 2D Asteroid game.
 
 ## Requirements
-You need to have a x64 computer and a msvc compiler that supports C++20.
+You need to have a x64 computer and a compiler that supports C++20.
 
 ## How to build
 1) Run the build-vs2022.bat. It will generate a vs2022 solution. If you want some other solution then you need to trivially edit this batch file on windows or manually run premake executable on your OS if it is not windows.
