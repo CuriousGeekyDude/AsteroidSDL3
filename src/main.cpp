@@ -69,14 +69,13 @@ int main()
 	
 
 	
+		std::unique_ptr<Engine> lv_engine = std::make_unique<Engine>(std::move(lv_engineInitialData));
 
-		Engine lv_asteroidEngine(std::move(lv_engineInitialData));
-
-		if (false == lv_asteroidEngine.Init()) {
+		if (false == lv_engine->Init()) {
 			return -1;
 		}
 
-		if (false == lv_asteroidEngine.GameLoop()) {
+		if (false == lv_engine->GameLoop()) {
 			return -1;
 		}
 	}
