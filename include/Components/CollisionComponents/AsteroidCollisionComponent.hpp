@@ -24,7 +24,7 @@ namespace Asteroid
 		bool Update(UpdateComponents& l_updateContext) override;
 
 
-		void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity, CallbacksTimer& l_timer) override;
+		void CollisionReaction(IEvent* l_collisionEvent) override;
 
 
 		void Init(EntityHandle l_ownerEntityHandle

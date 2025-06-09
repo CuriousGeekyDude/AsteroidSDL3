@@ -12,7 +12,7 @@ namespace Asteroid
 	class Entity;
 	class IndefiniteRepeatableAnimationComponent;
 	class CallbacksTimer;
-
+	class IEvent;
 	
 	class CollisionComponent : public Component
 	{
@@ -22,7 +22,7 @@ namespace Asteroid
 		CollisionComponent();
 
 
-		virtual void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity, CallbacksTimer& l_timer) = 0;
+		virtual void CollisionReaction(IEvent*) = 0;
 
 
 

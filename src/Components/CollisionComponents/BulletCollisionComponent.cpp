@@ -9,6 +9,7 @@
 #include "Components/StateComponents/ActiveBasedStateComponent.hpp"
 #include "Systems/CallbacksTimer.hpp"
 #include "Systems/LogSystem.hpp"
+#include "Systems/EventSystem/IEventCollision.hpp"
 
 namespace Asteroid
 {
@@ -38,12 +39,27 @@ namespace Asteroid
 	}
 
 
-	void BulletCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity, CallbacksTimer& l_callBackTimes)
+	void BulletCollisionComponent::CollisionReaction(IEvent* l_collisionEvent)
 	{
 
 		using namespace LogSystem;
 
-		if (EntityType::BULLET == l_entityItCollidedWith.GetType() || EntityType::PLAYER == l_entityItCollidedWith.GetType()) {
+
+		IEventCollision* lv_collisionEvent = static_cast<IEventCollision*>(l_collisionEvent);
+		Entity* lv_entityItCollidedWith{};
+		Entity* lv_ownerEntity{};
+
+		if (lv_collisionEvent->GetEntity1()->GetID() == m_ownerEntityHandle.m_entityHandle) {
+			lv_entityItCollidedWith = lv_collisionEvent->GetEntity1();
+			lv_ownerEntity = lv_collisionEvent->GetEntity2();
+		}
+		else {
+			lv_entityItCollidedWith = lv_collisionEvent->GetEntity2();
+			lv_ownerEntity = lv_collisionEvent->GetEntity1();
+		}
+
+
+		if (EntityType::BULLET == lv_entityItCollidedWith->GetType() || EntityType::PLAYER == lv_entityItCollidedWith->GetType()) {
 			return;
 		}
 
@@ -55,7 +71,7 @@ namespace Asteroid
 
 		if (false == m_resetCollision && true == m_firstCollision && true == m_isCollisionActive) {
 
-			l_ownerEntity.SetActiveState(false);
+			lv_ownerEntity->SetActiveState(false);
 
 			m_firstCollision = false;
 

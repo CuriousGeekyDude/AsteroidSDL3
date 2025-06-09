@@ -8,6 +8,7 @@
 #include "Components/CollisionComponents/AsteroidCollisionComponent.hpp"
 #include "Systems/CallbacksTimer.hpp"
 #include "Systems/LogSystem.hpp"
+#include "Systems/EventSystem/IEventCollision.hpp"
 
 
 namespace Asteroid
@@ -51,13 +52,28 @@ namespace Asteroid
 
 
 
-	void PlayerCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_collisionReactContext, CallbacksTimer& l_timer)
+	void PlayerCollisionComponent::CollisionReaction(IEvent* l_collisionEvent)
 	{
 		using namespace LogSystem;
 
-		auto lv_collidedEntityID = l_entityItCollidedWith.GetID();
 
-		if (EntityType::ASTEROID == l_entityItCollidedWith.GetType()) {
+		IEventCollision* lv_collisionEvent = static_cast<IEventCollision*>(l_collisionEvent);
+		Entity* lv_entityItCollidedWith{};
+		Entity* lv_ownerEntity{};
+
+		if (lv_collisionEvent->GetEntity1()->GetID() == m_ownerEntityHandle.m_entityHandle) {
+			lv_entityItCollidedWith = lv_collisionEvent->GetEntity1();
+			lv_ownerEntity = lv_collisionEvent->GetEntity2();
+		}
+		else {
+			lv_entityItCollidedWith = lv_collisionEvent->GetEntity2();
+			lv_ownerEntity = lv_collisionEvent->GetEntity1();
+		}
+
+
+		auto lv_collidedEntityID = lv_entityItCollidedWith->GetID();
+
+		if (EntityType::ASTEROID == lv_entityItCollidedWith->GetType()) {
 
 
 			for (uint32_t i = 0; i < m_alreadyRegisteredCollisionEntityIDs.size(); ++i) {
@@ -75,7 +91,7 @@ namespace Asteroid
 							.m_maxNumFrames = m_frameTimeToFlushRegisteredCollisionIDs
 						};
 
-						l_timer.AddSetStateCallback(std::move(lv_delayedCallback));
+						lv_collisionEvent->m_callbackTimer->AddSetStateCallback(std::move(lv_delayedCallback));
 
 						return;
 					}
@@ -98,7 +114,7 @@ namespace Asteroid
 				.m_maxNumFrames = m_frameTimeToFlushRegisteredCollisionIDs
 			};
 
-			l_timer.AddSetStateCallback(std::move(lv_delayedCallback));
+			lv_collisionEvent->m_callbackTimer->AddSetStateCallback(std::move(lv_delayedCallback));
 
 		}
 

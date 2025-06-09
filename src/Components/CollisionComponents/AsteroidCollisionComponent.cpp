@@ -11,6 +11,7 @@
 #include "Systems/CallbacksTimer.hpp"
 #include "Systems/LogSystem.hpp"
 #include "Components/UpdateComponents.hpp"
+#include "Systems/EventSystem/IEventCollision.hpp"
 
 
 namespace Asteroid
@@ -61,8 +62,7 @@ namespace Asteroid
 		m_hitBullet = l_hitBullet;
 	}
 
-	void AsteroidCollisionComponent::CollisionReaction(Entity& l_entityItCollidedWith
-		, Entity& l_ownerEntity, CallbacksTimer& l_timer)
+	void AsteroidCollisionComponent::CollisionReaction(IEvent* l_collisionEvent)
 	{
 		
 		using namespace LogSystem;
@@ -74,10 +74,23 @@ namespace Asteroid
 		}
 
 
+		IEventCollision* lv_collisionEvent = static_cast<IEventCollision*>(l_collisionEvent);
+		Entity* lv_entityItCollidedWith{};
+		Entity* lv_ownerEntity{};
+
+		if (lv_collisionEvent->GetEntity1()->GetID() == m_ownerEntityHandle.m_entityHandle) {
+			lv_entityItCollidedWith = lv_collisionEvent->GetEntity1();
+			lv_ownerEntity = lv_collisionEvent->GetEntity2();
+		}
+		else {
+			lv_entityItCollidedWith = lv_collisionEvent->GetEntity2();
+			lv_ownerEntity = lv_collisionEvent->GetEntity1();
+		}
+
 
 		if (false == m_resetCollision && true == m_firstCollision && true == m_isCollisionActive) {
 
-			if (EntityType::BULLET == l_entityItCollidedWith.GetType()) {
+			if (EntityType::BULLET == lv_entityItCollidedWith->GetType()) {
 				++m_hitBullet;
 			}
 		
@@ -85,12 +98,12 @@ namespace Asteroid
 			bool lv_stateValue{ false };
 
 			DelayedSetStateCallback lv_delayedDeactive
-			{ .m_callback{[&l_ownerEntity, lv_stateValue] {l_ownerEntity.SetActiveState(lv_stateValue); }},
+			{ .m_callback{[lv_ownerEntity, lv_stateValue] {lv_ownerEntity->SetActiveState(lv_stateValue); }},
 			  .m_currentFrame = 0U,
 			  .m_maxNumFrames = m_activeComponent->GetframeCountToDeactivate(),
 			};
 
-			l_timer.AddSetStateCallback(std::move(lv_delayedDeactive));
+			lv_collisionEvent->m_callbackTimer->AddSetStateCallback(std::move(lv_delayedDeactive));
 
 			m_activeComponent->SetDelayedActivationCallbackFlag(true);
 
@@ -100,7 +113,7 @@ namespace Asteroid
 				.m_currentFrame = 0U,
 				.m_maxNumFrames = m_frameCountToDeactivateCollision
 			};
-			l_timer.AddSetStateCallback(std::move(lv_delayedCollisionDeactivate));
+			lv_collisionEvent->m_callbackTimer->AddSetStateCallback(std::move(lv_delayedCollisionDeactivate));
 
 			m_repeatableAnimationComponent->SetVisibleState(false);
 			LOG(Severity::INFO, Channel::PROGRAM_LOGIC, "2 callbacks have been recorded for an asteroid entity.");

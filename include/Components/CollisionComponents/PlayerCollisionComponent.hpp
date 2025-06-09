@@ -34,7 +34,7 @@ namespace Asteroid
 			, const uint32_t l_frameTimeToFlushRegisteredCollision);
 
 
-		void CollisionReaction(Entity& l_entityItCollidedWith, Entity& l_ownerEntity, CallbacksTimer& l_timer) override;
+		void CollisionReaction(IEvent* l_collisionEvent) override;
 
 
 		std::vector<std::pair<uint32_t, bool>> GetAlreadyRegisteredCollisionIDs() const;
