@@ -8,7 +8,7 @@
 #include "Components/CollisionComponents/AsteroidCollisionComponent.hpp"
 #include "Systems/CallbacksTimer.hpp"
 #include "Systems/LogSystem.hpp"
-#include "Systems/EventSystem/IEventCollision.hpp"
+#include "Systems/EventSystem/EventCollision.hpp"
 
 
 namespace Asteroid
@@ -57,17 +57,17 @@ namespace Asteroid
 		using namespace LogSystem;
 
 
-		IEventCollision* lv_collisionEvent = static_cast<IEventCollision*>(l_collisionEvent);
+		EventCollision* lv_collisionEvent = static_cast<EventCollision*>(l_collisionEvent);
 		Entity* lv_entityItCollidedWith{};
 		Entity* lv_ownerEntity{};
 
 		if (lv_collisionEvent->GetEntity1()->GetID() == m_ownerEntityHandle.m_entityHandle) {
-			lv_entityItCollidedWith = lv_collisionEvent->GetEntity1();
-			lv_ownerEntity = lv_collisionEvent->GetEntity2();
-		}
-		else {
 			lv_entityItCollidedWith = lv_collisionEvent->GetEntity2();
 			lv_ownerEntity = lv_collisionEvent->GetEntity1();
+		}
+		else {
+			lv_entityItCollidedWith = lv_collisionEvent->GetEntity1();
+			lv_ownerEntity = lv_collisionEvent->GetEntity2();
 		}
 
 

@@ -233,6 +233,7 @@ namespace Asteroid
 				lv_timeRewinded = false;
 			}
 			
+			
 			m_callbacksTimer.Update();
 			auto* lv_playerAttribComp = (PlayerAttributeComponent*)m_entities[m_playerEntityHandle].GetComponent(ComponentTypes::ATTRIBUTE);
 			lv_isPlayerAlive = (0U == lv_playerAttribComp->GetHp()) ? false : true;
@@ -240,7 +241,7 @@ namespace Asteroid
 			if (true == lv_loopOverInThisLevel) {
 
 				m_grid.Update(lv_currentWindowSize, m_circleBoundsEntities, m_entities);
-				m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer);
+				m_grid.DoCollisionDetection(m_circleBoundsEntities, m_entities, m_callbacksTimer, m_eventManager, m_allocator);
 				m_entitySpawnerFromPools.SpawnNewEntitiesIfConditionsMet(m_currentLevel, lv_timeRewinded);
 				lv_updateComponent.m_deltaTime = (float)m_trackLastFrameElapsedTime.m_lastFrameElapsedTime;
 				for (auto& l_entity : m_entities) {
@@ -248,6 +249,7 @@ namespace Asteroid
 						assert(l_entity.Update(lv_updateComponent));
 					}
 				}
+				m_eventManager.Update(m_allocator);
 				m_entitySpawnerFromPools.UpdatePools();
 				UpdateCircleBounds();
 
@@ -273,6 +275,7 @@ namespace Asteroid
 			}
 			else {
 				
+				m_eventManager.FlushAllEventQueues(m_allocator);
 
 				ImGui_ImplSDLRenderer3_NewFrame();
 				ImGui_ImplSDL3_NewFrame();

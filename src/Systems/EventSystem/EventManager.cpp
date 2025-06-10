@@ -13,7 +13,7 @@
 namespace Asteroid
 {
 
-	void EventManager::AssociateNewDelegateToEventType(const EventType l_eventType, std::function<void(IEvent*)>&& l_delegate)
+	void EventManager::AssociateNewDelegateToEventType(const EventType l_eventType, std::function<void()>&& l_delegate)
 	{
 		auto lv_eventTypeDelegatesPair = m_eventTypesMappedToTheirDelegates.find(l_eventType);
 
@@ -22,7 +22,7 @@ namespace Asteroid
 		}
 		else {
 			
-			auto lv_newpair = m_eventTypesMappedToTheirDelegates.emplace(l_eventType, std::vector<std::function<void(IEvent*)>>{});
+			auto lv_newpair = m_eventTypesMappedToTheirDelegates.emplace(l_eventType, std::vector<std::function<void()>>{});
 			
 			if (false == lv_newpair.second) {
 				throw std::runtime_error("Failed to emplace new pair into mapping of event types to their delegates");
@@ -37,8 +37,8 @@ namespace Asteroid
 	void EventManager::AddNewEventToEventQueue(IEvent* l_newEvent)
 	{
 		auto& lv_currentActiveQueue = m_eventQueues[m_currentActiveQueueIndex];
-
-		lv_currentActiveQueue.push_back(l_newEvent);
+		auto lv_eventType = l_newEvent->GetType();
+		lv_currentActiveQueue.insert(std::pair<EventType, EventType>{lv_eventType, lv_eventType});
 
 
 	}
@@ -52,27 +52,44 @@ namespace Asteroid
 
 		for (auto lv_event : lv_previousActiveQueue) {
 
-			EventType lv_eventType = lv_event->GetType();
+			EventType lv_eventType = lv_event.first;
 
 			auto lv_eventTypeDelegatesPair = m_eventTypesMappedToTheirDelegates.find(lv_eventType);
 			
 			if (m_eventTypesMappedToTheirDelegates.end() != lv_eventTypeDelegatesPair) {
 
 				for (auto& lv_callbackToExec : lv_eventTypeDelegatesPair->second) {
-					lv_callbackToExec(lv_event);
+					lv_callbackToExec();
 				}
 
 				m_eventTypesMappedToTheirDelegates.erase(lv_eventTypeDelegatesPair);
 
 			}
+
 		}
 
-
-		for (auto l_event : lv_previousActiveQueue) {
-			l_allocator.Destruct<IEvent>(l_event, l_event->GetTrueTypeSize());
+		for (auto lv_tempIter = lv_previousActiveQueue.begin(); lv_previousActiveQueue.end() != lv_tempIter;) {
+			lv_tempIter = lv_previousActiveQueue.erase(lv_tempIter);
 		}
 
-		lv_previousActiveQueue.resize(0);
+		
+
+	}
+
+	void EventManager::FlushAllEventQueues(MemoryAlloc& l_alloc)
+	{
+		auto lv_prevQueueIndex = (m_currentActiveQueueIndex + 1U) % m_totalNumQueues;
+
+		auto& lv_currentQueue = m_eventQueues[m_currentActiveQueueIndex];
+		auto& lv_prevQueue = m_eventQueues[lv_prevQueueIndex];
+
+		for (auto lv_tempIter = lv_currentQueue.begin(); lv_currentQueue.end() != lv_tempIter;) {
+			lv_tempIter = lv_currentQueue.erase(lv_tempIter);
+		}
+
+		for (auto lv_tempIter = lv_prevQueue.begin(); lv_prevQueue.end() != lv_tempIter;) {
+			lv_tempIter = lv_prevQueue.erase(lv_tempIter);
+		}
 
 	}
 

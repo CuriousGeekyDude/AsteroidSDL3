@@ -20,6 +20,7 @@
 #include "Systems/TimeRewind/TimeRewind.hpp"
 #include <vector>
 #include <glm.hpp>
+#include "Systems/EventSystem/EventManager.hpp"
 
 
 struct SDL_Window;
@@ -104,6 +105,8 @@ namespace Asteroid
 		TimeRewind m_timeRewind{};
 
 		MemoryAlloc m_allocator{};
+
+		EventManager m_eventManager{};
 
 		GpuResourceManager m_gpuResourceManager;
 

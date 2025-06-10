@@ -13,9 +13,9 @@ namespace Asteroid
 
 	MemoryAlloc::MemoryAlloc()
 		: m_pool16(8192, 16)
-		, m_pool32(8192, 32)
-		, m_pool48(131072, 48)
-		, m_pool64(131072, 64)
+		, m_pool32(262144, 32)
+		, m_pool48(262144, 48)
+		, m_pool64(262144, 64)
 		, m_pool80(1024, 80)
 		, m_pool96(2048, 96)
 	{

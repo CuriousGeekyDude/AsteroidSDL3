@@ -14,6 +14,8 @@ namespace Asteroid
 	struct Rectangle;
 	class Entity;
 	class CallbacksTimer;
+	class EventManager;
+	class MemoryAlloc;
 
 	class Grid final
 	{
@@ -26,7 +28,7 @@ namespace Asteroid
 
 		void Update(const glm::ivec2& l_currentWindowSize, const std::vector<Circle>& l_circleBounds, const std::vector<Entity>& l_entities);
 
-		void DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities, CallbacksTimer& l_timer);
+		void DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities, CallbacksTimer& l_timer, EventManager& l_eventManager, MemoryAlloc& l_memAlloc);
 
 
 		uint32_t GetTotalNumNonEmptyCells() const;

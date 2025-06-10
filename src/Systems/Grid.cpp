@@ -13,9 +13,10 @@
 #include <glm.hpp>
 #include "Components/CollisionComponent.hpp"
 #include "Components/StateComponents/ActiveBasedStateComponent.hpp"
-
+#include "Systems/EventSystem/EventManager.hpp"
 #include "Systems/LogSystem.hpp"
-
+#include "Systems/MemoryAlloc.hpp"
+#include "Systems/EventSystem/EventCollision.hpp"
 
 namespace Asteroid
 {
@@ -98,7 +99,7 @@ namespace Asteroid
 
 
 
-	void Grid::DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities, CallbacksTimer& l_timer)
+	void Grid::DoCollisionDetection(const std::vector<Circle>& l_circleBounds, std::vector<Entity>& l_entities, CallbacksTimer& l_timer, EventManager& l_eventManager, MemoryAlloc& l_memAlloc)
 	{
 
 		using namespace LogSystem;
@@ -134,9 +135,22 @@ namespace Asteroid
 							
 							CollisionComponent* lv_collisionComponentEntityD = (CollisionComponent*)l_entities[m_allIndicesInOneCell[d]].GetComponent(ComponentTypes::COLLISION);
 
-							lv_collisionComponentEntityK->CollisionReaction(l_entities[m_allIndicesInOneCell[d]], l_entities[m_allIndicesInOneCell[k]], l_timer);
-							lv_collisionComponentEntityD->CollisionReaction(l_entities[m_allIndicesInOneCell[k]], l_entities[m_allIndicesInOneCell[d]], l_timer);
 
+							EventCollision* lv_collisionEvent = static_cast<EventCollision*>(l_memAlloc.Allocate(sizeof(EventCollision)));
+							lv_collisionEvent = new(lv_collisionEvent) EventCollision(&l_entities[m_allIndicesInOneCell[d]], &l_entities[m_allIndicesInOneCell[k]], &l_timer);
+
+							std::function<void()> lv_collisionDelegate{
+								[lv_collisionComponentEntityK, lv_collisionComponentEntityD, lv_collisionEvent, &l_memAlloc]() -> void
+								{
+									lv_collisionComponentEntityD->CollisionReaction(lv_collisionEvent);
+									lv_collisionComponentEntityK->CollisionReaction(lv_collisionEvent);
+
+									l_memAlloc.Destruct<EventCollision>(lv_collisionEvent, sizeof(EventCollision));
+								}
+							};
+
+							l_eventManager.AssociateNewDelegateToEventType(lv_collisionEvent->GetType(), std::move(lv_collisionDelegate));
+							l_eventManager.AddNewEventToEventQueue(lv_collisionEvent);
 						}
 					}
 				}
